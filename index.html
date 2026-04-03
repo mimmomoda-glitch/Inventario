@@ -361,8 +361,8 @@ function confirmNumpad() { db.history[selectedDay] = parseFloat(numValue) || 0; 
 
 function showConfirm(type) {
     const btn = document.getElementById('confirm-yes');
-    document.getElementById('confirm-title').innerText = type === 'fine' ? "CHIUDI GIORNATA" : "AZZERA";
-    document.getElementById('confirm-msg').innerText = type === 'fine' ? "Scarico le vendite e aggiorno la busta?" : "Resetto le quantità per la nuova quindicina?";
+    document.getElementById('confirm-title').innerText = type === 'fine' ? "CHIUDI GIORNATA" : "AZZERA QUINDICINA";
+    document.getElementById('confirm-msg').innerText = type === 'fine' ? "Scarico le vendite di oggi e aggiorno la busta?" : "Attenzione: questo azzererà tutti i carichi, le vendite e gli scarichi nelle schede. Continuare?";
     btn.onclick = () => {
         if(type === 'fine') {
             let d = new Date().getDate();
@@ -370,7 +370,17 @@ function showConfirm(type) {
             db.history[d] = (db.history[d] || 0) + inc;
             db.prodotti.forEach(p => { p.q = calcGiacenza(p); p.c=p.vePas=p.vePen=p.omaggio=0; });
         } else {
-            db.prodotti.forEach(p => { p.q = p.reale !== null ? p.reale : calcGiacenza(p); p.c=p.vePas=p.vePen=p.omaggio=0; p.reale=null; });
+            // AZZERA QUINDICINA: 
+            // 1. La nuova quantità iniziale (q) diventa la giacenza attuale (o il reale se inserito)
+            // 2. Tutti i contatori di movimento (carico, vendite pas, vendite pen, omaggi) vengono azzerati
+            db.prodotti.forEach(p => { 
+                p.q = p.reale !== null ? p.reale : calcGiacenza(p); 
+                p.c = 0; 
+                p.vePas = 0; 
+                p.vePen = 0; 
+                p.omaggio = 0; 
+                p.reale = null; 
+            });
         }
         closeModal('mod-confirm'); render();
     };
