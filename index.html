@@ -3,234 +3,428 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NAV-PRO V128: FULL FEATURE</title>
+    <title>NAV-PRO V160 FINAL</title>
     <style>
         :root { --bg: #000; --card: #1c1c1e; --txt: #fff; --cyan: #5ac8fa; --apple-blue: #007aff; --lime: #4cd964; --red: #ff3b30; --gold: #ffcc00; --orange: #ff9500; --purple: #af52de; }
-        * { box-sizing: border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: var(--bg); color: var(--txt); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        .header { background: #000; padding: 10px 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        .header b { font-size: 18px; color: var(--lime); }
-        .header small { color: #888; text-transform: uppercase; }
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { margin: 0; background: var(--bg); color: var(--txt); height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: fixed; width: 100%; }
+        
+        /* Header */
+        .header { background: #000; padding: 10px 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; height: 65px; flex-shrink: 0; z-index: 100; }
+        .header b { font-size: 14px; color: var(--lime); }
+        .header small { color: #888; text-transform: uppercase; font-size: 8px; }
 
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; overflow-y: auto; flex-grow: 1; padding-bottom: 100px; }
-        .product-btn { background: var(--card); height: 85px; border-radius: 12px; display: flex; align-items: center; padding: 10px; border: 1px solid #333; }
-        .product-btn i { font-size: 24px; margin-right: 10px; width: 30px; text-align: center; }
-        .product-btn b { font-size: 10px; text-transform: uppercase; }
-        .product-btn .stock { font-size: 13px; font-weight: bold; color: var(--cyan); display: block; }
+        .boat-box { background: #1c1c1e; padding: 8px 10px; border-radius: 10px; border: 1px solid #333; color: var(--cyan); font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 5px; max-width: 160px; overflow: hidden; cursor: pointer; z-index: 110; transition: background 0.3s; }
+        .boat-box.changed { background: #3a3a3c; }
 
+        /* Pagine */
+        .page { display: none; overflow-y: auto; flex-grow: 1; padding-bottom: 100px; -webkit-overflow-scrolling: touch; width: 100%; }
+        .active-page { display: block; }
+
+        /* Grid Cassa */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; }
+        .product-btn { background: var(--card); height: 100px; border-radius: 14px; display: flex; align-items: center; padding: 12px; border: 1px solid #333; color: white; text-align: left; width: 100%; position: relative; cursor: pointer; }
+        .product-btn:active { background: #3a3a3c; transform: scale(0.96); }
+        .product-btn i { font-size: 24px; margin-right: 12px; font-style: normal; pointer-events: none; }
+        .product-btn div { pointer-events: none; flex-grow: 1; }
+        .product-btn b { font-size: 10px; text-transform: uppercase; display: block; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-btn .price-info { font-size: 9px; color: #888; display: block; margin-bottom: 4px; }
+        .product-btn .stock { font-size: 16px; font-weight: bold; color: var(--cyan); }
+
+        /* Report Accordion */
         .accordion { background: var(--card); border-radius: 12px; margin: 10px; border: 1px solid #333; overflow: hidden; }
-        .acc-header { padding: 15px; background: #2c2c2e; display: flex; justify-content: space-between; align-items: center; }
-        .acc-body { display: none; padding: 10px 15px; background: #1c1c1e; }
-        .edit-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #333; }
-        .edit-row input { background: #333; border: none; color: var(--cyan); text-align: right; font-size: 16px; font-weight: bold; width: 75px; border-radius: 4px; padding: 5px; }
-        
-        .footer { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; height: 70px; border-top: 1px solid #333; padding-bottom: env(safe-area-inset-bottom); }
-        .footer button { flex: 1; background: none; border: none; color: #888; font-weight: bold; font-size: 10px; }
+        .acc-header { padding: 15px; background: #2c2c2e; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .acc-body { display: none; padding: 10px; background: #1c1c1e; }
+        .edit-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #2c2c2e; }
+        .edit-row span { font-size: 12px; color: #ccc; }
+        .edit-row input { background: #000; border: 1px solid #444; color: var(--cyan); text-align: right; width: 90px; border-radius: 8px; padding: 8px; font-size: 16px; font-weight: bold; }
+        .price-row { background: #252525; border-radius: 8px; margin-top: 5px; padding: 5px 10px !important; }
+
+        /* Inventario */
+        .inv-row { border-bottom: 1px solid #333; display: flex; align-items: center; padding: 15px; background: var(--card); justify-content: space-between; }
+        .inv-row b { font-size: 14px; }
+        .inv-row input { width: 90px; background: #000; border: 1px solid var(--apple-blue); color: var(--txt); text-align: center; border-radius: 8px; padding: 10px; font-size: 18px; font-weight: bold; }
+        .summary-card { background: #1c1c1e; border: 2px solid #333; border-radius: 15px; margin: 15px; padding: 15px; text-align: center; }
+
+        /* Footer */
+        .footer { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; height: 75px; border-top: 1px solid #333; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
+        .footer button { flex: 1; background: none; border: none; color: #888; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }
         .footer button.active { color: var(--cyan); }
 
-        .gestionale { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; padding: 20px; flex-direction: column; }
+        /* Modali */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; flex-direction: column; justify-content: center; padding: 20px; }
+        .modal-card { background: #1c1c1e; padding: 25px; border-radius: 25px; border: 1px solid #444; text-align: center; max-height: 90vh; overflow-y: auto; width: 100%; max-width: 400px; margin: auto; }
+        .btn-big { width: 100%; padding: 18px; border-radius: 15px; font-weight: bold; font-size: 16px; margin-top: 12px; border: none; cursor: pointer; }
+        .btn-big:active { opacity: 0.7; transform: scale(0.98); }
+
+        /* Buste */
+        .quin-box { background: #1c1c1e; margin: 10px; border-radius: 15px; border: 1px solid #333; overflow: hidden; }
+        .quin-header { background: #2c2c2e; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        .quin-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 12px; }
+        .day-cell { aspect-ratio: 1; background: #111; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 14px; border: 1px solid #333; color: #777; transition: all 0.2s; cursor: pointer; }
+        .day-active { border-color: var(--lime); background: #1a2e1a; color: #fff; border-width: 2px; }
+        .day-active .day-val { font-size: 9px; color: var(--lime); font-weight: bold; margin-top: 1px; }
+        .day-active .day-paga { font-size: 8px; color: var(--gold); font-weight: normal; }
+
+        /* Tastierino e Input */
+        .numpad-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+        .num-btn { background: #333; color: white; border: none; padding: 20px; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; }
+        .num-btn:active { background: #555; }
+        .num-display { background: #000; border: 1px solid #444; padding: 15px; font-size: 32px; font-weight: bold; color: var(--lime); border-radius: 10px; margin-bottom: 10px; text-align: right; }
+        
+        .input-text-custom { width: 100%; background: #000; border: 1px solid #444; color: var(--txt); padding: 15px; border-radius: 12px; font-size: 18px; margin-bottom: 15px; text-align: center; }
+
+        /* Boat list specific */
+        .boat-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 15px; border-bottom: 1px solid #333; color: white; font-size: 16px; font-weight: bold; }
+        .boat-item:active { background: #2c2c2e; }
+        .boat-name-part { flex-grow: 1; text-align: left; }
+        .edit-icon { padding: 5px 10px; color: var(--cyan); font-size: 18px; border-left: 1px solid #444; margin-left: 10px; }
     </style>
 </head>
 <body onload="init()">
 
 <div class="header">
-    <div><small>Incasso App</small><br><b id="tot-incasso">0.00€</b></div>
-    <div style="text-align:right"><small>Valore Bordo</small><br><b id="header-val-carico" style="color:var(--gold)">0.00€</b></div>
+    <div class="boat-box" onclick="openBoatMenu()" id="boat-display">
+        <span id="current-boat-name">...</span>
+    </div>
+    <div style="text-align:center"><small>Incasso Oggi</small><br><b id="tot-incasso">0.00€</b></div>
+    <div style="text-align:right"><small>Val. Magazzino</small><br><b id="header-val-carico" style="color:var(--gold)">0.00€</b></div>
 </div>
 
-<div id="page-cassa" class="grid"></div>
+<!-- PAGINA CASSA -->
+<div id="page-c" class="page active-page">
+    <div class="grid" id="grid-cassa"></div>
+</div>
 
-<div id="page-menu" style="display:none; overflow-y:auto; flex-grow:1; padding-bottom:150px;">
-    <h3 style="color:var(--cyan); margin: 15px;">📊 Report & Opzioni</h3>
-    
-    <div style="padding:0 10px 15px 10px;">
-        <button onclick="chiudiGiornata()" style="width:100%; padding:20px; background:var(--lime); color:#000; border:none; border-radius:12px; font-weight:bold; font-size:16px;">☀️ INIZIO NUOVA GIORNATA</button>
-    </div>
-
-    <div id="accordion-list"></div>
-    
+<!-- PAGINA REPORT -->
+<div id="page-m" class="page">
     <div style="padding:15px; display: flex; flex-direction: column; gap: 10px;">
-        <button onclick="document.getElementById('fileInput').click()" style="padding:15px; background:var(--orange); border:none; border-radius:10px; color:#000; font-weight:bold;">📤 CARICA BACKUP</button>
-        <button onclick="exportJSON()" style="padding:15px; background:var(--apple-blue); border:none; border-radius:10px; color:#fff; font-weight:bold;">📥 SALVA BACKUP</button>
-        <input type="file" id="fileInput" style="display:none" onchange="importAndRepair(event)">
+        <button onclick="showConfirm('fine')" class="btn-big" style="background:var(--apple-blue); color:white;">☀️ CHIUDI GIORNATA</button>
+        <button onclick="showConfirm('quindicina')" class="btn-big" style="background:var(--lime); color:black;">🏁 AZZERA QUINDICINA</button>
+    </div>
+    <div id="accordion-list"></div>
+    <div style="padding:15px; display: flex; gap: 10px;">
+        <button onclick="exportJSON()" style="flex:1; padding:12px; background:var(--orange); border-radius:10px; border:none; font-weight:bold; color:black;">📥 BACKUP</button>
+        <button onclick="document.getElementById('fileInput').click()" style="flex:1; padding:12px; background:#444; border-radius:10px; border:none; color:#fff; font-weight:bold;">📤 CARICA</button>
+        <input type="file" id="fileInput" style="display:none" onchange="importData(event)">
     </div>
 </div>
 
-<div id="page-history" style="display:none; overflow-y:auto; flex-grow:1; padding-bottom:120px;">
-    <h3 style="color:var(--apple-blue); margin: 15px;">📅 Storico Buste</h3>
-    <div id="calendar-body" style="display:grid; grid-template-columns: repeat(7, 1fr); gap:5px; padding:10px;"></div>
-    <div style="margin:15px; padding:20px; background:var(--card); border-radius:15px; border:2px solid var(--lime); text-align:center;">
-        <small style="color:#888;">TOTALE REALE (CALENDARIO)</small>
-        <div id="tot-reale-somma" style="font-size:32px; font-weight:bold; color:var(--txt);">0.00€</div>
+<!-- PAGINA INVENTARIO -->
+<div id="page-i" class="page">
+    <div class="summary-card">
+        <small style="color:#888">DIFFERENZA REALE vs APP</small>
+        <div id="inv-diff" style="font-size:32px; font-weight:bold;">0.00€</div>
+        <button onclick="clearReali()" style="background:none; border:1px solid var(--red); color:var(--red); padding:8px 15px; border-radius:8px; margin-top:10px; font-size:12px; font-weight:bold;">AZZERA CONTEGGI FISICI</button>
     </div>
+    <div id="inventory-list"></div>
 </div>
 
-<div id="gestionale" class="gestionale">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h2 id="g-nome" style="color:var(--cyan); margin:0;">NOME</h2>
-        <button onclick="closeGest()" style="background:none; border:none; color:var(--red); font-size:40px">&times;</button>
-    </div>
-    <div style="text-align:center; margin-bottom:20px;">
-        <div style="display:flex; justify-content:center; align-items:center; gap:30px;">
-            <button onclick="changeQty(-1)" style="width:60px; height:60px; border-radius:30px; background:#333; color:white; font-size:25px; border:none;">-</button>
-            <b id="g-qty" style="font-size:50px">1</b>
-            <button onclick="changeQty(1)" style="width:60px; height:60px; border-radius:30px; background:#333; color:white; font-size:25px; border:none;">+</button>
+<!-- PAGINA BUSTE -->
+<div id="page-h" class="page">
+    <div style="padding:15px 15px 5px 15px; font-weight:bold; color:var(--cyan); font-size: 18px;">BUSTE & PAGA</div>
+    <div id="quindicine-container"></div>
+</div>
+
+<!-- MODALE VENDITA -->
+<div id="mod-gest" class="modal-overlay">
+    <div class="modal-card">
+        <h2 id="g-nome" style="color:var(--cyan); margin:0 0 20px 0;"></h2>
+        <div style="display:flex; justify-content:center; align-items:center; gap:30px; margin-bottom:30px;">
+            <button onclick="changeQty(-1)" style="width:70px; height:70px; border-radius:50%; background:#333; color:white; font-size:35px; border:none;">-</button>
+            <b id="g-qty" style="font-size:55px; min-width:60px;">1</b>
+            <button onclick="changeQty(1)" style="width:70px; height:70px; border-radius:50%; background:#333; color:white; font-size:35px; border:none;">+</button>
         </div>
+        <button onclick="conferma('vePas')" class="btn-big" style="background:none; border:2px solid var(--gold); color:var(--gold);">VENDITA PASSEGGERO</button>
+        <button onclick="conferma('vePen')" class="btn-big" style="background:none; border:2px solid var(--apple-blue); color:var(--apple-blue);">VENDITA PENDOLARE</button>
+        <button onclick="conferma('omaggio')" class="btn-big" style="background:none; border:1px solid var(--purple); color:var(--purple);">🎁 OMAGGIO / SCARICO</button>
+        <button onclick="closeModal('mod-gest')" class="btn-big" style="background:#444; color:white;">ANNULLA</button>
     </div>
-    <button onclick="conferma('pas')" style="width:100%; padding:20px; border-radius:12px; border:2px solid var(--gold); background:none; color:var(--gold); font-weight:bold; margin-bottom:10px; font-size:16px;">VENDITA PASSEGGERO</button>
-    <button onclick="conferma('pen')" style="width:100%; padding:20px; border-radius:12px; border:2px solid var(--apple-blue); background:none; color:var(--apple-blue); font-weight:bold; margin-bottom:10px; font-size:16px;">VENDITA PENDOLARE</button>
-    <button onclick="conferma('omaggio')" style="width:100%; padding:20px; border-radius:12px; border:2px solid var(--purple); background:none; color:var(--purple); font-weight:bold; font-size:16px;">🎁 REGALA (OMAGGIO)</button>
 </div>
+
+<!-- MODALE MODIFICA NOME BARCA -->
+<div id="mod-edit-boat" class="modal-overlay">
+    <div class="modal-card">
+        <h3 style="color:var(--cyan)">MODIFICA NOME</h3>
+        <p id="edit-boat-info" style="font-size:12px; color:#888"></p>
+        <input type="text" id="input-boat-name" class="input-text-custom" placeholder="Nuovo nome...">
+        <button onclick="saveCustomBoatName()" class="btn-big" style="background:var(--lime); color:black;">SALVA NOME</button>
+        <button onclick="closeModal('mod-edit-boat')" class="btn-big" style="background:#444; color:white;">ANNULLA</button>
+    </div>
+</div>
+
+<!-- MODALI EXTRA -->
+<div id="mod-numpad" class="modal-overlay"><div class="modal-card"><h3 id="numpad-title"></h3><div id="numpad-display" class="num-display">0</div><div class="numpad-container"><button class="num-btn" onclick="numIn('1')">1</button><button class="num-btn" onclick="numIn('2')">2</button><button class="num-btn" onclick="numIn('3')">3</button><button class="num-btn" onclick="numIn('4')">4</button><button class="num-btn" onclick="numIn('5')">5</button><button class="num-btn" onclick="numIn('6')">6</button><button class="num-btn" onclick="numIn('7')">7</button><button class="num-btn" onclick="numIn('8')">8</button><button class="num-btn" onclick="numIn('9')">9</button><button class="num-btn" onclick="numIn('.')">.</button><button class="num-btn" onclick="numIn('0')">0</button><button class="num-btn" style="background:var(--red)" onclick="numDel()">⌫</button></div><button onclick="confirmNumpad()" class="btn-big" style="background:var(--lime); color:black;">CONFERMA</button><button onclick="closeModal('mod-numpad')" class="btn-big" style="background:#444; color:white;">CHIUDI</button></div></div>
+<div id="mod-confirm" class="modal-overlay"><div class="modal-card"><h3 id="confirm-title">CONFERMA</h3><p id="confirm-msg"></p><button id="confirm-yes" class="btn-big" style="background:var(--lime); color:black;">CONFERMA</button><button onclick="closeModal('mod-confirm')" class="btn-big" style="background:#444; color:white;">ANNULLA</button></div></div>
+<div id="mod-boat" class="modal-overlay"><div class="modal-card" style="padding:0;"><div style="padding:15px; border-bottom:1px solid #333; background:#2c2c2e; border-radius:25px 25px 0 0;"><b>FLOTTA NAV-PRO</b></div><div id="boat-list-container" style="max-height:60vh; overflow-y:auto; padding:10px 0;"></div><button onclick="closeModal('mod-boat')" class="btn-big" style="width:90%; margin:15px; background:#333; color:white;">CHIUDI</button></div></div>
 
 <div class="footer">
-    <button id="btn-c" class="active" onclick="switchTab('c')">🛒 CASSA</button>
-    <button id="btn-m" onclick="switchTab('m')">📊 REPORT</button>
-    <button id="btn-h" onclick="switchTab('h')">📅 STORICO</button>
+    <button id="t-c" class="active" onclick="switchTab('c')">🛒 CASSA</button>
+    <button id="t-m" onclick="switchTab('m')">📊 REPORT</button>
+    <button id="t-i" onclick="switchTab('i')">📦 INV</button>
+    <button id="t-h" onclick="switchTab('h')">📅 BUSTE</button>
 </div>
 
 <script>
-const masterList = [
-    {n:"ACQUA", i:"💧", q:112, c:0, pas:2.0, pen:1.0}, {n:"ARACHIDI+", i:"🥜", q:11, c:0, pas:2.5, pen:1.0},
-    {n:"BORSE G", i:"👜", q:17, c:0, pas:10.0, pen:10.0}, {n:"BORSE M", i:"🛍️", q:3, c:0, pas:7.0, pen:7.0},
-    {n:"BUENO/BISC", i:"🍫", q:36, c:0, pas:3.0, pen:1.0}, {n:"CAPPELLI", i:"🧢", q:175, c:0, pas:5.0, pen:5.0},
-    {n:"CARAMELLE", i:"🍬", q:119, c:0, pas:2.5, pen:1.0}, {n:"CHOCO CHIPS", i:"🍪", q:10, c:0, pas:3.5, pen:2.0},
-    {n:"CIALDE", i:"☕", q:160, c:0, pas:2.0, pen:1.0}, {n:"DECA", i:"☕", q:5, c:0, pas:2.0, pen:1.0},
-    {n:"FITNESS", i:"🌾", q:3, c:0, pas:2.5, pen:1.5}, {n:"FONZIES", i:"🍟", q:66, c:0, pas:2.5, pen:1.0},
-    {n:"GINSENG", i:"☕", q:10, c:0, pas:2.0, pen:1.0}, {n:"IMPERMEAB", i:"🧥", q:57, c:0, pas:5.0, pen:5.0},
-    {n:"KINDER CARDS", i:"🃏", q:12, c:0, pas:3.0, pen:1.5}, {n:"LATTINE", i:"🥤", q:245, c:0, pas:2.5, pen:1.5},
-    {n:"M&M", i:"🍫", q:24, c:0, pas:2.5, pen:1.5}, {n:"MAGLIE", i:"👕", q:99, c:0, pas:5.0, pen:5.0},
-    {n:"NIK NOK", i:"🥜", q:8, c:0, pas:2.5, pen:1.5}, {n:"PAVESINI", i:"🍪", q:15, c:0, pas:2.5, pen:1.0},
-    {n:"PERONI", i:"🍺", q:35, c:0, pas:4.5, pen:1.5}, {n:"PERONI C.", i:"🍋", q:15, c:0, pas:7.5, pen:5.5},
-    {n:"PRINGLES", i:"🥔", q:17, c:0, pas:3.5, pen:2.0}, {n:"PROSECCO", i:"🍷", q:30, c:0, pas:6.0, pen:3.0},
-    {n:"RED BULL", i:"⚡", q:64, c:0, pas:4.5, pen:2.5}, {n:"RINGO/OREO", i:"🍪", q:64, c:0, pas:2.5, pen:1.0},
-    {n:"RITZ", i:"🥨", q:9, c:0, pas:4.5, pen:3.0}, {n:"SPRITZ", i:"🍹", q:10, c:0, pas:8.0, pen:5.0},
-    {n:"SUCCO", i:"🧃", q:59, c:0, pas:3.5, pen:2.0}, {n:"THE/CAMOM", i:"🍵", q:125, c:0, pas:2.5, pen:1.5},
-    {n:"TUC", i:"🍪", q:7, c:0, pas:3.5, pen:2.5}, {n:"TWIX/KIT KAT", i:"🍫", q:81, c:0, pas:2.5, pen:1.5}
-];
-
+let currentBoatID = "1";
 let db = { prodotti: [], history: {} };
-let cur = -1, qty = 1;
+let curIdx = -1, qty = 1, selectedDay = null, numValue = "0";
+let editingBoatID = null;
+const FISSO = 26, PERC = 0.05;
+
+let customNames = JSON.parse(localStorage.getItem('NAV_FLEET_NAMES')) || {};
+const DEFAULT_FLEET = ["NAPOLI JET", "SALERNO JET", "AMALFI JET", "SUPER JET", "CAPRI JET", "ISCHIA JET", "TREMITI JET", "VESUVIO JET", "JUMBO JET", "SORRENTO JET", "GIUNONE JET", "EUROPA JET", "CITTÀ DI SORRENTO", "APOLLO", "FRECCIA D ARGENTO", "BLIZ", "ISCHIA MAR 3", "URAGANO", "ACQUARIUS", "RAID"];
 
 function init() {
-    const saved = localStorage.getItem('NAV_V128');
-    if(saved) { db = JSON.parse(saved); repairData(); } 
-    else { hardReset(); }
+    currentBoatID = localStorage.getItem('NAV_LAST_ID');
+    if (!currentBoatID || currentBoatID === "null") currentBoatID = "1";
+    loadData();
+}
+
+function loadData() {
+    const storageKey = 'NAV_DATA_B' + currentBoatID;
+    const saved = localStorage.getItem(storageKey);
+    
+    if(saved && saved !== "undefined") {
+        try {
+            db = JSON.parse(saved);
+            repairData();
+        } catch(e) {
+            console.error("Errore parse JSON", e);
+            hardReset();
+        }
+    } else {
+        hardReset();
+    }
     render();
 }
 
 function repairData() {
-    if(!db.history || Array.isArray(db.history)) db.history = {};
+    if (!db.prodotti) db.prodotti = [];
     db.prodotti.forEach(p => {
-        p.q = Number(p.q)||0; p.c = Number(p.c)||0;
-        p.vePas = Number(p.vePas)||0; p.vePen = Number(p.vePen)||0;
-        p.omaggio = Number(p.omaggio)||0; // Fix per vecchi dati senza omaggio
+        p.q=Number(p.q)||0; p.c=Number(p.c)||0; p.vePas=Number(p.vePas)||0;
+        p.vePen=Number(p.vePen)||0; p.omaggio=Number(p.omaggio)||0;
+        p.pas=Number(p.pas)||0; p.pen=Number(p.pen)||0;
+        if(p.reale === undefined) p.reale = null;
     });
-}
-
-function chiudiGiornata() {
-    if(!confirm("Azzero l'incasso odierno? Le rimanenze restano aggiornate.")) return;
-    db.prodotti.forEach(p => {
-        p.q = calcF(p);
-        p.c = 0; p.vePas = 0; p.vePen = 0; p.omaggio = 0;
-    });
-    save(); render();
+    if(!db.history) db.history = {};
 }
 
 function hardReset() {
-    db.prodotti = masterList.map(p => ({...p, vePas:0, vePen:0, c:0, omaggio:0}));
+    const master = [
+        {n:"ACQUA", i:"💧", pas:2.0, pen:1.0}, {n:"ARACHIDI+", i:"🥜", pas:2.5, pen:1.0}, {n:"BORSE G", i:"👜", pas:10.0, pen:10.0}, {n:"BORSE M", i:"🛍️", pas:7.0, pen:7.0},
+        {n:"BUENO/BISC", i:"🍫", pas:3.0, pen:1.0}, {n:"CAPPELLI", i:"🧢", pas:5.0, pen:5.0}, {n:"CARAMELLE", i:"🍬", pas:2.5, pen:1.0}, {n:"CHOCO CHIPS", i:"🍪", pas:3.5, pen:2.0},
+        {n:"CIALDE", i:"☕", pas:2.0, pen:1.0}, {n:"DECA", i:"☕", pas:2.0, pen:1.0}, {n:"FITNESS", i:"🌾", pas:2.5, pen:1.5}, {n:"FONZIES", i:"🍟", pas:2.5, pen:1.0},
+        {n:"GINSENG", i:"☕", pas:2.0, pen:1.0}, {n:"IMPERMEAB", i:"🧥", pas:5.0, pen:5.0}, {n:"KINDER CARDS", i:"🃏", pas:3.0, pen:1.5}, {n:"LATTINE", i:"🥤", pas:2.5, pen:1.5},
+        {n:"M&M", i:"🍫", pas:2.5, pen:1.5}, {n:"MAGLIE", i:"👕", pas:5.0, pen:5.0}, {n:"NIK NOK", i:"🥜", pas:2.5, pen:1.5}, {n:"PAVESINI", i:"🍪", pas:2.5, pen:1.0},
+        {n:"PERONI", i:"🍺", pas:4.5, pen:1.5}, {n:"PERONI C.", i:"🍋", pas:7.5, pen:5.5}, {n:"PRINGLES", i:"🥔", pas:3.5, pen:2.0}, {n:"PROSECCO", i:"🍷", pas:6.0, pen:3.0},
+        {n:"RED BULL", i:"⚡", pas:4.5, pen:2.5}, {n:"RINGO/OREO", i:"🍪", pas:2.5, pen:1.0}, {n:"RITZ", i:"🥨", pas:4.5, pen:3.0}, {n:"SPRITZ", i:"🍹", pas:8.0, pen:5.0},
+        {n:"SUCCO", i:"🧃", pas:3.5, pen:2.0}, {n:"THE/CAMOM", i:"🍵", pas:2.5, pen:1.5}, {n:"TUC", i:"🍪", pas:3.5, pen:2.5}, {n:"TWIX/KIT KAT", i:"🍫", pas:2.5, pen:1.5}
+    ];
+    db.prodotti = master.map(p => ({...p, q:0, c:0, vePas:0, vePen:0, omaggio:0, reale:null}));
     db.history = {};
-    save(); render();
+    save();
 }
 
-function save() { localStorage.setItem('NAV_V128', JSON.stringify(db)); }
-function calcF(p) { return p.q + p.c - p.vePas - p.vePen - (p.omaggio||0); }
+function save() { 
+    localStorage.setItem('NAV_DATA_B' + currentBoatID, JSON.stringify(db)); 
+    localStorage.setItem('NAV_LAST_ID', currentBoatID); 
+}
+
+function calcGiacenza(p) { return (p.q || 0) + (p.c || 0) - (p.vePas || 0) - (p.vePen || 0) - (p.omaggio || 0); }
 
 function render() {
-    document.getElementById('page-cassa').innerHTML = db.prodotti.map((p,i) => `
+    let name = customNames[currentBoatID] || DEFAULT_FLEET[parseInt(currentBoatID)-1];
+    document.getElementById('current-boat-name').innerText = name;
+
+    // CASSA
+    document.getElementById('grid-cassa').innerHTML = db.prodotti.map((p, i) => `
         <div class="product-btn" onclick="openGest(${i})">
             <i>${p.i}</i>
-            <div><b>${p.n}</b><span class="stock">Disp: ${calcF(p)}</span></div>
-        </div>
-    `).join('');
+            <div>
+                <b>${p.n}</b>
+                <span class="price-info">${p.pas.toFixed(1)}€ / ${p.pen.toFixed(1)}€</span>
+                <span class="stock">${calcGiacenza(p)}</span>
+            </div>
+        </div>`).join('');
 
-    let tInc = 0, tVal = 0;
-    document.getElementById('accordion-list').innerHTML = db.prodotti.map((p,i) => {
-        let fine = calcF(p);
-        tInc += (p.vePas * p.pas) + (p.vePen * p.pen);
-        tVal += fine * p.pas;
-        return `
-        <div class="accordion">
+    // REPORT
+    let tInc = db.prodotti.reduce((acc, p) => acc + (p.vePas * p.pas) + (p.vePen * p.pen), 0);
+    let tValApp = 0;
+    
+    document.getElementById('accordion-list').innerHTML = db.prodotti.map((p, i) => {
+        let fine = calcGiacenza(p);
+        tValApp += fine * p.pas;
+        return `<div class="accordion">
             <div class="acc-header" onclick="toggleAcc(${i})"><b>${p.n}</b> <b style="color:var(--gold)">${(fine*p.pas).toFixed(2)}€</b></div>
             <div id="acc-${i}" class="acc-body">
-                <div class="edit-row"><span>Giacenza Inizio:</span> <input type="number" value="${p.q}" onchange="up(${i},'q',this.value)"></div>
-                <div class="edit-row"><span>Carico (+):</span> <input type="number" value="${p.c||0}" onchange="up(${i},'c',this.value)"></div>
-                <div class="edit-row"><span>Venduto Pas:</span> <input type="number" value="${p.vePas}" onchange="up(${i},'vePas',this.value)"></div>
-                <div class="edit-row"><span>Venduto Pen:</span> <input type="number" value="${p.vePen}" onchange="up(${i},'vePen',this.value)"></div>
-                <div class="edit-row"><span>Omaggi (-):</span> <input type="number" value="${p.omaggio||0}" onchange="up(${i},'omaggio',this.value)"></div>
-                <div style="padding-top:10px; color:var(--purple); font-size:12px; font-weight:bold;">RIMANENZA: ${fine} pz</div>
+                <div class="edit-row price-row" style="margin-bottom:10px; border-bottom:1px solid #444">
+                    <span>Prezzo Pas:</span>
+                    <input type="number" step="0.5" value="${p.pas}" onchange="up(${i},'pas',this.value)" style="color:var(--gold); border-color:var(--gold)">
+                </div>
+                <div class="edit-row price-row" style="margin-bottom:15px">
+                    <span>Prezzo Pen:</span>
+                    <input type="number" step="0.5" value="${p.pen}" onchange="up(${i},'pen',this.value)" style="color:var(--apple-blue); border-color:var(--apple-blue)">
+                </div>
+                <div class="edit-row"><span>Inizio Q:</span> <input type="number" value="${p.q}" onchange="up(${i},'q',this.value)"></div>
+                <div class="edit-row"><span>Carico:</span> <input type="number" value="${p.c}" onchange="up(${i},'c',this.value)"></div>
+                <div class="edit-row"><span>Vend. Pas:</span> <input type="number" value="${p.vePas}" onchange="up(${i},'vePas',this.value)"></div>
+                <div class="edit-row"><span>Vend. Pen:</span> <input type="number" value="${p.vePen}" onchange="up(${i},'vePen',this.value)"></div>
+                <div class="edit-row"><span>Scarichi:</span> <input type="number" value="${p.omaggio}" onchange="up(${i},'omaggio',this.value)"></div>
             </div>
         </div>`;
     }).join('');
 
-    let totR = 0;
-    const grid = document.getElementById('calendar-body');
-    grid.innerHTML = "";
-    for(let d=1; d<=31; d++) {
-        let v = Number(db.history[d]) || 0;
-        totR += v;
-        grid.innerHTML += `<div onclick="setDay(${d})" style="aspect-ratio:1; background:#2c2c2e; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:10px; border:1px solid ${v>0?'var(--lime)':'#444'}"><b>${d}</b><span>${v>0?v+'€':''}</span></div>`;
-    }
+    // INV
+    let tValReale = 0;
+    document.getElementById('inventory-list').innerHTML = db.prodotti.map((p, i) => {
+        let app = calcGiacenza(p);
+        let r = p.reale !== null ? p.reale : app;
+        tValReale += r * p.pas;
+        return `<div class="inv-row">
+            <div><b>${p.n}</b><br><small style="color:#888">App: ${app}</small></div>
+            <input type="number" value="${p.reale !== null ? p.reale : ''}" placeholder="${app}" onchange="up(${i},'reale',this.value)">
+        </div>`;
+    }).join('');
 
-    document.getElementById('tot-incasso').textContent = tInc.toFixed(2) + "€";
-    document.getElementById('header-val-carico').textContent = tVal.toFixed(2) + "€";
-    document.getElementById('tot-reale-somma').textContent = totR.toFixed(2) + "€";
+    let diff = tValReale - tValApp;
+    document.getElementById('inv-diff').innerText = (diff > 0 ? "+" : "") + diff.toFixed(2) + "€";
+    document.getElementById('inv-diff').style.color = diff >= 0 ? "var(--lime)" : "var(--red)";
+    
+    renderBuste();
+    document.getElementById('tot-incasso').innerText = tInc.toFixed(2) + "€";
+    document.getElementById('header-val-carico').innerText = tValApp.toFixed(2) + "€";
     save();
 }
 
-function setDay(d) {
-    let r = prompt("Incasso giorno "+d, db.history[d]||"");
-    if(r!==null) { db.history[d] = parseFloat(r.replace(',','.')) || 0; render(); }
+function renderBuste() {
+    let h = "";
+    const calcP = (inc) => inc > 0 ? FISSO + (inc * PERC) : 0;
+    
+    [ {t: "1ª QUINDICINA", r: [1,15]}, {t: "2ª QUINDICINA", r: [16,31]} ].forEach(q => {
+        let totI = 0;
+        for(let d=q.r[0]; d<=q.r[1]; d++) totI += Number(db.history[d]) || 0;
+        h += `<div class="quin-box"><div class="quin-header"><b>${q.t}</b><small>Tot Paga: ${calcP(totI).toFixed(2)}€</small></div><div class="quin-grid">`;
+        for(let d=q.r[0]; d<=q.r[1]; d++) {
+            let v = db.history[d] || 0;
+            let pDay = calcP(v);
+            h += `<div class="day-cell ${v>0?'day-active':''}" onclick="openNumpad(${d})">
+                <b>${d}</b>
+                ${v>0 ? `<span class="day-val">${v}€</span><span class="day-paga">P:${pDay.toFixed(0)}€</span>` : ''}
+            </div>`;
+        }
+        h += `</div></div>`;
+    });
+    document.getElementById('quindicine-container').innerHTML = h;
 }
 
-function up(i,f,v) { db.prodotti[i][f] = Number(v)||0; render(); }
-function toggleAcc(i) { let e=document.getElementById('acc-'+i); e.style.display=e.style.display==='block'?'none':'block'; }
+function openGest(i) {
+    curIdx = i; qty = 1;
+    document.getElementById('g-nome').innerText = db.prodotti[i].n;
+    document.getElementById('g-qty').innerText = qty;
+    document.getElementById('mod-gest').style.display = 'flex';
+}
+
+function changeQty(v) { qty = Math.max(1, qty + v); document.getElementById('g-qty').innerText = qty; }
+
+function conferma(f) { 
+    db.prodotti[curIdx][f] += qty; 
+    closeModal('mod-gest'); 
+    render(); 
+}
+
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 function switchTab(t) {
-    document.getElementById('page-cassa').style.display = t=='c'?'grid':'none';
-    document.getElementById('page-menu').style.display = t=='m'?'block':'none';
-    document.getElementById('page-history').style.display = t=='h'?'block':'none';
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+    document.getElementById('page-'+t).classList.add('active-page');
     document.querySelectorAll('.footer button').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-'+t).classList.add('active');
-}
-function openGest(i) { cur=i; qty=1; document.getElementById('g-nome').textContent=db.prodotti[i].n; document.getElementById('g-qty').textContent=qty; document.getElementById('gestionale').style.display='flex'; }
-function closeGest() { document.getElementById('gestionale').style.display='none'; }
-function changeQty(v) { qty=Math.max(1, qty+v); document.getElementById('g-qty').textContent=qty; }
-
-function conferma(t) { 
-    if(t==='pas') db.prodotti[cur].vePas+=qty; 
-    else if(t==='pen') db.prodotti[cur].vePen+=qty;
-    else if(t==='omaggio') db.prodotti[cur].omaggio = (db.prodotti[cur].omaggio || 0) + qty;
-    closeGest(); render(); 
+    document.getElementById('t-'+t).classList.add('active');
 }
 
-function exportJSON() {
-    const blob = new Blob([JSON.stringify(db)], {type:'application/json'});
-    const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="NAV_V128.json"; a.click();
+function up(i, f, v) { db.prodotti[i][f] = v==='' ? (f==='reale'?null:0) : parseFloat(v); render(); }
+function toggleAcc(i) { let e = document.getElementById('acc-'+i); e.style.display = e.style.display === 'block' ? 'none' : 'block'; }
+function clearReali() { db.prodotti.forEach(p => p.reale = null); render(); }
+
+function openNumpad(d) {
+    selectedDay = d; 
+    numValue = (db.history[d] || 0).toString();
+    if(numValue === "0") numValue = "";
+    document.getElementById('numpad-title').innerText = "GIORNO " + d;
+    document.getElementById('numpad-display').innerText = numValue || "0";
+    document.getElementById('mod-numpad').style.display = 'flex';
 }
-function importAndRepair(e) {
-    const f=e.target.files[0]; if(!f) return;
-    const r=new FileReader();
-    r.onload=(ev)=>{ 
-        try {
-            let content = ev.target.result;
-            content = content.replace(/\[object Object\]/g, "0");
-            db = JSON.parse(content);
-            repairData(); render();
-            alert("Backup Caricato con Omaggi!");
-        } catch(err) { alert("Errore caricamento."); }
+function numIn(c) { numValue += c; document.getElementById('numpad-display').innerText = numValue; }
+function numDel() { numValue = numValue.slice(0,-1); document.getElementById('numpad-display').innerText = numValue || "0"; }
+function confirmNumpad() { db.history[selectedDay] = parseFloat(numValue) || 0; closeModal('mod-numpad'); render(); }
+
+function showConfirm(type) {
+    const btn = document.getElementById('confirm-yes');
+    document.getElementById('confirm-title').innerText = type === 'fine' ? "CHIUDI GIORNATA" : "AZZERA";
+    document.getElementById('confirm-msg').innerText = type === 'fine' ? "Scarico le vendite e aggiorno la busta?" : "Resetto le quantità per la nuova quindicina?";
+    btn.onclick = () => {
+        if(type === 'fine') {
+            let d = new Date().getDate();
+            let inc = db.prodotti.reduce((acc, p) => acc + (p.vePas * p.pas) + (p.vePen * p.pen), 0);
+            db.history[d] = (db.history[d] || 0) + inc;
+            db.prodotti.forEach(p => { p.q = calcGiacenza(p); p.c=p.vePas=p.vePen=p.omaggio=0; });
+        } else {
+            db.prodotti.forEach(p => { p.q = p.reale !== null ? p.reale : calcGiacenza(p); p.c=p.vePas=p.vePen=p.omaggio=0; p.reale=null; });
+        }
+        closeModal('mod-confirm'); render();
     };
-    r.readAsText(f);
+    document.getElementById('mod-confirm').style.display = 'flex';
 }
+
+function openBoatMenu() {
+    let h = "";
+    for(let i=1; i<=20; i++) {
+        let n = customNames[i] || DEFAULT_FLEET[i-1];
+        let activeStyle = (i.toString() === currentBoatID) ? 'border: 2px solid var(--lime); background: #3a3a3c;' : '';
+        h += `<div class="boat-item" style="${activeStyle}">
+                <div class="boat-name-part" onclick="selectBoat('${i}')">
+                    ${n} ${i.toString() === currentBoatID ? '✓' : ''}
+                </div>
+                <div class="edit-icon" onclick="openEditBoatName('${i}')">📝</div>
+              </div>`;
+    }
+    document.getElementById('boat-list-container').innerHTML = h;
+    document.getElementById('mod-boat').style.display = 'flex';
+}
+
+function openEditBoatName(id) {
+    editingBoatID = id;
+    let current = customNames[id] || DEFAULT_FLEET[parseInt(id)-1];
+    document.getElementById('edit-boat-info').innerText = "Stai modificando la barca #" + id;
+    document.getElementById('input-boat-name').value = current;
+    document.getElementById('mod-edit-boat').style.display = 'flex';
+}
+
+function saveCustomBoatName() {
+    let newName = document.getElementById('input-boat-name').value.trim().toUpperCase();
+    if (newName && editingBoatID) {
+        customNames[editingBoatID] = newName;
+        localStorage.setItem('NAV_FLEET_NAMES', JSON.stringify(customNames));
+        closeModal('mod-edit-boat');
+        openBoatMenu();
+        render();
+    }
+}
+
+function selectBoat(id) { 
+    currentBoatID = id.toString(); 
+    localStorage.setItem('NAV_LAST_ID', currentBoatID);
+    const display = document.getElementById('boat-display');
+    display.classList.add('changed');
+    setTimeout(() => display.classList.remove('changed'), 500);
+    closeModal('mod-boat'); 
+    loadData();
+}
+
+function exportJSON() { let b=new Blob([JSON.stringify(db)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download="backup.json"; a.click(); }
+function importData(e) { let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=(ev)=>{ try{db=JSON.parse(ev.target.result); repairData(); render();}catch(err){alert("Errore caricamento");} }; r.readAsText(f); }
 </script>
 </body>
 </html>
+
