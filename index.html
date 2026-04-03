@@ -362,7 +362,7 @@ function confirmNumpad() { db.history[selectedDay] = parseFloat(numValue) || 0; 
 function showConfirm(type) {
     const btn = document.getElementById('confirm-yes');
     document.getElementById('confirm-title').innerText = type === 'fine' ? "CHIUDI GIORNATA" : "AZZERA QUINDICINA";
-    document.getElementById('confirm-msg').innerText = type === 'fine' ? "Scarico le vendite di oggi e aggiorno la busta?" : "Attenzione: questo azzererà tutti i carichi, le vendite e gli scarichi nelle schede. Continuare?";
+    document.getElementById('confirm-msg').innerText = type === 'fine' ? "Scarico le vendite di oggi e aggiorno la busta?" : "Attenzione: questo azzererà TUTTI i dati della quindicina attuale (magazzino e incassi busta paga). Continuare?";
     btn.onclick = () => {
         if(type === 'fine') {
             let d = new Date().getDate();
@@ -370,9 +370,8 @@ function showConfirm(type) {
             db.history[d] = (db.history[d] || 0) + inc;
             db.prodotti.forEach(p => { p.q = calcGiacenza(p); p.c=p.vePas=p.vePen=p.omaggio=0; });
         } else {
-            // AZZERA QUINDICINA: 
-            // 1. La nuova quantità iniziale (q) diventa la giacenza attuale (o il reale se inserito)
-            // 2. Tutti i contatori di movimento (carico, vendite pas, vendite pen, omaggi) vengono azzerati
+            // AZZERA QUINDICINA TOTALE
+            // 1. Resetta Magazzino
             db.prodotti.forEach(p => { 
                 p.q = p.reale !== null ? p.reale : calcGiacenza(p); 
                 p.c = 0; 
@@ -381,6 +380,8 @@ function showConfirm(type) {
                 p.omaggio = 0; 
                 p.reale = null; 
             });
+            // 2. Resetta Storico Incassi Busta
+            db.history = {}; 
         }
         closeModal('mod-confirm'); render();
     };
