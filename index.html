@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario Jet Smart</title>
+    <title>Inventario Napoli Jet</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print { .no-print { display: none !important; } }
         .row-checked { background-color: #f0fdf4; opacity: 0.7; }
         #signature-pad { touch-action: none; cursor: crosshair; background-color: white; border: 2px dashed #cbd5e1; border-radius: 12px; }
-        #photo-preview { max-height: 200px; object-fit: contain; display: none; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; }
+        #photo-preview { max-width: 100%; max-height: 250px; object-fit: contain; display: none; margin-top: 10px; border-radius: 8px; border: 2px solid #3b82f6; }
     </style>
 </head>
 <body class="bg-slate-100 py-4 px-2 antialiased font-sans">
@@ -20,26 +20,24 @@
             <div class="flex flex-col gap-4">
                 <div class="flex justify-between items-center">
                     <h1 id="display-mezzo" class="text-2xl font-black uppercase">NAPOLI JET</h1>
-                    <button onclick="window.print()" class="no-print bg-blue-600 px-4 py-2 rounded-lg font-bold text-sm">STAMPA</button>
+                    <button onclick="window.print()" class="no-print bg-blue-600 px-4 py-2 rounded-lg font-bold text-sm">STAMPA PDF</button>
                 </div>
                 
                 <div class="flex flex-wrap gap-2 no-print">
-                    <select id="mezzo-select" onchange="document.getElementById('display-mezzo').innerText = this.value" class="bg-slate-800 border-none text-white text-xs rounded-lg p-3 font-bold flex-grow">
-                        <option>NAPOLI JET</option><option>SALERNO JET</option><option>AMALFI JET</option>
-                        <option>SUPER JET</option><option>CAPRI JET</option><option>ISCHIA JET</option>
-                        <option>TREMITI JET</option><option>VESUVIO JET</option><option>JUMBO JET</option>
-                        <option>SORRENTO JET</option><option>GIUNONE JET</option><option>EUROPA JET</option>
-                        <option>CITTÀ DI SORRENTO</option><option>APOLLO</option><option>FRECCIA D ARGENTO</option>
-                        <option>BLIZ</option><option>ISCHIA MAR 3</option><option>URAGANO</option>
-                        <option>ACQUARIUS</option><option>RAID</option>
+                    <select id="mezzo-select" class="bg-slate-800 border-none text-white text-xs rounded-lg p-3 font-bold flex-grow">
+                        <option selected>NAPOLI JET</option>
+                        <option>SALERNO JET</option><option>AMALFI JET</option>
+                        <option>SUPER JET</option><option>CAPRI JET</option>
                     </select>
 
                     <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold text-xs cursor-pointer flex items-center gap-2">
-                        📸 FOTO MERCE
-                        <input type="file" accept="image/*" capture="environment" class="hidden" onchange="previewImage(this)">
+                        📸 AGGIUNGI FOTO
+                        <input type="file" accept="image/*" class="hidden" onchange="previewImage(this)">
                     </label>
                 </div>
-                <img id="photo-preview" src="#" alt="Anteprima">
+                <div class="flex justify-center">
+                    <img id="photo-preview" src="#" alt="Anteprima">
+                </div>
             </div>
         </div>
 
@@ -60,7 +58,7 @@
         <div class="p-6 bg-slate-50 border-t grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="space-y-4">
                 <div class="flex items-center gap-2 border-b pb-2"><span class="font-bold w-24">INCASSO:</span><input type="text" class="font-black text-blue-700 w-full bg-transparent text-xl" value="0.00€"></div>
-                <div class="flex items-center gap-2 border-b pb-2 text-slate-400 italic"><span class="w-24">PAS:</span><input type="text" class="w-full bg-transparent" value="0.00€"></div>
+                <div class="flex items-center gap-2 border-b pb-2 text-slate-400 italic"><span class="w-24 uppercase">Note:</span><input type="text" class="w-full bg-transparent font-bold" value="Rimanenze Napoli"></div>
             </div>
             <div class="flex flex-col items-center">
                 <span class="text-[10px] uppercase font-black text-slate-500 mb-2 tracking-widest text-center">Firma Responsabile</span>
@@ -70,33 +68,61 @@
     </div>
 
     <script>
-        const items = ["💧 ACQUA", "🥜 ARACHIDI+", "👜 BORSE G", "🛍️ BORSE M", "🍫 BUENO/BISC", "🧢 CAPPELLI", "🍬 CARAMELLE", "🍪 CHOCO CHIPS", "☕ CIALDE", "☕ DECA", "🌾 FITNESS", "🍟 FONZIES", "☕ GINSENG", "🧥 IMPERMEAB", "🃏 KINDER CARDS", "🥤 LATTINE", "🍫 M&M", "👕 MAGLIE", "🥜 NIK NOK", "🍪 PAVESINI", "🍺 PERONI", "🍋 PERONI C.", "🥔 PRINGLES", "🍷 PROSECCO", "⚡ RED BULL", "🍪 RINGO/OREO", "🥨 RITZ", "🍹 SPRITZ", "🧃 SUCCO", "🍵 THE/CAMOM", "🍪 TUC", "🍫 TWIX/KIT KAT", "👨‍✈️ TU"];
+        // Dati caricati dall'ultimo inventario Napoli Jet (Totale 2245)
+        const napoliData = [
+            { name: "💧 ACQUA", val: "313" },
+            { name: "🥜 ARACHIDI+", val: "28" },
+            { name: "👜 BORSE G", val: "5" },
+            { name: "🛍️ BORSE M", val: "1" },
+            { name: "🍫 BUENO/BISC", val: "55" },
+            { name: "🧢 CAPPELLI", val: "175" },
+            { name: "🍬 CARAMELLE", val: "56" },
+            { name: "🍪 CHOCO CHIPS", val: "0" },
+            { name: "☕ CIALDE", val: "0" },
+            { name: "☕ DECA", val: "20" },
+            { name: "🍬 DIETOR", val: "17" },
+            { name: "🌾 FITNESS", val: "33" },
+            { name: "🍟 FONZIES", val: "45" },
+            { name: "🧥 IMPERMEAB", val: "70" },
+            { name: "🃏 KINDER CARDS", val: "0" },
+            { name: "☕ GINSENG", val: "10" },
+            { name: "🥛 LATTE", val: "4" },
+            { name: "🥤 LATTINE", val: "338" },
+            { name: "👕 MAGLIE", val: "83" },
+            { name: "🥢 MIKADO", val: "17" },
+            { name: "🧁 MUFFIN", val: "17" },
+            { name: "🥜 NIK NOK", val: "15" },
+            { name: "☕ ORZO", val: "10" },
+            { name: "🍪 PAVESINI", val: "4" },
+            { name: "🍺 PERONI", val: "115" },
+            { name: "🍋 PERONI C.", val: "24" },
+            { name: "🥔 PRINGLES", val: "62" },
+            { name: "🍷 PROSECCO", val: "59" },
+            { name: "⚡ RED BULL", val: "55" },
+            { name: "🍪 RINGO/OREO", val: "96" },
+            { name: "🥨 RITZ", val: "12" },
+            { name: "🍹 SPRITZ", val: "57" },
+            { name: "🧃 SUCCO", val: "53" },
+            { name: "🍵 THE/CAMOM", val: "88" },
+            { name: "🍪 TUC", val: "14" },
+            { name: "🍫 TWIX/KIT KAT", val: "170" }
+        ];
 
         const body = document.getElementById('inventory-body');
-        items.forEach(name => {
+        napoliData.forEach(item => {
             const tr = document.createElement('tr');
             tr.className = "border-b border-slate-200 transition";
+            const total = item.val.split('+').reduce((a, b) => a + (parseInt(b.trim()) || 0), 0);
             tr.innerHTML = `<td class="p-2 border text-center no-print"><input type="checkbox" onchange="this.parentElement.parentElement.classList.toggle('row-checked')" class="w-5 h-5 accent-blue-600"></td>
-                            <td class="p-3 border font-bold text-slate-700 leading-tight">${name}</td>
-                            <td class="p-2 border"><input type="text" oninput="updateT(this)" class="w-full bg-transparent outline-none font-mono text-blue-600 font-bold" placeholder="0"></td>
-                            <td class="p-2 border text-center font-black bg-slate-50 text-lg total-cell">0</td>`;
+                            <td class="p-3 border font-bold text-slate-700 leading-tight">${item.name}</td>
+                            <td class="p-2 border"><input type="text" oninput="updateT(this)" class="w-full bg-transparent outline-none font-mono text-blue-600 font-bold" value="${item.val}"></td>
+                            <td class="p-2 border text-center font-black bg-slate-50 text-lg total-cell">${total}</td>`;
             body.appendChild(tr);
         });
 
-        function updateT(i){ const s = i.value.split('+').reduce((a,b)=>a+(parseInt(b)||0),0); i.parentElement.parentElement.querySelector('.total-cell').innerText=s; }
-        
-        function previewImage(input) {
-            const preview = document.getElementById('photo-preview');
-            const file = input.files[0];
-            if (file) {
-                preview.src = URL.createObjectURL(file);
-                preview.style.display = 'block';
-            }
-        }
-
-        const c = document.getElementById('signature-pad');
-        const ctx = c.getContext('2d');
-        let d = false;
+        function updateT(i){ const s = i.value.split('+').reduce((a,b)=>a+(parseInt(b.trim())||0),0); i.parentElement.parentElement.querySelector('.total-cell').innerText=s; }
+        function previewImage(input) { const preview = document.getElementById('photo-preview'); const file = input.files[0]; if (file) { preview.src = URL.createObjectURL(file); preview.style.display = 'block'; } }
+        const c = document.getElementById('signature-pad'); const ctx = c.getContext('2d'); let d = false;
         function getP(e){ const r = c.getBoundingClientRect(); const x = e.touches ? e.touches[0].clientX : e.clientX; const y = e.touches ? e.touches[0].clientY : e.clientY; return { x: x - r.left, y: y - r.top }; }
         c.addEventListener('mousedown', (e)=>{ d=true; ctx.beginPath(); const p=getP(e); ctx.moveTo(p.x, p.y); });
         c.addEventListener('mousemove', (e)=>{ if(d){ const p=getP(e); ctx.lineTo(p.x, p.y); ctx.stroke(); } });
