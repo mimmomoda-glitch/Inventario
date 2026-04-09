@@ -71,17 +71,14 @@
     </div>
 
     <script>
-        // Database con tutti i mezzi aggiornati
         const db = {
             napoli: [
-                {n:"💧 ACQUA",v:"313"}, {n:"🥜 ARACHIDI+",v:"28"}, {n:"🍫 BUENO/BISC",v:"55"}, {n:"🧢 CAPPELLI",v:"175"}, {n:"🥤 LATTINE",v:"338"}, {n:"🍺 PERONI",v:"115"}, {n:"🥔 PRINGLES",v:"62"}, {n:"🍫 TWIX/KIT KAT",v:"170"}
-                // Aggiungi qui gli altri di Napoli se mancano
+                {n:"💧 ACQUA",v:"313"}, {n:"🥜 ARACHIDI+",v:"28"}, {n:"👜 BORSE G",v:"5"}, {n:"🛍️ BORSE M",v:"1"}, {n:"🍫 BUENO/BISC",v:"55"}, {n:"🧢 CAPPELLI",v:"175"}, {n:"🍬 CARAMELLE",v:"56"}, {n:"☕ DECA",v:"20"}, {n:"🍬 DIETOR",v:"17"}, {n:"🌾 FITNESS",v:"33"}, {n:"🍟 FONZIES",v:"45"}, {n:"🧥 IMPERMEAB",v:"70"}, {n:"☕ GINSENG",v:"10"}, {n:"🥤 LATTINE",v:"338"}, {n:"👕 MAGLIE",v:"83"}, {n:"🥢 MIKADO",v:"17"}, {n:"🧁 MUFFIN",v:"17"}, {n:"🥜 NIK NOK",v:"15"}, {n:"☕ ORZO",v:"10"}, {n:"🍪 PAVESINI",v:"4"}, {n:"🍺 PERONI",v:"115"}, {n:"🍋 PERONI C.",v:"24"}, {n:"🥔 PRINGLES",v:"62"}, {n:"🍷 PROSECCO",v:"59"}, {n:"⚡ RED BULL",v:"55"}, {n:"🍪 RINGO/OREO",v:"96"}, {n:"🥨 RITZ",v:"12"}, {n:"🍹 SPRITZ",v:"57"}, {n:"🧃 SUCCO",v:"53"}, {n:"🍵 THE/CAMOM",v:"88"}, {n:"🍪 TUC",v:"14"}, {n:"🍫 TWIX/KIT KAT",v:"170"}
             ],
             salerno: [
-                {n:"💧 ACQUA",v:"72+19+24"}, {n:"🥜 ARACHIDI+",v:"4+12"}, {n:"🧢 CAPPELLI",v:"116"}, {n:"🥤 LATTINE",v:"63+158+7+6"}, {n:"🍺 PERONI",v:"112+20+22+2"}, {n:"🥔 PRINGLES",v:"36+28"}
+                {n:"💧 ACQUA",v:"72+19+24"}, {n:"🥜 ARACHIDI+",v:"4+12"}, {n:"👜 BORSE G",v:"11+4+6+2"}, {n:"🍫 BUENO/BISC",v:"35"}, {n:"🧢 CAPPELLI",v:"116"}, {n:"🍬 CARAMELLE",v:"37+40"}, {n:"☕ CIALDE",v:"140"}, {n:"☕ DECA",v:"4"}, {n:"🍬 DIETOR",v:"22"}, {n:"🌾 FITNESS",v:"15"}, {n:"🍟 FONZIES",v:"6+9+3+22+21"}, {n:"☕ GINSENG",v:"18"}, {n:"🥛 LATTE",v:"4"}, {n:"🥤 LATTINE",v:"63+158+7+6"}, {n:"👕 MAGLIE",v:"137"}, {n:"🥢 MIKADO",v:"17"}, {n:"🧁 MUFFIN",v:"28"}, {n:"🥜 NIK NOK",v:"17"}, {n:"☕ ORZO",v:"50"}, {n:"🍪 PAVESINI",v:"18"}, {n:"🍺 PERONI",v:"112+20+22+2"}, {n:"🍋 PERONI C.",v:"30+10+4"}, {n:"🥔 PRINGLES",v:"36+28"}, {n:"🍷 PROSECCO",v:"20+10+20+30"}, {n:"⚡ RED BULL",v:"38"}, {n:"🍪 RINGO/OREO",v:"100"}, {n:"🥨 RITZ",v:"15+10"}, {n:"🍹 SPRITZ",v:"50"}, {n:"🧃 SUCCO",v:"16"}, {n:"🍵 THE/CAMOM",v:"63"}, {n:"🍪 TUC",v:"14"}, {n:"🍫 TWIX/KIT KAT",v:"51+20+11"}
             ],
-            // Per tutti gli altri creo una lista vuota pronta da compilare
-            default: ["💧 ACQUA", "🥜 ARACHIDI+", "👜 BORSE G", "🛍️ BORSE M", "🍫 BUENO/BISC", "🧢 CAPPELLI", "🍬 CARAMELLE", "☕ DECA", "🌾 FITNESS", "🍟 FONZIES", "☕ GINSENG", "🥤 LATTINE", "👕 MAGLIE", "🍺 PERONI", "🥔 PRINGLES", "🍷 PROSECCO", "⚡ RED BULL", "🍪 RINGO/OREO", "🍹 SPRITZ", "🧃 SUCCO", "🍵 THE/CAMOM", "🍫 TWIX/KIT KAT"]
+            default: ["💧 ACQUA", "🥜 ARACHIDI+", "👜 BORSE G", "🛍️ BORSE M", "🍫 BUENO/BISC", "🧢 CAPPELLI", "🍬 CARAMELLE", "🍪 CHOCO CHIPS", "☕ CIALDE", "☕ DECA", "🍬 DIETOR", "🌾 FITNESS", "🍟 FONZIES", "☕ GINSENG", "🧥 IMPERMEAB", "🃏 KINDER CARDS", "🥤 LATTINE", "🍫 M&M", "👕 MAGLIE", "🥢 MIKADO", "🧁 MUFFIN", "🥜 NIK NOK", "☕ ORZO", "🍪 PAVESINI", "🍺 PERONI", "🍋 PERONI C.", "🥔 PRINGLES", "🍷 PROSECCO", "⚡ RED BULL", "🍪 RINGO/OREO", "🥨 RITZ", "🍹 SPRITZ", "🧃 SUCCO", "🍵 THE/CAMOM", "🍪 TUC", "🍫 TWIX/KIT KAT"]
         };
 
         function caricaMezzo(id) {
@@ -89,9 +86,7 @@
             document.getElementById('display-mezzo').innerText = document.getElementById('mezzo-select').options[document.getElementById('mezzo-select').selectedIndex].text;
             const body = document.getElementById('inventory-body');
             body.innerHTML = "";
-
             const dati = db[id] || db.default.map(n => ({n, v:"0"}));
-
             dati.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-slate-200 transition";
@@ -106,8 +101,6 @@
         }
 
         function updateT(i){ const s = i.value.split('+').reduce((a,b)=>a+(parseInt(b.trim())||0),0); i.parentElement.parentElement.querySelector('.total-cell').innerText=s; }
-        
-        // Setup Firma
         const c = document.getElementById('signature-pad'); const ctx = c.getContext('2d'); let d = false;
         function getP(e){ const r = c.getBoundingClientRect(); const x = e.touches ? e.touches[0].clientX : e.clientX; const y = e.touches ? e.touches[0].clientY : e.clientY; return { x: x - r.left, y: y - r.top }; }
         c.addEventListener('touchstart', (e)=>{ d=true; ctx.beginPath(); const p=getP(e); ctx.moveTo(p.x, p.y); e.preventDefault(); }, {passive:false});
