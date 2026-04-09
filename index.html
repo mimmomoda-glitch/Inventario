@@ -3,255 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Inventario Flotta</title>
+    <title>Inventario Jet Smart</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @media print {
-            .no-print { display: none !important; }
-            body { padding: 0; background-color: white; }
-            .print-container { box-shadow: none; border: none; width: 100%; max-width: 100%; margin: 0; }
-            table { font-size: 8pt; }
-            th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
-            input[type="text"] { border: none; padding: 0; background: transparent; }
-        }
-        .row-checked { background-color: #f0fdf4; }
-        #signature-pad { touch-action: none; cursor: crosshair; background-color: white; }
+        @media print { .no-print { display: none !important; } }
+        .row-checked { background-color: #f0fdf4; opacity: 0.7; }
+        #signature-pad { touch-action: none; cursor: crosshair; background-color: white; border: 2px dashed #cbd5e1; border-radius: 12px; }
+        #photo-preview { max-height: 200px; object-fit: contain; display: none; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; }
     </style>
 </head>
-<body class="bg-slate-100 py-4 px-2 md:py-8 md:px-4 antialiased">
+<body class="bg-slate-100 py-4 px-2 antialiased font-sans">
 
     <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden print-container">
         
         <div class="bg-slate-900 text-white p-6">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <span class="text-blue-400 text-xs font-bold uppercase tracking-widest">Gestione Inventario Mezzi</span>
-                    <h1 id="display-mezzo" class="text-3xl font-black uppercase tracking-tighter">NAPOLI JET</h1>
-                    <p class="text-slate-400 text-sm">Data Documento: 09/04/2026</p>
+            <div class="flex flex-col gap-4">
+                <div class="flex justify-between items-center">
+                    <h1 id="display-mezzo" class="text-2xl font-black uppercase">NAPOLI JET</h1>
+                    <button onclick="window.print()" class="no-print bg-blue-600 px-4 py-2 rounded-lg font-bold text-sm">STAMPA</button>
                 </div>
                 
                 <div class="flex flex-wrap gap-2 no-print">
-                    <select id="mezzo-select" onchange="updateMezzo()" class="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 font-bold uppercase">
-                        <option value="NAPOLI JET">NAPOLI JET</option>
-                        <option value="SALERNO JET">SALERNO JET</option>
-                        <option value="AMALFI JET">AMALFI JET</option>
-                        <option value="SUPER JET">SUPER JET</option>
-                        <option value="CAPRI JET">CAPRI JET</option>
-                        <option value="ISCHIA JET">ISCHIA JET</option>
-                        <option value="TREMITI JET">TREMITI JET</option>
-                        <option value="VESUVIO JET">VESUVIO JET</option>
-                        <option value="JUMBO JET">JUMBO JET</option>
-                        <option value="SORRENTO JET">SORRENTO JET</option>
-                        <option value="GIUNONE JET">GIUNONE JET</option>
-                        <option value="EUROPA JET">EUROPA JET</option>
-                        <option value="CITTÀ DI SORRENTO">CITTÀ DI SORRENTO</option>
-                        <option value="APOLLO">APOLLO</option>
-                        <option value="FRECCIA D ARGENTO">FRECCIA D ARGENTO</option>
-                        <option value="BLIZ">BLIZ</option>
-                        <option value="ISCHIA MAR 3">ISCHIA MAR 3</option>
-                        <option value="URAGANO">URAGANO</option>
-                        <option value="ACQUARIUS">ACQUARIUS</option>
-                        <option value="RAID">RAID</option>
+                    <select id="mezzo-select" onchange="document.getElementById('display-mezzo').innerText = this.value" class="bg-slate-800 border-none text-white text-xs rounded-lg p-3 font-bold flex-grow">
+                        <option>NAPOLI JET</option><option>SALERNO JET</option><option>AMALFI JET</option>
+                        <option>SUPER JET</option><option>CAPRI JET</option><option>ISCHIA JET</option>
+                        <option>TREMITI JET</option><option>VESUVIO JET</option><option>JUMBO JET</option>
+                        <option>SORRENTO JET</option><option>GIUNONE JET</option><option>EUROPA JET</option>
+                        <option>CITTÀ DI SORRENTO</option><option>APOLLO</option><option>FRECCIA D ARGENTO</option>
+                        <option>BLIZ</option><option>ISCHIA MAR 3</option><option>URAGANO</option>
+                        <option>ACQUARIUS</option><option>RAID</option>
                     </select>
-                    <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                        STAMPA
-                    </button>
-                </div>
-            </div>
-        </div>
 
-        <div class="bg-slate-50 border-b p-3 flex justify-between items-center no-print px-6">
-            <div class="flex gap-4">
-                <button onclick="addRow()" class="text-emerald-600 hover:text-emerald-700 font-bold text-xs flex items-center gap-1">
-                    [+] AGGIUNGI VOCE
-                </button>
-                <button onclick="clearAllCounts()" class="text-rose-600 hover:text-rose-700 font-bold text-xs flex items-center gap-1">
-                    [X] AZZERA CONTEGGI
-                </button>
+                    <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold text-xs cursor-pointer flex items-center gap-2">
+                        📸 FOTO MERCE
+                        <input type="file" accept="image/*" capture="environment" class="hidden" onchange="previewImage(this)">
+                    </label>
+                </div>
+                <img id="photo-preview" src="#" alt="Anteprima">
             </div>
-            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Inventario Interattivo</span>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full border-collapse">
-                <thead>
-                    <tr class="bg-slate-100 text-slate-600 uppercase text-[10px] tracking-tighter font-black">
-                        <th class="py-3 px-2 border text-center no-print w-10">OK</th>
-                        <th class="py-3 px-4 border text-left">Articolo / Categoria</th>
-                        <th class="py-3 px-4 border text-left">Conteggio Parziale (es: 10+5)</th>
-                        <th class="py-3 px-4 border text-center w-28">Totale Pz</th>
-                        <th class="py-3 px-2 border text-center no-print w-10"></th>
+                <thead class="bg-slate-100">
+                    <tr class="text-slate-600 uppercase text-[10px] font-black">
+                        <th class="py-3 px-2 border no-print w-10 text-center">OK</th>
+                        <th class="py-3 px-4 border text-left">Articolo</th>
+                        <th class="py-3 px-4 border text-left">Conteggio</th>
+                        <th class="py-3 px-4 border text-center w-20">Tot</th>
                     </tr>
                 </thead>
-                <tbody id="inventory-body" class="text-slate-800 text-sm">
-                    </tbody>
+                <tbody id="inventory-body" class="text-slate-800 text-sm"></tbody>
             </table>
         </div>
 
         <div class="p-6 bg-slate-50 border-t grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-                <label class="text-xs uppercase font-black text-slate-500 mb-2 block tracking-widest">Resoconto Finanziario</label>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
-                        <span class="text-sm font-bold w-32 uppercase">Incasso Oggi:</span>
-                        <input type="text" class="font-black text-xl text-blue-700 w-full outline-none bg-transparent" value="0.00€">
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm font-bold w-32 uppercase text-slate-400 italic">Rimanenze (PAS):</span>
-                        <input type="text" class="font-bold text-slate-400 w-full outline-none bg-transparent italic" value="0.00€">
-                    </div>
-                    <textarea class="w-full mt-4 p-3 border border-slate-300 rounded-lg text-sm bg-white" rows="2" placeholder="Note aggiuntive..."></textarea>
-                </div>
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 border-b pb-2"><span class="font-bold w-24">INCASSO:</span><input type="text" class="font-black text-blue-700 w-full bg-transparent text-xl" value="0.00€"></div>
+                <div class="flex items-center gap-2 border-b pb-2 text-slate-400 italic"><span class="w-24">PAS:</span><input type="text" class="w-full bg-transparent" value="0.00€"></div>
             </div>
-            
-            <div class="flex flex-col items-center justify-center">
-                <span class="text-xs uppercase font-black text-slate-500 mb-2 tracking-widest">Convalida Responsabile</span>
-                <div class="relative w-full bg-white border-2 border-dashed border-slate-300 rounded-xl overflow-hidden">
-                    <canvas id="signature-pad" class="w-full h-32"></canvas>
-                    <button onclick="clearSignature()" class="no-print absolute top-2 right-2 text-[9px] bg-slate-800 text-white px-2 py-1 rounded-md font-bold uppercase opacity-50 hover:opacity-100 transition">
-                        Reset Firma
-                    </button>
-                </div>
-                <div class="mt-2 text-[10px] font-bold text-slate-400 uppercase">Firma Eseguita sullo schermo</div>
+            <div class="flex flex-col items-center">
+                <span class="text-[10px] uppercase font-black text-slate-500 mb-2 tracking-widest text-center">Firma Responsabile</span>
+                <canvas id="signature-pad" class="w-full h-32"></canvas>
             </div>
         </div>
     </div>
 
     <script>
-        const allItems = [
-            ["💧 ACQUA", "0"],
-            ["🥜 ARACHIDI+", "0"],
-            ["👜 BORSE G", "0"],
-            ["🛍️ BORSE M", "0"],
-            ["🍫 BUENO/BISC", "0"],
-            ["🧢 CAPPELLI", "0"],
-            ["🍬 CARAMELLE", "0"],
-            ["🍪 CHOCO CHIPS", "0"],
-            ["☕ CIALDE", "0"],
-            ["☕ DECA", "0"],
-            ["🌾 FITNESS", "0"],
-            ["🍟 FONZIES", "0"],
-            ["☕ GINSENG", "0"],
-            ["🧥 IMPERMEAB", "0"],
-            ["🃏 KINDER CARDS", "0"],
-            ["🥤 LATTINE", "0"],
-            ["🍫 M&M", "0"],
-            ["👕 MAGLIE", "0"],
-            ["🥜 NIK NOK", "0"],
-            ["🍪 PAVESINI", "0"],
-            ["🍺 PERONI", "0"],
-            ["🍋 PERONI C.", "0"],
-            [" potatoes🥔 PRINGLES", "0"],
-            ["🍷 PROSECCO", "0"],
-            ["⚡ RED BULL", "0"],
-            ["🍪 RINGO/OREO", "0"],
-            ["🥨 RITZ", "0"],
-            ["🍹 SPRITZ", "0"],
-            ["🧃 SUCCO", "0"],
-            ["🍵 THE/CAMOM", "0"],
-            ["🍪 TUC", "0"],
-            ["🍫 TWIX/KIT KAT", "0"],
-            ["👨‍✈️ TU", "0"]
-        ];
+        const items = ["💧 ACQUA", "🥜 ARACHIDI+", "👜 BORSE G", "🛍️ BORSE M", "🍫 BUENO/BISC", "🧢 CAPPELLI", "🍬 CARAMELLE", "🍪 CHOCO CHIPS", "☕ CIALDE", "☕ DECA", "🌾 FITNESS", "🍟 FONZIES", "☕ GINSENG", "🧥 IMPERMEAB", "🃏 KINDER CARDS", "🥤 LATTINE", "🍫 M&M", "👕 MAGLIE", "🥜 NIK NOK", "🍪 PAVESINI", "🍺 PERONI", "🍋 PERONI C.", "🥔 PRINGLES", "🍷 PROSECCO", "⚡ RED BULL", "🍪 RINGO/OREO", "🥨 RITZ", "🍹 SPRITZ", "🧃 SUCCO", "🍵 THE/CAMOM", "🍪 TUC", "🍫 TWIX/KIT KAT", "👨‍✈️ TU"];
 
-        function updateMezzo() {
-            const select = document.getElementById('mezzo-select');
-            document.getElementById('display-mezzo').innerText = select.value;
-        }
-
-        function calculateTotal(val) {
-            if (!val) return 0;
-            return val.toString().split('+').reduce((acc, curr) => {
-                const n = parseInt(curr.trim());
-                return acc + (isNaN(n) ? 0 : n);
-            }, 0);
-        }
-
-        function createRow(name = "", val = "0") {
+        const body = document.getElementById('inventory-body');
+        items.forEach(name => {
             const tr = document.createElement('tr');
-            tr.className = "border-b border-slate-200 hover:bg-slate-50 transition";
-            const total = calculateTotal(val);
-            tr.innerHTML = `
-                <td class="py-2 px-2 border text-center no-print">
-                    <input type="checkbox" onchange="this.parentElement.parentElement.classList.toggle('row-checked')" class="w-4 h-4 accent-blue-600">
-                </td>
-                <td class="py-2 px-4 border font-bold text-slate-700">
-                    <input type="text" value="${name}" class="w-full bg-transparent outline-none">
-                </td>
-                <td class="py-2 px-4 border italic text-slate-400">
-                    <input type="text" value="${val}" oninput="updateTotal(this)" class="w-full bg-transparent outline-none font-mono">
-                </td>
-                <td class="py-2 px-4 border text-center font-black bg-slate-50 text-slate-900 text-lg total-cell">${total}</td>
-                <td class="py-2 px-2 border text-center no-print">
-                    <button onclick="this.parentElement.parentElement.remove()" class="text-slate-300 hover:text-rose-500 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
-                </td>
-            `;
-            return tr;
-        }
+            tr.className = "border-b border-slate-200 transition";
+            tr.innerHTML = `<td class="p-2 border text-center no-print"><input type="checkbox" onchange="this.parentElement.parentElement.classList.toggle('row-checked')" class="w-5 h-5 accent-blue-600"></td>
+                            <td class="p-3 border font-bold text-slate-700 leading-tight">${name}</td>
+                            <td class="p-2 border"><input type="text" oninput="updateT(this)" class="w-full bg-transparent outline-none font-mono text-blue-600 font-bold" placeholder="0"></td>
+                            <td class="p-2 border text-center font-black bg-slate-50 text-lg total-cell">0</td>`;
+            body.appendChild(tr);
+        });
 
-        function updateTotal(input) {
-            const row = input.parentElement.parentElement;
-            row.querySelector('.total-cell').innerText = calculateTotal(input.value);
-        }
-
-        function clearAllCounts() {
-            if(confirm("Vuoi azzerare tutti i conteggi per questo mezzo?")) {
-                document.querySelectorAll('#inventory-body input[type="text"]:nth-child(1)').forEach((input, index) => {
-                    if (index % 2 !== 0) { // Seleziona solo i campi conteggio
-                        input.value = "0";
-                        updateTotal(input);
-                    }
-                });
+        function updateT(i){ const s = i.value.split('+').reduce((a,b)=>a+(parseInt(b)||0),0); i.parentElement.parentElement.querySelector('.total-cell').innerText=s; }
+        
+        function previewImage(input) {
+            const preview = document.getElementById('photo-preview');
+            const file = input.files[0];
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
             }
         }
 
-        function addRow() {
-            document.getElementById('inventory-body').appendChild(createRow("Nuovo Articolo", "0"));
-        }
-
-        // --- Logica Firma ---
-        const canvas = document.getElementById('signature-pad');
-        const ctx = canvas.getContext('2d');
-        let drawing = false;
-
-        function getPos(e) {
-            const rect = canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return {
-                x: (clientX - rect.left) * (canvas.width / rect.width),
-                y: (clientY - rect.top) * (canvas.height / rect.height)
-            };
-        }
-        function startDrawing(e) { drawing = true; ctx.beginPath(); const pos = getPos(e); ctx.moveTo(pos.x, pos.y); e.preventDefault(); }
-        function draw(e) { if (!drawing) return; const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); }
-        function stopDrawing() { drawing = false; }
-        function clearSignature() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-        function setupCanvas() {
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            ctx.strokeStyle = "#0f172a";
-            ctx.lineWidth = 2.5;
-            ctx.lineCap = "round";
-        }
-
-        window.onload = () => {
-            const body = document.getElementById('inventory-body');
-            allItems.forEach(item => body.appendChild(createRow(item[0], item[1])));
-            setupCanvas();
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            window.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('touchstart', startDrawing, {passive: false});
-            canvas.addEventListener('touchmove', draw, {passive: false});
-            canvas.addEventListener('touchend', stopDrawing);
-        };
-        window.onresize = setupCanvas;
+        const c = document.getElementById('signature-pad');
+        const ctx = c.getContext('2d');
+        let d = false;
+        function getP(e){ const r = c.getBoundingClientRect(); const x = e.touches ? e.touches[0].clientX : e.clientX; const y = e.touches ? e.touches[0].clientY : e.clientY; return { x: x - r.left, y: y - r.top }; }
+        c.addEventListener('mousedown', (e)=>{ d=true; ctx.beginPath(); const p=getP(e); ctx.moveTo(p.x, p.y); });
+        c.addEventListener('mousemove', (e)=>{ if(d){ const p=getP(e); ctx.lineTo(p.x, p.y); ctx.stroke(); } });
+        window.addEventListener('mouseup', ()=> d=false);
+        c.addEventListener('touchstart', (e)=>{ d=true; ctx.beginPath(); const p=getP(e); ctx.moveTo(p.x, p.y); e.preventDefault(); }, {passive:false});
+        c.addEventListener('touchmove', (e)=>{ if(d){ const p=getP(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); } }, {passive:false});
+        window.onload = () => { c.width = c.offsetWidth; c.height = c.offsetHeight; ctx.lineWidth = 2.5; ctx.lineCap="round"; ctx.strokeStyle="#0f172a"; };
     </script>
 </body>
 </html>
-
-```
