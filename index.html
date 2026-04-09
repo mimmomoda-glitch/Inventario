@@ -1,441 +1,258 @@
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NAV-PRO V160 FINAL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Inventario Flotta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --bg: #000; --card: #1c1c1e; --txt: #fff; --cyan: #5ac8fa; --apple-blue: #007aff; --lime: #4cd964; --red: #ff3b30; --gold: #ffcc00; --orange: #ff9500; --purple: #af52de; }
-        
-        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        body { margin: 0; background: var(--bg); color: var(--txt); height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: fixed; width: 100%; }
-        
-        /* Header */
-        .header { background: #000; padding: 10px 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; height: 65px; flex-shrink: 0; z-index: 100; }
-        .header b { font-size: 14px; color: var(--lime); }
-        .header small { color: #888; text-transform: uppercase; font-size: 8px; }
-
-        .boat-box { background: #1c1c1e; padding: 8px 10px; border-radius: 10px; border: 1px solid #333; color: var(--cyan); font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 5px; max-width: 160px; overflow: hidden; cursor: pointer; z-index: 110; transition: background 0.3s; }
-        .boat-box.changed { background: #3a3a3c; }
-
-        /* Pagine */
-        .page { display: none; overflow-y: auto; flex-grow: 1; padding-bottom: 100px; -webkit-overflow-scrolling: touch; width: 100%; }
-        .active-page { display: block; }
-
-        /* Grid Cassa */
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; }
-        .product-btn { background: var(--card); height: 100px; border-radius: 14px; display: flex; align-items: center; padding: 12px; border: 1px solid #333; color: white; text-align: left; width: 100%; position: relative; cursor: pointer; }
-        .product-btn:active { background: #3a3a3c; transform: scale(0.96); }
-        .product-btn i { font-size: 24px; margin-right: 12px; font-style: normal; pointer-events: none; }
-        .product-btn div { pointer-events: none; flex-grow: 1; }
-        .product-btn b { font-size: 10px; text-transform: uppercase; display: block; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .product-btn .price-info { font-size: 9px; color: #888; display: block; margin-bottom: 4px; }
-        .product-btn .stock { font-size: 16px; font-weight: bold; color: var(--cyan); }
-
-        /* Report Accordion */
-        .accordion { background: var(--card); border-radius: 12px; margin: 10px; border: 1px solid #333; overflow: hidden; }
-        .acc-header { padding: 15px; background: #2c2c2e; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .acc-body { display: none; padding: 10px; background: #1c1c1e; }
-        .edit-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #2c2c2e; }
-        .edit-row span { font-size: 12px; color: #ccc; }
-        .edit-row input { background: #000; border: 1px solid #444; color: var(--cyan); text-align: right; width: 90px; border-radius: 8px; padding: 8px; font-size: 16px; font-weight: bold; }
-        .price-row { background: #252525; border-radius: 8px; margin-top: 5px; padding: 5px 10px !important; }
-
-        /* Inventario */
-        .inv-row { border-bottom: 1px solid #333; display: flex; align-items: center; padding: 15px; background: var(--card); justify-content: space-between; }
-        .inv-row b { font-size: 14px; }
-        .inv-row input { width: 90px; background: #000; border: 1px solid var(--apple-blue); color: var(--txt); text-align: center; border-radius: 8px; padding: 10px; font-size: 18px; font-weight: bold; }
-        .summary-card { background: #1c1c1e; border: 2px solid #333; border-radius: 15px; margin: 15px; padding: 15px; text-align: center; }
-
-        /* Footer */
-        .footer { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; height: 75px; border-top: 1px solid #333; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
-        .footer button { flex: 1; background: none; border: none; color: #888; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }
-        .footer button.active { color: var(--cyan); }
-
-        /* Modali */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; flex-direction: column; justify-content: center; padding: 20px; }
-        .modal-card { background: #1c1c1e; padding: 25px; border-radius: 25px; border: 1px solid #444; text-align: center; max-height: 90vh; overflow-y: auto; width: 100%; max-width: 400px; margin: auto; }
-        .btn-big { width: 100%; padding: 18px; border-radius: 15px; font-weight: bold; font-size: 16px; margin-top: 12px; border: none; cursor: pointer; }
-        .btn-big:active { opacity: 0.7; transform: scale(0.98); }
-
-        /* Buste */
-        .quin-box { background: #1c1c1e; margin: 10px; border-radius: 15px; border: 1px solid #333; overflow: hidden; }
-        .quin-header { background: #2c2c2e; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
-        .quin-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 12px; }
-        .day-cell { aspect-ratio: 1; background: #111; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 14px; border: 1px solid #333; color: #777; transition: all 0.2s; cursor: pointer; }
-        .day-active { border-color: var(--lime); background: #1a2e1a; color: #fff; border-width: 2px; }
-        .day-active .day-val { font-size: 9px; color: var(--lime); font-weight: bold; margin-top: 1px; }
-        .day-active .day-paga { font-size: 8px; color: var(--gold); font-weight: normal; }
-
-        /* Tastierino e Input */
-        .numpad-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-        .num-btn { background: #333; color: white; border: none; padding: 20px; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; }
-        .num-btn:active { background: #555; }
-        .num-display { background: #000; border: 1px solid #444; padding: 15px; font-size: 32px; font-weight: bold; color: var(--lime); border-radius: 10px; margin-bottom: 10px; text-align: right; }
-        
-        .input-text-custom { width: 100%; background: #000; border: 1px solid #444; color: var(--txt); padding: 15px; border-radius: 12px; font-size: 18px; margin-bottom: 15px; text-align: center; }
-
-        /* Boat list specific */
-        .boat-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 15px; border-bottom: 1px solid #333; color: white; font-size: 16px; font-weight: bold; }
-        .boat-item:active { background: #2c2c2e; }
-        .boat-name-part { flex-grow: 1; text-align: left; }
-        .edit-icon { padding: 5px 10px; color: var(--cyan); font-size: 18px; border-left: 1px solid #444; margin-left: 10px; }
+        @media print {
+            .no-print { display: none !important; }
+            body { padding: 0; background-color: white; }
+            .print-container { box-shadow: none; border: none; width: 100%; max-width: 100%; margin: 0; }
+            table { font-size: 8pt; }
+            th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
+            input[type="text"] { border: none; padding: 0; background: transparent; }
+        }
+        .row-checked { background-color: #f0fdf4; }
+        #signature-pad { touch-action: none; cursor: crosshair; background-color: white; }
     </style>
 </head>
-<body onload="init()">
+<body class="bg-slate-100 py-4 px-2 md:py-8 md:px-4 antialiased">
 
-<div class="header">
-    <div class="boat-box" onclick="openBoatMenu()" id="boat-display">
-        <span id="current-boat-name">...</span>
-    </div>
-    <div style="text-align:center"><small>Incasso Oggi</small><br><b id="tot-incasso">0.00€</b></div>
-    <div style="text-align:right"><small>Val. Magazzino</small><br><b id="header-val-carico" style="color:var(--gold)">0.00€</b></div>
-</div>
-
-<!-- PAGINA CASSA -->
-<div id="page-c" class="page active-page">
-    <div class="grid" id="grid-cassa"></div>
-</div>
-
-<!-- PAGINA REPORT -->
-<div id="page-m" class="page">
-    <div style="padding:15px; display: flex; flex-direction: column; gap: 10px;">
-        <button onclick="showConfirm('fine')" class="btn-big" style="background:var(--apple-blue); color:white;">☀️ CHIUDI GIORNATA</button>
-        <button onclick="showConfirm('quindicina')" class="btn-big" style="background:var(--lime); color:black;">🏁 AZZERA QUINDICINA</button>
-    </div>
-    <div id="accordion-list"></div>
-    <div style="padding:15px; display: flex; gap: 10px;">
-        <button onclick="exportJSON()" style="flex:1; padding:12px; background:var(--orange); border-radius:10px; border:none; font-weight:bold; color:black;">📥 BACKUP</button>
-        <button onclick="document.getElementById('fileInput').click()" style="flex:1; padding:12px; background:#444; border-radius:10px; border:none; color:#fff; font-weight:bold;">📤 CARICA</button>
-        <input type="file" id="fileInput" style="display:none" onchange="importData(event)">
-    </div>
-</div>
-
-<!-- PAGINA INVENTARIO -->
-<div id="page-i" class="page">
-    <div class="summary-card">
-        <small style="color:#888">DIFFERENZA REALE vs APP</small>
-        <div id="inv-diff" style="font-size:32px; font-weight:bold;">0.00€</div>
-        <button onclick="clearReali()" style="background:none; border:1px solid var(--red); color:var(--red); padding:8px 15px; border-radius:8px; margin-top:10px; font-size:12px; font-weight:bold;">AZZERA CONTEGGI FISICI</button>
-    </div>
-    <div id="inventory-list"></div>
-</div>
-
-<!-- PAGINA BUSTE -->
-<div id="page-h" class="page">
-    <div style="padding:15px 15px 5px 15px; font-weight:bold; color:var(--cyan); font-size: 18px;">BUSTE & PAGA</div>
-    <div id="quindicine-container"></div>
-</div>
-
-<!-- MODALE VENDITA -->
-<div id="mod-gest" class="modal-overlay">
-    <div class="modal-card">
-        <h2 id="g-nome" style="color:var(--cyan); margin:0 0 20px 0;"></h2>
-        <div style="display:flex; justify-content:center; align-items:center; gap:30px; margin-bottom:30px;">
-            <button onclick="changeQty(-1)" style="width:70px; height:70px; border-radius:50%; background:#333; color:white; font-size:35px; border:none;">-</button>
-            <b id="g-qty" style="font-size:55px; min-width:60px;">1</b>
-            <button onclick="changeQty(1)" style="width:70px; height:70px; border-radius:50%; background:#333; color:white; font-size:35px; border:none;">+</button>
+    <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden print-container">
+        
+        <div class="bg-slate-900 text-white p-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="text-blue-400 text-xs font-bold uppercase tracking-widest">Gestione Inventario Mezzi</span>
+                    <h1 id="display-mezzo" class="text-3xl font-black uppercase tracking-tighter">NAPOLI JET</h1>
+                    <p class="text-slate-400 text-sm">Data Documento: 09/04/2026</p>
+                </div>
+                
+                <div class="flex flex-wrap gap-2 no-print">
+                    <select id="mezzo-select" onchange="updateMezzo()" class="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 font-bold uppercase">
+                        <option value="NAPOLI JET">NAPOLI JET</option>
+                        <option value="SALERNO JET">SALERNO JET</option>
+                        <option value="AMALFI JET">AMALFI JET</option>
+                        <option value="SUPER JET">SUPER JET</option>
+                        <option value="CAPRI JET">CAPRI JET</option>
+                        <option value="ISCHIA JET">ISCHIA JET</option>
+                        <option value="TREMITI JET">TREMITI JET</option>
+                        <option value="VESUVIO JET">VESUVIO JET</option>
+                        <option value="JUMBO JET">JUMBO JET</option>
+                        <option value="SORRENTO JET">SORRENTO JET</option>
+                        <option value="GIUNONE JET">GIUNONE JET</option>
+                        <option value="EUROPA JET">EUROPA JET</option>
+                        <option value="CITTÀ DI SORRENTO">CITTÀ DI SORRENTO</option>
+                        <option value="APOLLO">APOLLO</option>
+                        <option value="FRECCIA D ARGENTO">FRECCIA D ARGENTO</option>
+                        <option value="BLIZ">BLIZ</option>
+                        <option value="ISCHIA MAR 3">ISCHIA MAR 3</option>
+                        <option value="URAGANO">URAGANO</option>
+                        <option value="ACQUARIUS">ACQUARIUS</option>
+                        <option value="RAID">RAID</option>
+                    </select>
+                    <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                        STAMPA
+                    </button>
+                </div>
+            </div>
         </div>
-        <button onclick="conferma('vePas')" class="btn-big" style="background:none; border:2px solid var(--gold); color:var(--gold);">VENDITA PASSEGGERO</button>
-        <button onclick="conferma('vePen')" class="btn-big" style="background:none; border:2px solid var(--apple-blue); color:var(--apple-blue);">VENDITA PENDOLARE</button>
-        <button onclick="conferma('omaggio')" class="btn-big" style="background:none; border:1px solid var(--purple); color:var(--purple);">🎁 OMAGGIO / SCARICO</button>
-        <button onclick="closeModal('mod-gest')" class="btn-big" style="background:#444; color:white;">ANNULLA</button>
-    </div>
-</div>
 
-<!-- MODALE MODIFICA NOME BARCA -->
-<div id="mod-edit-boat" class="modal-overlay">
-    <div class="modal-card">
-        <h3 style="color:var(--cyan)">MODIFICA NOME</h3>
-        <p id="edit-boat-info" style="font-size:12px; color:#888"></p>
-        <input type="text" id="input-boat-name" class="input-text-custom" placeholder="Nuovo nome...">
-        <button onclick="saveCustomBoatName()" class="btn-big" style="background:var(--lime); color:black;">SALVA NOME</button>
-        <button onclick="closeModal('mod-edit-boat')" class="btn-big" style="background:#444; color:white;">ANNULLA</button>
-    </div>
-</div>
+        <div class="bg-slate-50 border-b p-3 flex justify-between items-center no-print px-6">
+            <div class="flex gap-4">
+                <button onclick="addRow()" class="text-emerald-600 hover:text-emerald-700 font-bold text-xs flex items-center gap-1">
+                    [+] AGGIUNGI VOCE
+                </button>
+                <button onclick="clearAllCounts()" class="text-rose-600 hover:text-rose-700 font-bold text-xs flex items-center gap-1">
+                    [X] AZZERA CONTEGGI
+                </button>
+            </div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Inventario Interattivo</span>
+        </div>
 
-<!-- MODALI EXTRA -->
-<div id="mod-numpad" class="modal-overlay"><div class="modal-card"><h3 id="numpad-title"></h3><div id="numpad-display" class="num-display">0</div><div class="numpad-container"><button class="num-btn" onclick="numIn('1')">1</button><button class="num-btn" onclick="numIn('2')">2</button><button class="num-btn" onclick="numIn('3')">3</button><button class="num-btn" onclick="numIn('4')">4</button><button class="num-btn" onclick="numIn('5')">5</button><button class="num-btn" onclick="numIn('6')">6</button><button class="num-btn" onclick="numIn('7')">7</button><button class="num-btn" onclick="numIn('8')">8</button><button class="num-btn" onclick="numIn('9')">9</button><button class="num-btn" onclick="numIn('.')">.</button><button class="num-btn" onclick="numIn('0')">0</button><button class="num-btn" style="background:var(--red)" onclick="numDel()">⌫</button></div><button onclick="confirmNumpad()" class="btn-big" style="background:var(--lime); color:black;">CONFERMA</button><button onclick="closeModal('mod-numpad')" class="btn-big" style="background:#444; color:white;">CHIUDI</button></div></div>
-<div id="mod-confirm" class="modal-overlay"><div class="modal-card"><h3 id="confirm-title">CONFERMA</h3><p id="confirm-msg"></p><button id="confirm-yes" class="btn-big" style="background:var(--lime); color:black;">CONFERMA</button><button onclick="closeModal('mod-confirm')" class="btn-big" style="background:#444; color:white;">ANNULLA</button></div></div>
-<div id="mod-boat" class="modal-overlay"><div class="modal-card" style="padding:0;"><div style="padding:15px; border-bottom:1px solid #333; background:#2c2c2e; border-radius:25px 25px 0 0;"><b>FLOTTA NAV-PRO</b></div><div id="boat-list-container" style="max-height:60vh; overflow-y:auto; padding:10px 0;"></div><button onclick="closeModal('mod-boat')" class="btn-big" style="width:90%; margin:15px; background:#333; color:white;">CHIUDI</button></div></div>
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-slate-100 text-slate-600 uppercase text-[10px] tracking-tighter font-black">
+                        <th class="py-3 px-2 border text-center no-print w-10">OK</th>
+                        <th class="py-3 px-4 border text-left">Articolo / Categoria</th>
+                        <th class="py-3 px-4 border text-left">Conteggio Parziale (es: 10+5)</th>
+                        <th class="py-3 px-4 border text-center w-28">Totale Pz</th>
+                        <th class="py-3 px-2 border text-center no-print w-10"></th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-body" class="text-slate-800 text-sm">
+                    </tbody>
+            </table>
+        </div>
 
-<div class="footer">
-    <button id="t-c" class="active" onclick="switchTab('c')">🛒 CASSA</button>
-    <button id="t-m" onclick="switchTab('m')">📊 REPORT</button>
-    <button id="t-i" onclick="switchTab('i')">📦 INV</button>
-    <button id="t-h" onclick="switchTab('h')">📅 BUSTE</button>
-</div>
-
-<script>
-let currentBoatID = "1";
-let db = { prodotti: [], history: {} };
-let curIdx = -1, qty = 1, selectedDay = null, numValue = "0";
-let editingBoatID = null;
-const FISSO = 26, PERC = 0.05;
-
-let customNames = JSON.parse(localStorage.getItem('NAV_FLEET_NAMES')) || {};
-const DEFAULT_FLEET = ["NAPOLI JET", "SALERNO JET", "AMALFI JET", "SUPER JET", "CAPRI JET", "ISCHIA JET", "TREMITI JET", "VESUVIO JET", "JUMBO JET", "SORRENTO JET", "GIUNONE JET", "EUROPA JET", "CITTÀ DI SORRENTO", "APOLLO", "FRECCIA D ARGENTO", "BLIZ", "ISCHIA MAR 3", "URAGANO", "ACQUARIUS", "RAID"];
-
-function init() {
-    currentBoatID = localStorage.getItem('NAV_LAST_ID');
-    if (!currentBoatID || currentBoatID === "null") currentBoatID = "1";
-    loadData();
-}
-
-function loadData() {
-    const storageKey = 'NAV_DATA_B' + currentBoatID;
-    const saved = localStorage.getItem(storageKey);
-    
-    if(saved && saved !== "undefined") {
-        try {
-            db = JSON.parse(saved);
-            repairData();
-        } catch(e) {
-            console.error("Errore parse JSON", e);
-            hardReset();
-        }
-    } else {
-        hardReset();
-    }
-    render();
-}
-
-function repairData() {
-    if (!db.prodotti) db.prodotti = [];
-    db.prodotti.forEach(p => {
-        p.q=Number(p.q)||0; p.c=Number(p.c)||0; p.vePas=Number(p.vePas)||0;
-        p.vePen=Number(p.vePen)||0; p.omaggio=Number(p.omaggio)||0;
-        p.pas=Number(p.pas)||0; p.pen=Number(p.pen)||0;
-        if(p.reale === undefined) p.reale = null;
-    });
-    if(!db.history) db.history = {};
-}
-
-function hardReset() {
-    const master = [
-        {n:"ACQUA", i:"💧", pas:2.0, pen:1.0}, {n:"ARACHIDI+", i:"🥜", pas:2.5, pen:1.0}, {n:"BORSE G", i:"👜", pas:10.0, pen:10.0}, {n:"BORSE M", i:"🛍️", pas:7.0, pen:7.0},
-        {n:"BUENO/BISC", i:"🍫", pas:3.0, pen:1.0}, {n:"CAPPELLI", i:"🧢", pas:5.0, pen:5.0}, {n:"CARAMELLE", i:"🍬", pas:2.5, pen:1.0}, {n:"CHOCO CHIPS", i:"🍪", pas:3.5, pen:2.0},
-        {n:"CIALDE", i:"☕", pas:2.0, pen:1.0}, {n:"DECA", i:"☕", pas:2.0, pen:1.0}, {n:"FITNESS", i:"🌾", pas:2.5, pen:1.5}, {n:"FONZIES", i:"🍟", pas:2.5, pen:1.0},
-        {n:"GINSENG", i:"☕", pas:2.0, pen:1.0}, {n:"IMPERMEAB", i:"🧥", pas:5.0, pen:5.0}, {n:"KINDER CARDS", i:"🃏", pas:3.0, pen:1.5}, {n:"LATTINE", i:"🥤", pas:2.5, pen:1.5},
-        {n:"M&M", i:"🍫", pas:2.5, pen:1.5}, {n:"MAGLIE", i:"👕", pas:5.0, pen:5.0}, {n:"NIK NOK", i:"🥜", pas:2.5, pen:1.5}, {n:"PAVESINI", i:"🍪", pas:2.5, pen:1.0},
-        {n:"PERONI", i:"🍺", pas:4.5, pen:1.5}, {n:"PERONI C.", i:"🍋", pas:7.5, pen:5.5}, {n:"PRINGLES", i:"🥔", pas:3.5, pen:2.0}, {n:"PROSECCO", i:"🍷", pas:6.0, pen:3.0},
-        {n:"RED BULL", i:"⚡", pas:4.5, pen:2.5}, {n:"RINGO/OREO", i:"🍪", pas:2.5, pen:1.0}, {n:"RITZ", i:"🥨", pas:4.5, pen:3.0}, {n:"SPRITZ", i:"🍹", pas:8.0, pen:5.0},
-        {n:"SUCCO", i:"🧃", pas:3.5, pen:2.0}, {n:"THE/CAMOM", i:"🍵", pas:2.5, pen:1.5}, {n:"TUC", i:"🍪", pas:3.5, pen:2.5}, {n:"TWIX/KIT KAT", i:"🍫", pas:2.5, pen:1.5}
-    ];
-    db.prodotti = master.map(p => ({...p, q:0, c:0, vePas:0, vePen:0, omaggio:0, reale:null}));
-    db.history = {};
-    save();
-}
-
-function save() { 
-    localStorage.setItem('NAV_DATA_B' + currentBoatID, JSON.stringify(db)); 
-    localStorage.setItem('NAV_LAST_ID', currentBoatID); 
-}
-
-function calcGiacenza(p) { return (p.q || 0) + (p.c || 0) - (p.vePas || 0) - (p.vePen || 0) - (p.omaggio || 0); }
-
-function render() {
-    let name = customNames[currentBoatID] || DEFAULT_FLEET[parseInt(currentBoatID)-1];
-    document.getElementById('current-boat-name').innerText = name;
-
-    // CASSA
-    document.getElementById('grid-cassa').innerHTML = db.prodotti.map((p, i) => `
-        <div class="product-btn" onclick="openGest(${i})">
-            <i>${p.i}</i>
+        <div class="p-6 bg-slate-50 border-t grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-                <b>${p.n}</b>
-                <span class="price-info">${p.pas.toFixed(1)}€ / ${p.pen.toFixed(1)}€</span>
-                <span class="stock">${calcGiacenza(p)}</span>
+                <label class="text-xs uppercase font-black text-slate-500 mb-2 block tracking-widest">Resoconto Finanziario</label>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
+                        <span class="text-sm font-bold w-32 uppercase">Incasso Oggi:</span>
+                        <input type="text" class="font-black text-xl text-blue-700 w-full outline-none bg-transparent" value="0.00€">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold w-32 uppercase text-slate-400 italic">Rimanenze (PAS):</span>
+                        <input type="text" class="font-bold text-slate-400 w-full outline-none bg-transparent italic" value="0.00€">
+                    </div>
+                    <textarea class="w-full mt-4 p-3 border border-slate-300 rounded-lg text-sm bg-white" rows="2" placeholder="Note aggiuntive..."></textarea>
+                </div>
             </div>
-        </div>`).join('');
-
-    // REPORT
-    let tInc = db.prodotti.reduce((acc, p) => acc + (p.vePas * p.pas) + (p.vePen * p.pen), 0);
-    let tValApp = 0;
-    
-    document.getElementById('accordion-list').innerHTML = db.prodotti.map((p, i) => {
-        let fine = calcGiacenza(p);
-        tValApp += fine * p.pas;
-        return `<div class="accordion">
-            <div class="acc-header" onclick="toggleAcc(${i})"><b>${p.n}</b> <b style="color:var(--gold)">${(fine*p.pas).toFixed(2)}€</b></div>
-            <div id="acc-${i}" class="acc-body">
-                <div class="edit-row price-row" style="margin-bottom:10px; border-bottom:1px solid #444">
-                    <span>Prezzo Pas:</span>
-                    <input type="number" step="0.5" value="${p.pas}" onchange="up(${i},'pas',this.value)" style="color:var(--gold); border-color:var(--gold)">
+            
+            <div class="flex flex-col items-center justify-center">
+                <span class="text-xs uppercase font-black text-slate-500 mb-2 tracking-widest">Convalida Responsabile</span>
+                <div class="relative w-full bg-white border-2 border-dashed border-slate-300 rounded-xl overflow-hidden">
+                    <canvas id="signature-pad" class="w-full h-32"></canvas>
+                    <button onclick="clearSignature()" class="no-print absolute top-2 right-2 text-[9px] bg-slate-800 text-white px-2 py-1 rounded-md font-bold uppercase opacity-50 hover:opacity-100 transition">
+                        Reset Firma
+                    </button>
                 </div>
-                <div class="edit-row price-row" style="margin-bottom:15px">
-                    <span>Prezzo Pen:</span>
-                    <input type="number" step="0.5" value="${p.pen}" onchange="up(${i},'pen',this.value)" style="color:var(--apple-blue); border-color:var(--apple-blue)">
-                </div>
-                <div class="edit-row"><span>Inizio Q:</span> <input type="number" value="${p.q}" onchange="up(${i},'q',this.value)"></div>
-                <div class="edit-row"><span>Carico:</span> <input type="number" value="${p.c}" onchange="up(${i},'c',this.value)"></div>
-                <div class="edit-row"><span>Vend. Pas:</span> <input type="number" value="${p.vePas}" onchange="up(${i},'vePas',this.value)"></div>
-                <div class="edit-row"><span>Vend. Pen:</span> <input type="number" value="${p.vePen}" onchange="up(${i},'vePen',this.value)"></div>
-                <div class="edit-row"><span>Scarichi:</span> <input type="number" value="${p.omaggio}" onchange="up(${i},'omaggio',this.value)"></div>
+                <div class="mt-2 text-[10px] font-bold text-slate-400 uppercase">Firma Eseguita sullo schermo</div>
             </div>
-        </div>`;
-    }).join('');
+        </div>
+    </div>
 
-    // INV
-    let tValReale = 0;
-    document.getElementById('inventory-list').innerHTML = db.prodotti.map((p, i) => {
-        let app = calcGiacenza(p);
-        let r = p.reale !== null ? p.reale : app;
-        tValReale += r * p.pas;
-        return `<div class="inv-row">
-            <div><b>${p.n}</b><br><small style="color:#888">App: ${app}</small></div>
-            <input type="number" value="${p.reale !== null ? p.reale : ''}" placeholder="${app}" onchange="up(${i},'reale',this.value)">
-        </div>`;
-    }).join('');
+    <script>
+        const allItems = [
+            ["💧 ACQUA", "0"],
+            ["🥜 ARACHIDI+", "0"],
+            ["👜 BORSE G", "0"],
+            ["🛍️ BORSE M", "0"],
+            ["🍫 BUENO/BISC", "0"],
+            ["🧢 CAPPELLI", "0"],
+            ["🍬 CARAMELLE", "0"],
+            ["🍪 CHOCO CHIPS", "0"],
+            ["☕ CIALDE", "0"],
+            ["☕ DECA", "0"],
+            ["🌾 FITNESS", "0"],
+            ["🍟 FONZIES", "0"],
+            ["☕ GINSENG", "0"],
+            ["🧥 IMPERMEAB", "0"],
+            ["🃏 KINDER CARDS", "0"],
+            ["🥤 LATTINE", "0"],
+            ["🍫 M&M", "0"],
+            ["👕 MAGLIE", "0"],
+            ["🥜 NIK NOK", "0"],
+            ["🍪 PAVESINI", "0"],
+            ["🍺 PERONI", "0"],
+            ["🍋 PERONI C.", "0"],
+            [" potatoes🥔 PRINGLES", "0"],
+            ["🍷 PROSECCO", "0"],
+            ["⚡ RED BULL", "0"],
+            ["🍪 RINGO/OREO", "0"],
+            ["🥨 RITZ", "0"],
+            ["🍹 SPRITZ", "0"],
+            ["🧃 SUCCO", "0"],
+            ["🍵 THE/CAMOM", "0"],
+            ["🍪 TUC", "0"],
+            ["🍫 TWIX/KIT KAT", "0"],
+            ["👨‍✈️ TU", "0"]
+        ];
 
-    let diff = tValReale - tValApp;
-    document.getElementById('inv-diff').innerText = (diff > 0 ? "+" : "") + diff.toFixed(2) + "€";
-    document.getElementById('inv-diff').style.color = diff >= 0 ? "var(--lime)" : "var(--red)";
-    
-    renderBuste();
-    document.getElementById('tot-incasso').innerText = tInc.toFixed(2) + "€";
-    document.getElementById('header-val-carico').innerText = tValApp.toFixed(2) + "€";
-    save();
-}
-
-function renderBuste() {
-    let h = "";
-    const calcP = (inc) => inc > 0 ? FISSO + (inc * PERC) : 0;
-    
-    [ {t: "1ª QUINDICINA", r: [1,15]}, {t: "2ª QUINDICINA", r: [16,31]} ].forEach(q => {
-        let totI = 0;
-        for(let d=q.r[0]; d<=q.r[1]; d++) totI += Number(db.history[d]) || 0;
-        h += `<div class="quin-box"><div class="quin-header"><b>${q.t}</b><small>Tot Paga: ${calcP(totI).toFixed(2)}€</small></div><div class="quin-grid">`;
-        for(let d=q.r[0]; d<=q.r[1]; d++) {
-            let v = db.history[d] || 0;
-            let pDay = calcP(v);
-            h += `<div class="day-cell ${v>0?'day-active':''}" onclick="openNumpad(${d})">
-                <b>${d}</b>
-                ${v>0 ? `<span class="day-val">${v}€</span><span class="day-paga">P:${pDay.toFixed(0)}€</span>` : ''}
-            </div>`;
+        function updateMezzo() {
+            const select = document.getElementById('mezzo-select');
+            document.getElementById('display-mezzo').innerText = select.value;
         }
-        h += `</div></div>`;
-    });
-    document.getElementById('quindicine-container').innerHTML = h;
-}
 
-function openGest(i) {
-    curIdx = i; qty = 1;
-    document.getElementById('g-nome').innerText = db.prodotti[i].n;
-    document.getElementById('g-qty').innerText = qty;
-    document.getElementById('mod-gest').style.display = 'flex';
-}
-
-function changeQty(v) { qty = Math.max(1, qty + v); document.getElementById('g-qty').innerText = qty; }
-
-function conferma(f) { 
-    db.prodotti[curIdx][f] += qty; 
-    closeModal('mod-gest'); 
-    render(); 
-}
-
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-function switchTab(t) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-    document.getElementById('page-'+t).classList.add('active-page');
-    document.querySelectorAll('.footer button').forEach(b => b.classList.remove('active'));
-    document.getElementById('t-'+t).classList.add('active');
-}
-
-function up(i, f, v) { db.prodotti[i][f] = v==='' ? (f==='reale'?null:0) : parseFloat(v); render(); }
-function toggleAcc(i) { let e = document.getElementById('acc-'+i); e.style.display = e.style.display === 'block' ? 'none' : 'block'; }
-function clearReali() { db.prodotti.forEach(p => p.reale = null); render(); }
-
-function openNumpad(d) {
-    selectedDay = d; 
-    numValue = (db.history[d] || 0).toString();
-    if(numValue === "0") numValue = "";
-    document.getElementById('numpad-title').innerText = "GIORNO " + d;
-    document.getElementById('numpad-display').innerText = numValue || "0";
-    document.getElementById('mod-numpad').style.display = 'flex';
-}
-function numIn(c) { numValue += c; document.getElementById('numpad-display').innerText = numValue; }
-function numDel() { numValue = numValue.slice(0,-1); document.getElementById('numpad-display').innerText = numValue || "0"; }
-function confirmNumpad() { db.history[selectedDay] = parseFloat(numValue) || 0; closeModal('mod-numpad'); render(); }
-
-function showConfirm(type) {
-    const btn = document.getElementById('confirm-yes');
-    document.getElementById('confirm-title').innerText = type === 'fine' ? "CHIUDI GIORNATA" : "AZZERA QUINDICINA";
-    document.getElementById('confirm-msg').innerText = type === 'fine' ? "Scarico le vendite di oggi e aggiorno la busta?" : "Attenzione: questo azzererà TUTTI i dati della quindicina attuale (magazzino e incassi busta paga). Continuare?";
-    btn.onclick = () => {
-        if(type === 'fine') {
-            let d = new Date().getDate();
-            let inc = db.prodotti.reduce((acc, p) => acc + (p.vePas * p.pas) + (p.vePen * p.pen), 0);
-            db.history[d] = (db.history[d] || 0) + inc;
-            db.prodotti.forEach(p => { p.q = calcGiacenza(p); p.c=p.vePas=p.vePen=p.omaggio=0; });
-        } else {
-            // AZZERA QUINDICINA TOTALE
-            // 1. Resetta Magazzino
-            db.prodotti.forEach(p => { 
-                p.q = p.reale !== null ? p.reale : calcGiacenza(p); 
-                p.c = 0; 
-                p.vePas = 0; 
-                p.vePen = 0; 
-                p.omaggio = 0; 
-                p.reale = null; 
-            });
-            // 2. Resetta Storico Incassi Busta
-            db.history = {}; 
+        function calculateTotal(val) {
+            if (!val) return 0;
+            return val.toString().split('+').reduce((acc, curr) => {
+                const n = parseInt(curr.trim());
+                return acc + (isNaN(n) ? 0 : n);
+            }, 0);
         }
-        closeModal('mod-confirm'); render();
-    };
-    document.getElementById('mod-confirm').style.display = 'flex';
-}
 
-function openBoatMenu() {
-    let h = "";
-    for(let i=1; i<=20; i++) {
-        let n = customNames[i] || DEFAULT_FLEET[i-1];
-        let activeStyle = (i.toString() === currentBoatID) ? 'border: 2px solid var(--lime); background: #3a3a3c;' : '';
-        h += `<div class="boat-item" style="${activeStyle}">
-                <div class="boat-name-part" onclick="selectBoat('${i}')">
-                    ${n} ${i.toString() === currentBoatID ? '✓' : ''}
-                </div>
-                <div class="edit-icon" onclick="openEditBoatName('${i}')">📝</div>
-              </div>`;
-    }
-    document.getElementById('boat-list-container').innerHTML = h;
-    document.getElementById('mod-boat').style.display = 'flex';
-}
+        function createRow(name = "", val = "0") {
+            const tr = document.createElement('tr');
+            tr.className = "border-b border-slate-200 hover:bg-slate-50 transition";
+            const total = calculateTotal(val);
+            tr.innerHTML = `
+                <td class="py-2 px-2 border text-center no-print">
+                    <input type="checkbox" onchange="this.parentElement.parentElement.classList.toggle('row-checked')" class="w-4 h-4 accent-blue-600">
+                </td>
+                <td class="py-2 px-4 border font-bold text-slate-700">
+                    <input type="text" value="${name}" class="w-full bg-transparent outline-none">
+                </td>
+                <td class="py-2 px-4 border italic text-slate-400">
+                    <input type="text" value="${val}" oninput="updateTotal(this)" class="w-full bg-transparent outline-none font-mono">
+                </td>
+                <td class="py-2 px-4 border text-center font-black bg-slate-50 text-slate-900 text-lg total-cell">${total}</td>
+                <td class="py-2 px-2 border text-center no-print">
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-slate-300 hover:text-rose-500 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                </td>
+            `;
+            return tr;
+        }
 
-function openEditBoatName(id) {
-    editingBoatID = id;
-    let current = customNames[id] || DEFAULT_FLEET[parseInt(id)-1];
-    document.getElementById('edit-boat-info').innerText = "Stai modificando la barca #" + id;
-    document.getElementById('input-boat-name').value = current;
-    document.getElementById('mod-edit-boat').style.display = 'flex';
-}
+        function updateTotal(input) {
+            const row = input.parentElement.parentElement;
+            row.querySelector('.total-cell').innerText = calculateTotal(input.value);
+        }
 
-function saveCustomBoatName() {
-    let newName = document.getElementById('input-boat-name').value.trim().toUpperCase();
-    if (newName && editingBoatID) {
-        customNames[editingBoatID] = newName;
-        localStorage.setItem('NAV_FLEET_NAMES', JSON.stringify(customNames));
-        closeModal('mod-edit-boat');
-        openBoatMenu();
-        render();
-    }
-}
+        function clearAllCounts() {
+            if(confirm("Vuoi azzerare tutti i conteggi per questo mezzo?")) {
+                document.querySelectorAll('#inventory-body input[type="text"]:nth-child(1)').forEach((input, index) => {
+                    if (index % 2 !== 0) { // Seleziona solo i campi conteggio
+                        input.value = "0";
+                        updateTotal(input);
+                    }
+                });
+            }
+        }
 
-function selectBoat(id) { 
-    currentBoatID = id.toString(); 
-    localStorage.setItem('NAV_LAST_ID', currentBoatID);
-    const display = document.getElementById('boat-display');
-    display.classList.add('changed');
-    setTimeout(() => display.classList.remove('changed'), 500);
-    closeModal('mod-boat'); 
-    loadData();
-}
+        function addRow() {
+            document.getElementById('inventory-body').appendChild(createRow("Nuovo Articolo", "0"));
+        }
 
-function exportJSON() { let b=new Blob([JSON.stringify(db)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download="backup.json"; a.click(); }
-function importData(e) { let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=(ev)=>{ try{db=JSON.parse(ev.target.result); repairData(); render();}catch(err){alert("Errore caricamento");} }; r.readAsText(f); }
-</script>
+        // --- Logica Firma ---
+        const canvas = document.getElementById('signature-pad');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+        function startDrawing(e) { drawing = true; ctx.beginPath(); const pos = getPos(e); ctx.moveTo(pos.x, pos.y); e.preventDefault(); }
+        function draw(e) { if (!drawing) return; const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); }
+        function stopDrawing() { drawing = false; }
+        function clearSignature() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+        function setupCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.strokeStyle = "#0f172a";
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = "round";
+        }
+
+        window.onload = () => {
+            const body = document.getElementById('inventory-body');
+            allItems.forEach(item => body.appendChild(createRow(item[0], item[1])));
+            setupCanvas();
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            window.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('touchstart', startDrawing, {passive: false});
+            canvas.addEventListener('touchmove', draw, {passive: false});
+            canvas.addEventListener('touchend', stopDrawing);
+        };
+        window.onresize = setupCanvas;
+    </script>
 </body>
 </html>
 
+```
