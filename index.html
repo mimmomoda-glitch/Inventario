@@ -1,112 +1,291 @@
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario Flotta Totale</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Salerno Jet App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @media print { .no-print { display: none !important; } }
-        .row-checked { background-color: #f0fdf4; opacity: 0.7; }
-        #signature-pad { touch-action: none; cursor: crosshair; background-color: white; border: 2px dashed #cbd5e1; border-radius: 12px; }
+        :root { 
+            --bg: #0f172a; 
+            --card: #1e293b; 
+            --text: #f8fafc; 
+            --cyan: #22d3ee; 
+            --amber: #fbbf24; 
+            --border: #334155; 
+            --key-bg: #334155;
+        }
+        
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        .active-tab { border-bottom: 4px solid var(--cyan); color: var(--cyan) !important; }
+        
+        /* Stili Ordine Carico */
+        .category-label { color: var(--amber); font-weight: bold; margin: 20px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; text-transform: uppercase; font-size: 13px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 12px; border-radius: 10px; margin-bottom: 6px; border: 1px solid var(--border); }
+        .item-row.selected { border-color: var(--cyan); background: #1e293b; box-shadow: 0 0 10px rgba(34, 211, 238, 0.2); }
+        .qty-box { width: 70px; height: 35px; background: #000; border: 1px solid var(--border); color: var(--cyan); text-align: center; border-radius: 5px; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+
+        /* Tastierino Numerico */
+        .keypad { position: fixed; bottom: 0; left: 0; width: 100%; background: #1e293b; padding: 8px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; box-sizing: border-box; border-top: 2px solid var(--cyan); z-index: 1000; }
+        .key { background: var(--key-bg); color: white; border: none; padding: 12px 0; font-size: 18px; font-weight: bold; border-radius: 6px; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
+        .key:active { background: var(--cyan); color: #000; }
+        .key.op { background: #475569; color: var(--amber); }
+        .key.del { background: #7f1d1d; }
+        .action-key { grid-column: span 2; font-size: 12px; height: 45px; }
+
+        /* Stili Inventario (dal prospetto fornito) */
+        .row-checked { background-color: #f0fdf4 !important; opacity: 0.7; color: #1e293b !important; }
+        #signature-pad { touch-action: none; cursor: crosshair; background-color: white; border: 2px dashed #cbd5e1; border-radius: 12px; width: 100%; height: 128px; }
+
+        @media print { 
+            .no-print, .keypad, header { display: none !important; } 
+            body { background: white !important; color: black !important; padding: 0 !important; } 
+            #section-inventario { display: block !important; padding: 0 !important; }
+            .bg-white { box-shadow: none !important; border: none !important; }
+            .inventory-table th, .inventory-table td { border: 1px solid #94a3b8 !important; color: black !important; }
+            #display-mezzo { color: black !important; }
+        }
     </style>
 </head>
-<body class="bg-slate-100 py-4 px-2 antialiased">
+<body class="pb-80">
 
-    <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden">
-        
-        <div class="bg-slate-900 text-white p-6">
-            <div class="flex flex-col gap-4">
-                <div class="flex justify-between items-center">
-                    <h1 id="display-mezzo" class="text-2xl font-black uppercase">SELEZIONA JET</h1>
-                    <button onclick="window.print()" class="no-print bg-blue-600 px-4 py-2 rounded-lg font-bold text-sm">STAMPA PDF</button>
+    <!-- Navigazione Superiore -->
+    <header class="bg-slate-900 sticky top-0 z-50 shadow-xl no-print">
+        <div class="flex justify-around p-4 text-slate-400 font-black text-xs tracking-widest uppercase">
+            <button id="tab-ordine" onclick="switchTab('ordine')" class="active-tab pb-2 px-2">📦 Carico</button>
+            <button id="tab-inventario" onclick="switchTab('inventario')" class="pb-2 px-2">📋 Inventario</button>
+        </div>
+    </header>
+
+    <!-- SEZIONE 1: ORDINE CARICO -->
+    <main id="section-ordine" class="p-4 max-w-2xl mx-auto">
+        <h1 class="text-center text-cyan-400 font-black text-xl mb-4">ORDINE SALERNO JET</h1>
+        <div id="ordine-container"></div>
+    </main>
+
+    <!-- SEZIONE 2: INVENTARIO (Seguendo il nuovo prospetto) -->
+    <main id="section-inventario" class="hidden p-4 max-w-4xl mx-auto">
+        <div class="bg-white shadow-2xl rounded-xl overflow-hidden">
+            
+            <!-- Testata Inventario -->
+            <div class="bg-slate-900 text-white p-6">
+                <div class="flex flex-col gap-4">
+                    <div class="flex justify-between items-center">
+                        <h1 id="display-mezzo" class="text-2xl font-black uppercase">SELEZIONA JET</h1>
+                        <button onclick="window.print()" class="no-print bg-blue-600 px-4 py-2 rounded-lg font-bold text-sm">STAMPA PDF</button>
+                    </div>
+                    
+                    <select id="mezzo-select-inv" onchange="caricaMezzo(this.value)" class="no-print bg-slate-800 border-none text-white text-sm rounded-lg p-3 font-bold flex-grow">
+                        <option value="">-- CLICCA QUI PER CAMBIARE MEZZO --</option>
+                        <option value="napoli">NAPOLI JET</option>
+                        <option value="salerno">SALERNO JET</option>
+                        <option value="amalfi">AMALFI JET</option>
+                        <option value="super">SUPER JET</option>
+                        <option value="capri">CAPRI JET</option>
+                        <option value="ischia">ISCHIA JET</option>
+                        <option value="tremiti">TREMITI JET</option>
+                        <option value="vesuvio">VESUVIO JET</option>
+                        <option value="jumbo">JUMBO JET</option>
+                        <option value="sorrento">SORRENTO JET</option>
+                        <option value="giunone">GIUNONE JET</option>
+                        <option value="europa">EUROPA JET</option>
+                        <option value="cds">CITTÀ DI SORRENTO</option>
+                        <option value="apollo">APOLLO</option>
+                        <option value="freccia">FRECCIA D'ARGENTO</option>
+                        <option value="bliz">BLIZ</option>
+                        <option value="mar3">ISCHIA MAR 3</option>
+                        <option value="uragano">URAGANO</option>
+                        <option value="acquarius">ACQUARIUS</option>
+                        <option value="raid">RAID</option>
+                    </select>
                 </div>
-                
-                <select id="mezzo-select" onchange="caricaMezzo(this.value)" class="no-print bg-slate-800 border-none text-white text-sm rounded-lg p-3 font-bold flex-grow">
-                    <option value="">-- CLICCA QUI PER CAMBIARE MEZZO --</option>
-                    <option value="napoli">NAPOLI JET</option>
-                    <option value="salerno">SALERNO JET</option>
-                    <option value="amalfi">AMALFI JET</option>
-                    <option value="super">SUPER JET</option>
-                    <option value="capri">CAPRI JET</option>
-                    <option value="ischia">ISCHIA JET</option>
-                    <option value="tremiti">TREMITI JET</option>
-                    <option value="vesuvio">VESUVIO JET</option>
-                    <option value="jumbo">JUMBO JET</option>
-                    <option value="sorrento">SORRENTO JET</option>
-                    <option value="giunone">GIUNONE JET</option>
-                    <option value="europa">EUROPA JET</option>
-                    <option value="cds">CITTÀ DI SORRENTO</option>
-                    <option value="apollo">APOLLO</option>
-                    <option value="freccia">FRECCIA D'ARGENTO</option>
-                    <option value="bliz">BLIZ</option>
-                    <option value="mar3">ISCHIA MAR 3</option>
-                    <option value="uragano">URAGANO</option>
-                    <option value="acquarius">ACQUARIUS</option>
-                    <option value="raid">RAID</option>
-                </select>
+            </div>
+
+            <!-- Tabella Inventario -->
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse inventory-table">
+                    <thead class="bg-slate-100">
+                        <tr class="text-slate-600 uppercase text-[10px] font-black">
+                            <th class="py-3 px-2 border no-print w-10 text-center">OK</th>
+                            <th class="py-3 px-4 border text-left">Articolo</th>
+                            <th class="py-3 px-4 border text-left">Conteggio</th>
+                            <th class="py-3 px-4 border text-center w-20">Tot</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-body" class="text-slate-800 text-sm">
+                        <tr><td colspan="4" class="p-10 text-center text-slate-400 italic">Scegli un mezzo sopra per caricare i dati</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Firma -->
+            <div class="p-6 bg-slate-50 border-t flex flex-col items-center">
+                <span class="text-[10px] uppercase font-black text-slate-500 mb-2 tracking-widest">Firma Responsabile</span>
+                <canvas id="signature-pad"></canvas>
+                <button onclick="clearSignature()" class="no-print mt-2 text-[10px] text-red-500 font-bold uppercase">Cancella Firma</button>
             </div>
         </div>
+    </main>
 
-        <div class="overflow-x-auto">
-            <table class="w-full border-collapse">
-                <thead class="bg-slate-100">
-                    <tr class="text-slate-600 uppercase text-[10px] font-black">
-                        <th class="py-3 px-2 border no-print w-10 text-center">OK</th>
-                        <th class="py-3 px-4 border text-left">Articolo</th>
-                        <th class="py-3 px-4 border text-left">Conteggio</th>
-                        <th class="py-3 px-4 border text-center w-20">Tot</th>
-                    </tr>
-                </thead>
-                <tbody id="inventory-body" class="text-slate-800 text-sm">
-                    <tr><td colspan="4" class="p-10 text-center text-slate-400">Scegli un mezzo sopra per caricare i dati</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="p-6 bg-slate-50 border-t flex flex-col items-center">
-            <span class="text-[10px] uppercase font-black text-slate-500 mb-2 tracking-widest">Firma Responsabile</span>
-            <canvas id="signature-pad" class="w-full h-32"></canvas>
-        </div>
+    <!-- TASTIERINO (SOLO PER ORDINE CARICO) -->
+    <div id="main-keypad" class="keypad no-print">
+        <button class="key" onclick="press('7')">7</button>
+        <button class="key" onclick="press('8')">8</button>
+        <button class="key" onclick="press('9')">9</button>
+        <button class="key op" onclick="press(':')">:</button>
+        <button class="key" onclick="press('4')">4</button>
+        <button class="key" onclick="press('5')">5</button>
+        <button class="key" onclick="press('6')">6</button>
+        <button class="key op" onclick="press('*')">*</button>
+        <button class="key" onclick="press('1')">1</button>
+        <button class="key" onclick="press('2')">2</button>
+        <button class="key" onclick="press('3')">3</button>
+        <button class="key op" onclick="press('-')">-</button>
+        <button class="key del" onclick="press('DEL')">⌫</button>
+        <button class="key" onclick="press('0')">0</button>
+        <button class="key op" onclick="press('+')">+</button>
+        <button class="key op" onclick="press('.')">.</button>
+        <button class="key action-key bg-cyan-500 text-slate-900" onclick="copiaOrdine()">📋 COPIA WHATSAPP</button>
+        <button class="key action-key bg-emerald-600 text-white" onclick="window.print()">🖨️ PDF / STAMPA</button>
     </div>
 
     <script>
-        const db = {
+        // Database Prodotti Ordine
+        const catalogoOrdine = [
+            { c: "Bevande", i: ["Acqua Naturale", "Acqua Frizzante", "Acqua 2 Litri", "Coca", "Coca 0", "Fanta", "Sprite", "Lemonsoda", "The Pesca", "The Limone", "Birra Peroni", "Peroni Capri", "Spritz", "Red Bull", "Gatorade", "Vino Aglianico", "Vino Falanghina", "Vino 0,25", "Prosecco 0,25", "Succhi", "Limoncello/Amaro"] },
+            { c: "Caffetteria", i: ["Caffè", "Decaffeinato", "Cialde", "Ginseng", "Orzo", "Latte", "Dietor", "Thè / Camomilla"] },
+            { c: "Snack & Food", i: ["Patatine", "Fonzies", "Pringles", "Ritz", "Tuc", "Arachidi", "Nik Nok", "Mikado", "Twix", "Kit Kat", "M&M's", "Kinder Bueno", "Muffin", "Oreo", "Ringo", "Fitness", "Pavesini"] },
+            { c: "Extra", i: ["Borse G", "Borse M", "Cappelli", "Impermeabili", "Maglie"] }
+        ];
+
+        // Database Inventario (dal tuo prospetto)
+        const dbInventario = {
             napoli: [
-                {n:"💧 ACQUA",v:"313"}, {n:"🥜 ARACHIDI+",v:"28"}, {n:"👜 BORSE G",v:"5"}, {n:"🛍️ BORSE M",v:"1"}, {n:"🍫 BUENO/BISC",v:"55"}, {n:"🧢 CAPPELLI",v:"175"}, {n:"🍬 CARAMELLE",v:"56"}, {n:"☕ DECA",v:"20"}, {n:"🍬 DIETOR",v:"17"}, {n:"🌾 FITNESS",v:"33"}, {n:"🍟 FONZIES",v:"45"}, {n:"🧥 IMPERMEAB",v:"70"}, {n:"☕ GINSENG",v:"10"}, {n:"🥤 LATTINE",v:"338"}, {n:"👕 MAGLIE",v:"83"}, {n:"🥢 MIKADO",v:"17"}, {n:"🧁 MUFFIN",v:"17"}, {n:"🥜 NIK NOK",v:"15"}, {n:"☕ ORZO",v:"10"}, {n:"🍪 PAVESINI",v:"4"}, {n:"🍺 PERONI",v:"115"}, {n:"🍋 PERONI C.",v:"24"}, {n:"🥔 PRINGLES",v:"62"}, {n:"🍷 PROSECCO",v:"59"}, {n:"⚡ RED BULL",v:"55"}, {n:"🍪 RINGO/OREO",v:"96"}, {n:"🥨 RITZ",v:"12"}, {n:"🍹 SPRITZ",v:"57"}, {n:"🧃 SUCCO",v:"53"}, {n:"🍵 THE/CAMOM",v:"88"}, {n:"🍪 TUC",v:"14"}, {n:"🍫 TWIX/KIT KAT",v:"170"}
+                {n:"💧 ACQUA",v:"313"}, {n:"🥜 ARACHIDI+",v:"28"}, {n:"👜 BORSE G",v:"5"}, {n:"🛍️ BORSE M",v:"1"}, {n:"🍫 BUENO/BISC",v:"55"}, {n:"🧢 CAPPELLI",v:"175"}, {n:"🍬 CARAMELLE",v:"56"}, {n:"☕ DECA",v:"20"}, {n:"🍬 DIETOR",v:"17"}, {n:"🌾 FITNESS",v:"33"}, {n:"🍟 FONZIES",v:"45"}, {n:"🧥 IMPERMEAB",v:"70"}, {n:"☕ GINSENG",v:"10"}, {n:"🥤 LATTINE",v:"338"}, {n:"👕 MAGLIE",v:"83"}, {n:"🥢 MIKADO",v:"17"}, {n:"🧁 MUFFIN",v:"17"}, {n:"🥜 NIK NOK",v:"15"}, {n:"☕ ORZO",v:"10"}, {n:"🍪 PAVESINI",v:"4"}, {n:"🍺 PERONI",v:"115"}, {n:"🍋 PERONI C.",v:"24"}, {n:"🥔 PRINGLES",v:"62"}, {n:"🍷 PROSECCO",v:"59"}, {n:"⚡ RED BULL",v:"55"}, {n:"🍪 RINGO/OREO",v:"96"}, {n:"🥨 RITZ",v:"12"}, {n:"🍹 SPRITZ",v:"57"}, {n:"🧃 SUCCO",v:"53"}, {n:"🍵 THE/CAMOM",v:"88"}, {n:"🍪 TUC",v:"14"}, {n:"🍷 VINO AGLIAN.",v:"0"}, {n:"🍷 VINO FALANG.",v:"0"}, {n:"🍫 TWIX/KIT KAT",v:"170"}
             ],
             salerno: [
-                {n:"💧 ACQUA",v:"72+19+24"}, {n:"🥜 ARACHIDI+",v:"4+12"}, {n:"👜 BORSE G",v:"11+4+6+2"}, {n:"🍫 BUENO/BISC",v:"35"}, {n:"🧢 CAPPELLI",v:"116"}, {n:"🍬 CARAMELLE",v:"37+40"}, {n:"☕ CIALDE",v:"140"}, {n:"☕ DECA",v:"4"}, {n:"🍬 DIETOR",v:"22"}, {n:"🌾 FITNESS",v:"15"}, {n:"🍟 FONZIES",v:"6+9+3+22+21"}, {n:"☕ GINSENG",v:"18"}, {n:"🥛 LATTE",v:"4"}, {n:"🥤 LATTINE",v:"63+158+7+6"}, {n:"👕 MAGLIE",v:"137"}, {n:"🥢 MIKADO",v:"17"}, {n:"🧁 MUFFIN",v:"28"}, {n:"🥜 NIK NOK",v:"17"}, {n:"☕ ORZO",v:"50"}, {n:"🍪 PAVESINI",v:"18"}, {n:"🍺 PERONI",v:"112+20+22+2"}, {n:"🍋 PERONI C.",v:"30+10+4"}, {n:"🥔 PRINGLES",v:"36+28"}, {n:"🍷 PROSECCO",v:"20+10+20+30"}, {n:"⚡ RED BULL",v:"38"}, {n:"🍪 RINGO/OREO",v:"100"}, {n:"🥨 RITZ",v:"15+10"}, {n:"🍹 SPRITZ",v:"50"}, {n:"🧃 SUCCO",v:"16"}, {n:"🍵 THE/CAMOM",v:"63"}, {n:"🍪 TUC",v:"14"}, {n:"🍫 TWIX/KIT KAT",v:"51+20+11"}
+                {n:"💧 ACQUA",v:"72+19+24"}, {n:"🥜 ARACHIDI+",v:"4+12"}, {n:"👜 BORSE G",v:"11+4+6+2"}, {n:"🍫 BUENO/BISC",v:"35"}, {n:"🧢 CAPPELLI",v:"116"}, {n:"🍬 CARAMELLE",v:"37+40"}, {n:"☕ CIALDE",v:"140"}, {n:"☕ DECA",v:"4"}, {n:"🍬 DIETOR",v:"22"}, {n:"🌾 FITNESS",v:"15"}, {n:"🍟 FONZIES",v:"6+9+3+22+21"}, {n:"☕ GINSENG",v:"18"}, {n:"🥛 LATTE",v:"4"}, {n:"🥤 LATTINE",v:"63+158+7+6"}, {n:"👕 MAGLIE",v:"137"}, {n:"🥢 MIKADO",v:"17"}, {n:"🧁 MUFFIN",v:"28"}, {n:"🥜 NIK NOK",v:"17"}, {n:"☕ ORZO",v:"50"}, {n:"🍪 PAVESINI",v:"18"}, {n:"🍺 PERONI",v:"112+20+22+2"}, {n:"🍋 PERONI C.",v:"30+10+4"}, {n:"🥔 PRINGLES",v:"36+28"}, {n:"🍷 PROSECCO",v:"20+10+20+30"}, {n:"⚡ RED BULL",v:"38"}, {n:"🍪 RINGO/OREO",v:"100"}, {n:"🥨 RITZ",v:"15+10"}, {n:"🍹 SPRITZ",v:"50"}, {n:"🧃 SUCCO",v:"16"}, {n:"🍵 THE/CAMOM",v:"63"}, {n:"🍪 TUC",v:"14"}, {n:"🍷 VINO AGLIAN.",v:"0"}, {n:"🍷 VINO FALANG.",v:"0"}, {n:"🍫 TWIX/KIT KAT",v:"51+20+11"}
             ],
-            default: ["💧 ACQUA", "🥜 ARACHIDI+", "👜 BORSE G", "🛍️ BORSE M", "🍫 BUENO/BISC", "🧢 CAPPELLI", "🍬 CARAMELLE", "🍪 CHOCO CHIPS", "☕ CIALDE", "☕ DECA", "🍬 DIETOR", "🌾 FITNESS", "🍟 FONZIES", "☕ GINSENG", "🧥 IMPERMEAB", "🃏 KINDER CARDS", "🥤 LATTINE", "🍫 M&M", "👕 MAGLIE", "🥢 MIKADO", "🧁 MUFFIN", "🥜 NIK NOK", "☕ ORZO", "🍪 PAVESINI", "🍺 PERONI", "🍋 PERONI C.", "🥔 PRINGLES", "🍷 PROSECCO", "⚡ RED BULL", "🍪 RINGO/OREO", "🥨 RITZ", "🍹 SPRITZ", "🧃 SUCCO", "🍵 THE/CAMOM", "🍪 TUC", "🍫 TWIX/KIT KAT"]
+            default: ["💧 ACQUA", "🥜 ARACHIDI+", "👜 BORSE G", "🛍️ BORSE M", "🍫 BUENO/BISC", "🧢 CAPPELLI", "🍬 CARAMELLE", "🍪 CHOCO CHIPS", "☕ CIALDE", "☕ DECA", "🍬 DIETOR", "🌾 FITNESS", "🍟 FONZIES", "☕ GINSENG", "🧥 IMPERMEAB", "🃏 KINDER CARDS", "🥤 LATTINE", "🍫 M&M", "👕 MAGLIE", "🥢 MIKADO", "🧁 MUFFIN", "🥜 NIK NOK", "☕ ORZO", "🍪 PAVESINI", "🍺 PERONI", "🍋 PERONI C.", "🥔 PRINGLES", "🍷 PROSECCO", "⚡ RED BULL", "🍪 RINGO/OREO", "🥨 RITZ", "🍹 SPRITZ", "🧃 SUCCO", "🍵 THE/CAMOM", "🍪 TUC", "🍷 VINO AGLIAN.", "🍷 VINO FALANG.", "🍫 TWIX/KIT KAT"]
         };
 
+        let selectedElement = null;
+
+        function init() {
+            // Setup Ordine
+            const container = document.getElementById('ordine-container');
+            catalogoOrdine.forEach(cat => {
+                let h = document.createElement('div'); h.className = 'category-label'; h.innerText = cat.c; container.appendChild(h);
+                cat.i.forEach(art => {
+                    let r = document.createElement('div'); r.className = 'item-row';
+                    r.onclick = () => selectRow(r, art);
+                    r.innerHTML = `<span class="name text-sm">${art}</span><div class="qty-box" id="qty-${art.replace(/\s+/g, '_')}">0</div>`;
+                    container.appendChild(r);
+                });
+            });
+            initCanvas();
+        }
+
+        function switchTab(tab) {
+            document.getElementById('section-ordine').classList.toggle('hidden', tab !== 'ordine');
+            document.getElementById('section-inventario').classList.toggle('hidden', tab !== 'inventario');
+            document.getElementById('main-keypad').classList.toggle('hidden', tab !== 'ordine');
+            document.getElementById('tab-ordine').classList.toggle('active-tab', tab === 'ordine');
+            document.getElementById('tab-inventario').classList.toggle('active-tab', tab === 'inventario');
+        }
+
+        // --- Logica Ordine ---
+        function selectRow(el, id) {
+            document.querySelectorAll('.item-row').forEach(r => r.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedElement = document.getElementById(`qty-${id.replace(/\s+/g, '_')}`);
+        }
+
+        function press(val) {
+            if (!selectedElement) return;
+            let current = selectedElement.innerText;
+            if (val === 'DEL') {
+                selectedElement.innerText = current.length > 1 ? current.slice(0, -1) : "0";
+            } else {
+                selectedElement.innerText = (current === "0" && val !== '.') ? val : current + val;
+            }
+        }
+
+        function copiaOrdine() {
+            let t = `📦 *ORDINE SALERNO JET*\n📅 ${new Date().toLocaleDateString()}\n--------------------------\n`;
+            let hasItems = false;
+            document.querySelectorAll('.qty-box').forEach(box => {
+                if(box.innerText !== "0") {
+                    t += `▪️ *${box.id.replace('qty-','').replace(/_/g,' ')}:* ${box.innerText}\n`;
+                    hasItems = true;
+                }
+            });
+            if(!hasItems) return alert("Nessun prodotto inserito!");
+            const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el); el.select();
+            document.execCommand('copy'); document.body.removeChild(el);
+            alert("Ordine Copiato!");
+        }
+
+        // --- Logica Inventario (Nuovo Prospetto) ---
         function caricaMezzo(id) {
             if (!id) return;
-            document.getElementById('display-mezzo').innerText = document.getElementById('mezzo-select').options[document.getElementById('mezzo-select').selectedIndex].text;
+            document.getElementById('display-mezzo').innerText = document.getElementById('mezzo-select-inv').options[document.getElementById('mezzo-select-inv').selectedIndex].text;
             const body = document.getElementById('inventory-body');
             body.innerHTML = "";
-            const dati = db[id] || db.default.map(n => ({n, v:"0"}));
+            const dati = dbInventario[id] || dbInventario.default.map(n => ({n, v:"0"}));
             dati.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-slate-200 transition";
-                const total = item.v.split('+').reduce((a, b) => a + (parseInt(b.trim()) || 0), 0);
+                const total = item.v.toString().split('+').reduce((a, b) => a + (parseInt(b.trim()) || 0), 0);
                 tr.innerHTML = `
                     <td class="p-2 border text-center no-print"><input type="checkbox" onchange="this.parentElement.parentElement.classList.toggle('row-checked')" class="w-5 h-5"></td>
                     <td class="p-3 border font-bold">${item.n}</td>
-                    <td class="p-2 border"><input type="text" oninput="updateT(this)" class="w-full bg-transparent font-mono text-blue-600 font-bold" value="${item.v}"></td>
+                    <td class="p-2 border"><input type="text" oninput="updateT(this)" class="w-full bg-transparent font-mono text-blue-600 font-bold outline-none" value="${item.v}"></td>
                     <td class="p-2 border text-center font-black bg-slate-50 total-cell">${total}</td>`;
                 body.appendChild(tr);
             });
         }
 
-        function updateT(i){ const s = i.value.split('+').reduce((a,b)=>a+(parseInt(b.trim())||0),0); i.parentElement.parentElement.querySelector('.total-cell').innerText=s; }
-        const c = document.getElementById('signature-pad'); const ctx = c.getContext('2d'); let d = false;
-        function getP(e){ const r = c.getBoundingClientRect(); const x = e.touches ? e.touches[0].clientX : e.clientX; const y = e.touches ? e.touches[0].clientY : e.clientY; return { x: x - r.left, y: y - r.top }; }
-        c.addEventListener('touchstart', (e)=>{ d=true; ctx.beginPath(); const p=getP(e); ctx.moveTo(p.x, p.y); e.preventDefault(); }, {passive:false});
-        c.addEventListener('touchmove', (e)=>{ if(d){ const p=getP(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); } }, {passive:false});
-        window.addEventListener('touchend', ()=> d=false);
-        window.onload = () => { c.width = c.offsetWidth; c.height = c.offsetHeight; ctx.lineWidth = 2.5; ctx.lineCap="round"; ctx.strokeStyle="#0f172a"; };
+        function updateT(i){ 
+            const s = i.value.split('+').reduce((a,b)=>a+(parseInt(b.trim())||0),0); 
+            i.parentElement.parentElement.querySelector('.total-cell').innerText = s; 
+        }
+
+        // --- Firma Digitale ---
+        let canvas, ctx, drawing = false;
+        function initCanvas() {
+            canvas = document.getElementById('signature-pad');
+            ctx = canvas.getContext('2d');
+            const ratio = window.devicePixelRatio || 1;
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            ctx.scale(ratio, ratio);
+            ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.strokeStyle = "#0f172a";
+
+            const getP = (e) => {
+                const r = canvas.getBoundingClientRect();
+                const x = e.touches ? e.touches[0].clientX : e.clientX;
+                const y = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: x - r.left, y: y - r.top };
+            };
+
+            const start = (e) => { drawing = true; ctx.beginPath(); const p = getP(e); ctx.moveTo(p.x, p.y); };
+            const move = (e) => { if(drawing){ const p = getP(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); } };
+            const stop = () => drawing = false;
+
+            canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); window.addEventListener('mouseup', stop);
+            canvas.addEventListener('touchstart', start, {passive:false}); canvas.addEventListener('touchmove', move, {passive:false}); window.addEventListener('touchend', stop);
+        }
+
+        function clearSignature() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+        window.onload = init;
     </script>
 </body>
 </html>
+
+```
