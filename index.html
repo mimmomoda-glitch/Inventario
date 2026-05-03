@@ -18,7 +18,7 @@
             --key-bg: #334155;
         }
         
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
         .active-tab { border-bottom: 4px solid var(--cyan); color: var(--cyan) !important; }
         
         .category-label { color: var(--amber); font-weight: bold; margin: 20px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; text-transform: uppercase; font-size: 13px; }
@@ -36,11 +36,12 @@
         .row-checked { background-color: #f1f5f9 !important; }
         #signature-pad { touch-action: none; cursor: crosshair; background-color: white; border: 2px solid #000; border-radius: 8px; width: 100%; height: 150px; }
 
-        /* Fix per l'header per evitare sovrapposizioni su mobile */
-        .header-responsive { display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .title-responsive { font-size: 1.1rem; line-height: 1.2; max-width: 50%; }
+        /* Fix Header Responsive */
+        .header-container { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px; }
+        .title-box { flex: 1; min-width: 0; }
+        .title-box h1 { font-size: 1.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .btn-group { display: flex; gap: 4px; flex-shrink: 0; }
 
-        /* OTTIMIZZAZIONE STAMPA PDF */
         @media print { 
             @page { margin: 1cm; }
             .no-print, .keypad, header { display: none !important; } 
@@ -67,29 +68,34 @@
         </div>
     </header>
 
+    <!-- SEZIONE CARICO -->
     <main id="section-ordine" class="p-4 max-w-2xl mx-auto">
-        <div class="flex justify-between items-center mb-4">
-            <h1 class="text-cyan-400 font-black text-xl">ORDINE CARICO</h1>
-            <div class="flex gap-2">
-                <button onclick="salvaCaricoTxt()" class="bg-slate-700 px-3 py-1 rounded text-[10px] font-bold uppercase">Salva</button>
-                <button onclick="document.getElementById('import-carico').click()" class="bg-slate-700 px-3 py-1 rounded text-[10px] font-bold uppercase">Importa</button>
-                <input type="file" id="import-carico" class="hidden" accept=".txt" onchange="importaCaricoTxt(this)">
+        <div class="header-container mb-4">
+            <div class="title-box">
+                <h1 class="text-cyan-400 font-black">ORDINE CARICO</h1>
+            </div>
+            <div class="btn-group">
+                <button onclick="salvaCaricoTxt()" class="bg-slate-700 px-2 py-1.5 rounded text-[10px] font-bold uppercase text-white">Salva</button>
+                <button onclick="resetCarico()" class="bg-red-900 px-2 py-1.5 rounded text-[10px] font-bold uppercase text-white">Reset</button>
             </div>
         </div>
         <div id="ordine-container"></div>
     </main>
 
+    <!-- SEZIONE INVENTARIO -->
     <main id="section-inventario" class="hidden p-4 max-w-4xl mx-auto">
         <div class="bg-white shadow-2xl rounded-xl overflow-hidden text-black">
-            <div class="bg-slate-900 text-white p-4 md:p-6">
+            <div class="bg-slate-900 text-white p-4">
                 <div class="flex flex-col gap-4">
-                    <div class="header-responsive">
-                        <h1 id="display-mezzo" class="title-responsive font-black uppercase">SALERNO JET</h1>
-                        <div class="flex gap-1 no-print">
-                            <button onclick="salvaTxt()" class="bg-slate-700 hover:bg-slate-600 px-2 py-2 rounded-lg font-bold text-[10px]">SALVA</button>
-                            <button onclick="document.getElementById('import-file').click()" class="bg-slate-700 hover:bg-slate-600 px-2 py-2 rounded-lg font-bold text-[10px]">IMPORTA</button>
+                    <div class="header-container">
+                        <div class="title-box">
+                            <h1 id="display-mezzo" class="font-black uppercase tracking-tight">SALERNO JET</h1>
+                        </div>
+                        <div class="btn-group no-print">
+                            <button onclick="salvaTxt()" class="bg-slate-700 px-2 py-1.5 rounded-lg font-bold text-[10px]">TXT</button>
+                            <button onclick="document.getElementById('import-file').click()" class="bg-slate-700 px-2 py-1.5 rounded-lg font-bold text-[10px]">IMP</button>
                             <input type="file" id="import-file" class="hidden" accept=".txt" onchange="importaTxt(this)">
-                            <button onclick="window.print()" class="bg-blue-600 px-2 py-2 rounded-lg font-bold text-[10px]">PDF</button>
+                            <button onclick="window.print()" class="bg-blue-600 px-2 py-1.5 rounded-lg font-bold text-[10px]">PDF</button>
                         </div>
                     </div>
                     <select id="mezzo-select-inv" onchange="caricaMezzo(this.value)" class="no-print bg-slate-800 border-none text-white text-xs rounded-lg p-2 font-bold flex-grow">
@@ -125,6 +131,7 @@
         </div>
     </main>
 
+    <!-- TASTIERINO -->
     <div id="main-keypad" class="keypad no-print">
         <button class="key" onclick="press('7')">7</button>
         <button class="key" onclick="press('8')">8</button>
@@ -158,25 +165,36 @@
             salerno: [
                 {n:"💧 ACQUA",v:"350"}, {n:"🥜 ARACHIDI",v:"10"}, {n:"🛍️ BORSE P.",v:"245"}, {n:"🛍️ BORSE M.",v:"0"}, {n:"👜 BORSE G.",v:"28"}, {n:"🍫 BUENO/BISCUITS",v:"86"}, {n:"🧢 CAPPELLI",v:"117"}, {n:"🍬 CARAMELLE",v:"128"}, {n:"☕ CIALDE",v:"124"}, {n:"☕ DECA",v:"4"}, {n:"🍬 DIETOR",v:"15"}, {n:"🌾 FITNESS",v:"4"}, {n:"🍟 FONZIES/PAT.",v:"36"}, {n:"☕ GINSENG",v:"17"}, {n:"🧥 IMPERMEAB.",v:"50"}, {n:"🥛 LATTE",v:"6"}, {n:"🥤 LATTINE",v:"331"}, {n:"👕 MAGLIE",v:"89"}, {n:"🥢 MIKADO",v:"50"}, {n:"🧁 MUFFIN",v:"60"}, {n:"🥜 NIK NOK",v:"26"}, {n:"☕ ORZO",v:"50"}, {n:"🍪 PAVESINI",v:"14"}, {n:"🍺 PERONI",v:"149"}, {n:"🍋 PERONI CAPRI",v:"53"}, {n:"🥔 PRINGLES",v:"23"}, {n:"🍷 PROSECCO/VINO",v:"102"}, {n:"⚡ RED BULL/GAT.",v:"36"}, {n:"🍪 RINGO/OREO",v:"121"}, {n:"🥨 RITZ/CIPSTER",v:"22"}, {n:"🍹 SPRITZ",v:"33"}, {n:"🧃 SUCCO",v:"24"}, {n:"🍵 THE/CAMOM.",v:"57"}, {n:"🍪 TUC",v:"9"}, {n:"🍫 TWIX/KITKAT",v:"95"}
             ],
-            napoli: [{n:"💧 ACQUA",v:"0"}],
             default: ["💧 ACQUA", "🥜 ARACHIDI", "🛍️ BORSE P.", "🛍️ BORSE M.", "👜 BORSE G.", "🍫 BUENO/BISCUITS", "🧢 CAPPELLI", "🍬 CARAMELLE", "☕ CIALDE", "☕ DECA", "🍬 DIETOR", "🌾 FITNESS", "🍟 FONZIES/PAT.", "☕ GINSENG", "🧥 IMPERMEAB.", "🥤 LATTINE", "👕 MAGLIE", "🥢 MIKADO", "🧁 MUFFIN", "🥜 NIK NOK", "☕ ORZO", "🍪 PAVESINI", "🍺 PERONI", "🍋 PERONI CAPRI", "🥔 PRINGLES", "🍷 PROSECCO/VINO", "⚡ RED BULL/GAT.", "🍪 RINGO/OREO", "🥨 RITZ/CIPSTER", "🍹 SPRITZ", "🧃 SUCCO", "🍵 THE/CAMOM.", "🍪 TUC", "🍫 TWIX/KITKAT"]
         };
 
         let selectedElement = null;
 
         function init() {
+            // Inizializza Carico
             const container = document.getElementById('ordine-container');
+            const savedCarico = JSON.parse(localStorage.getItem('carico_salerno_jet')) || {};
+            
             catalogoOrdine.forEach(cat => {
                 let h = document.createElement('div'); h.className = 'category-label'; h.innerText = cat.c; container.appendChild(h);
                 cat.i.forEach(art => {
                     let r = document.createElement('div'); r.className = 'item-row';
                     r.onclick = () => selectRow(r, art);
                     const safeId = art.replace(/[^a-zA-Z0-9]/g, '_');
-                    r.innerHTML = `<span class="name text-sm">${art}</span><div class="qty-box" id="qty-${safeId}">0</div>`;
+                    const savedVal = savedCarico[safeId] || "0";
+                    r.innerHTML = `<span class="name text-sm">${art}</span><div class="qty-box" id="qty-${safeId}">${savedVal}</div>`;
                     container.appendChild(r);
                 });
             });
-            caricaMezzo('salerno');
+
+            // Inizializza Inventario
+            const savedInv = JSON.parse(localStorage.getItem('inventario_salerno_jet'));
+            if (savedInv) {
+                caricaMezzo(null, savedInv);
+            } else {
+                caricaMezzo('salerno');
+            }
+            
             initCanvas();
         }
 
@@ -203,6 +221,32 @@
             } else {
                 selectedElement.innerText = (current === "0" && val !== '.') ? val : current + val;
             }
+            saveState();
+        }
+
+        function saveState() {
+            // Salva Carico
+            const carico = {};
+            document.querySelectorAll('.qty-box').forEach(box => {
+                carico[box.id.replace('qty-', '')] = box.innerText;
+            });
+            localStorage.setItem('carico_salerno_jet', JSON.stringify(carico));
+
+            // Salva Inventario
+            const inv = [];
+            document.querySelectorAll('#inventory-body tr').forEach(r => {
+                inv.push({
+                    n: r.querySelector('.item-name').innerText,
+                    v: r.querySelector('.item-value').value
+                });
+            });
+            localStorage.setItem('inventario_salerno_jet', JSON.stringify(inv));
+        }
+
+        function resetCarico() {
+            if(!confirm("Cancellare tutto l'ordine attuale?")) return;
+            document.querySelectorAll('.qty-box').forEach(box => box.innerText = "0");
+            saveState();
         }
 
         function copiaOrdine() {
@@ -223,7 +267,7 @@
 
         function caricaMezzo(id, datiImportati = null) {
             const select = document.getElementById('mezzo-select-inv');
-            document.getElementById('display-mezzo').innerText = select.options[select.selectedIndex].text;
+            if (id) document.getElementById('display-mezzo').innerText = select.options[select.selectedIndex].text;
             const body = document.getElementById('inventory-body');
             body.innerHTML = "";
             const dati = datiImportati || dbInventario[id] || dbInventario.default.map(n => ({n, v:"0"}));
@@ -243,6 +287,7 @@
         function updateT(i){ 
             const s = i.value.split('+').reduce((a,b)=>a+(parseInt(b.trim())||0),0); 
             i.parentElement.parentElement.querySelector('.total-cell').innerText = s; 
+            saveState();
         }
 
         function salvaTxt() {
@@ -261,6 +306,20 @@
             a.click();
         }
 
+        function salvaCaricoTxt() {
+            let contenuto = `ORDINE CARICO\nDATA: ${new Date().toLocaleString()}\n\n`;
+            document.querySelectorAll('.qty-box').forEach(box => {
+                if(box.innerText !== "0") {
+                    contenuto += `${box.id.replace('qty-','').replace(/_/g,' ')}: ${box.innerText}\n`;
+                }
+            });
+            const blob = new Blob([contenuto], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `Carico_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+        }
+
         function importaTxt(input) {
             const file = input.files[0];
             if (!file) return;
@@ -276,41 +335,9 @@
                 });
                 if (datiCaricati.length > 0) {
                     caricaMezzo(null, datiCaricati);
+                    saveState();
                     alert("Dati importati!");
                 }
-            };
-            reader.readAsText(file);
-        }
-
-        function salvaCaricoTxt() {
-            let contenuto = `ORDINE CARICO\nDATA: ${new Date().toLocaleString()}\n\n`;
-            document.querySelectorAll('.qty-box').forEach(box => {
-                if(box.innerText !== "0") {
-                    contenuto += `${box.id.replace('qty-','').replace(/_/g,' ')}: ${box.innerText}\n`;
-                }
-            });
-            const blob = new Blob([contenuto], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `Carico_${new Date().toISOString().slice(0,10)}.txt`;
-            a.click();
-        }
-
-        function importaCaricoTxt(input) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const righe = e.target.result.split('\n');
-                righe.forEach(riga => {
-                    if (riga.includes(":")) {
-                        const [name, val] = riga.split(":");
-                        const id = `qty-${name.trim().replace(/\s+/g, '_')}`;
-                        const el = document.getElementById(id);
-                        if(el) el.innerText = val.trim();
-                    }
-                });
-                alert("Carico Importato!");
             };
             reader.readAsText(file);
         }
@@ -342,3 +369,4 @@
 </body>
 </html>
 
+```
