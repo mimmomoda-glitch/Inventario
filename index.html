@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -36,7 +37,6 @@
         .row-checked { background-color: #f1f5f9 !important; }
         #signature-pad { touch-action: none; cursor: crosshair; background-color: white; border: 2px solid #000; border-radius: 8px; width: 100%; height: 150px; }
 
-        /* Fix Header Responsive */
         .header-container { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px; }
         .title-box { flex: 1; min-width: 0; }
         .title-box h1 { font-size: 1.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -68,7 +68,6 @@
         </div>
     </header>
 
-    <!-- SEZIONE CARICO -->
     <main id="section-ordine" class="p-4 max-w-2xl mx-auto">
         <div class="header-container mb-4">
             <div class="title-box">
@@ -82,7 +81,6 @@
         <div id="ordine-container"></div>
     </main>
 
-    <!-- SEZIONE INVENTARIO -->
     <main id="section-inventario" class="hidden p-4 max-w-4xl mx-auto">
         <div class="bg-white shadow-2xl rounded-xl overflow-hidden text-black">
             <div class="bg-slate-900 text-white p-4">
@@ -131,7 +129,6 @@
         </div>
     </main>
 
-    <!-- TASTIERINO -->
     <div id="main-keypad" class="keypad no-print">
         <button class="key" onclick="press('7')">7</button>
         <button class="key" onclick="press('8')">8</button>
@@ -157,7 +154,7 @@
         const catalogoOrdine = [
             { c: "Bevande", i: ["Acqua Naturale", "Acqua Frizzante", "Acqua 2 Litri", "Coca", "Coca 0", "Fanta", "Sprite", "Lemonsoda", "The Pesca", "The Limone", "Birra Peroni", "Peroni Capri", "Spritz", "Red Bull", "Gatorade", "Vino Aglianico", "Vino Falanghina", "Vino 0,25", "Prosecco 0,25", "Succhi", "Limoncello/Amaro"] },
             { c: "Caffetteria", i: ["Caffè", "Decaffeinato", "Cialde", "Ginseng", "Orzo", "Latte", "Dietor", "Thè / Camomilla"] },
-            { c: "Snack & Food", i: ["Patatine", "Fonzies", "Pringles", "Ritz", "Tuc", "Arachidi", "Nik Nok", "Mikado", "Twix", "Kit Kat", "M&M's", "Kinder Bueno", "Muffin", "Oreo", "Ringo", "Fitness", "Pavesini"] },
+            { c: "Snack & Food", i: ["Patatine", "Fonzies", "Pringles", "Ritz", "Tuc", "Arachidi", "Nik Nok", "Mikado", "Mars", "Snickers", "Twix", "Kit Kat", "M&M's", "Kinder Bueno", "Bready", "Kinder Biscuit", "Kinder Card", "Gomme", "Caramelle", "Muffin", "Oreo", "Ringo", "Fitness", "Pavesini"] },
             { c: "Extra", i: ["Borse G", "Borse M", "Cappelli", "Impermeabili", "Maglie"] }
         ];
 
@@ -171,7 +168,6 @@
         let selectedElement = null;
 
         function init() {
-            // Inizializza Carico
             const container = document.getElementById('ordine-container');
             const savedCarico = JSON.parse(localStorage.getItem('carico_salerno_jet')) || {};
             
@@ -187,7 +183,6 @@
                 });
             });
 
-            // Inizializza Inventario
             const savedInv = JSON.parse(localStorage.getItem('inventario_salerno_jet'));
             if (savedInv) {
                 caricaMezzo(null, savedInv);
@@ -225,20 +220,19 @@
         }
 
         function saveState() {
-            // Salva Carico
             const carico = {};
             document.querySelectorAll('.qty-box').forEach(box => {
                 carico[box.id.replace('qty-', '')] = box.innerText;
             });
             localStorage.setItem('carico_salerno_jet', JSON.stringify(carico));
 
-            // Salva Inventario
             const inv = [];
             document.querySelectorAll('#inventory-body tr').forEach(r => {
-                inv.push({
-                    n: r.querySelector('.item-name').innerText,
-                    v: r.querySelector('.item-value').value
-                });
+                const nameNode = r.querySelector('.item-name');
+                const valNode = r.querySelector('.item-value');
+                if (nameNode && valNode) {
+                    inv.push({ n: nameNode.innerText, v: valNode.value });
+                }
             });
             localStorage.setItem('inventario_salerno_jet', JSON.stringify(inv));
         }
@@ -286,7 +280,9 @@
 
         function updateT(i){ 
             const s = i.value.split('+').reduce((a,b)=>a+(parseInt(b.trim())||0),0); 
-            i.parentElement.parentElement.querySelector('.total-cell').innerText = s; 
+            const row = i.parentElement.parentElement;
+            const totalCell = row.querySelector('.total-cell');
+            if (totalCell) totalCell.innerText = s; 
             saveState();
         }
 
@@ -345,6 +341,7 @@
         let canvas, ctx, drawing = false;
         function initCanvas() {
             canvas = document.getElementById('signature-pad');
+            if(!canvas) return;
             ctx = canvas.getContext('2d');
             const ratio = window.devicePixelRatio || 1;
             canvas.width = canvas.offsetWidth * ratio;
@@ -363,7 +360,7 @@
             canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); window.addEventListener('mouseup', stop);
             canvas.addEventListener('touchstart', start, {passive:false}); canvas.addEventListener('touchmove', move, {passive:false}); window.addEventListener('touchend', stop);
         }
-        function clearSignature() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+        function clearSignature() { if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); }
         window.onload = init;
     </script>
 </body>
