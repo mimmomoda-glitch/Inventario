@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -5,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Salerno Jet App</title>
+    <title>Gestione Flotta Jet</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root { 
@@ -34,12 +35,21 @@
         .action-key { grid-column: span 2; font-size: 12px; height: 45px; }
 
         .row-checked { background-color: #f1f5f9 !important; }
-        #signature-pad { touch-action: none; cursor: crosshair; background-color: white; border: 2px solid #000; border-radius: 8px; width: 100%; height: 150px; }
+        
+        /* Stile Canvas Migliorato */
+        #signature-pad { 
+            touch-action: none; 
+            background-color: #fff; 
+            border: 2px solid #cbd5e1; 
+            border-radius: 8px; 
+            width: 100%; 
+            height: 180px;
+            display: block;
+        }
 
         .header-container { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px; }
         .title-box { flex: 1; min-width: 0; }
         .title-box h1 { font-size: 1.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .btn-group { display: flex; gap: 4px; flex-shrink: 0; }
 
         @media print { 
             @page { margin: 1cm; }
@@ -54,7 +64,7 @@
             .item-value { color: black !important; font-weight: bold !important; font-size: 11pt !important; }
             .total-cell { background: #f9f9f9 !important; color: black !important; font-weight: 900 !important; font-size: 12pt !important; }
             #display-mezzo { color: black !important; font-size: 20pt !important; }
-            #signature-pad { border: 1px solid black !important; height: 120px !important; }
+            #signature-pad { border: 1px solid black !important; height: 150px !important; }
         }
     </style>
 </head>
@@ -62,17 +72,17 @@
 
     <header class="bg-slate-900 sticky top-0 z-50 shadow-xl no-print">
         <div class="flex justify-around p-4 text-slate-400 font-black text-xs tracking-widest uppercase">
-            <button id="tab-ordine" onclick="switchTab('ordine')" class="active-tab pb-2 px-2">📦 Carico</button>
-            <button id="tab-inventario" onclick="switchTab('inventario')" class="pb-2 px-2">📋 Inventario</button>
+            <button id="tab-ordine" onclick="switchTab('ordine')" class="pb-2 px-2">📦 Carico</button>
+            <button id="tab-inventario" onclick="switchTab('inventario')" class="active-tab pb-2 px-2">📋 Inventario</button>
         </div>
     </header>
 
-    <main id="section-ordine" class="p-4 max-w-2xl mx-auto">
+    <main id="section-ordine" class="hidden p-4 max-w-2xl mx-auto">
         <div class="header-container mb-4">
             <div class="title-box">
                 <h1 class="text-cyan-400 font-black">ORDINE CARICO</h1>
             </div>
-            <div class="btn-group">
+            <div class="btn-group flex gap-2">
                 <button onclick="salvaCaricoTxt()" class="bg-slate-700 px-2 py-1.5 rounded text-[10px] font-bold uppercase text-white">Salva</button>
                 <button onclick="resetCarico()" class="bg-red-900 px-2 py-1.5 rounded text-[10px] font-bold uppercase text-white">Reset</button>
             </div>
@@ -80,28 +90,22 @@
         <div id="ordine-container"></div>
     </main>
 
-    <main id="section-inventario" class="hidden p-4 max-w-4xl mx-auto">
+    <main id="section-inventario" class="p-4 max-w-4xl mx-auto">
         <div class="bg-white shadow-2xl rounded-xl overflow-hidden text-black">
             <div class="bg-slate-900 text-white p-4">
                 <div class="flex flex-col gap-4">
                     <div class="header-container">
                         <div class="title-box">
-                            <h1 id="display-mezzo" class="font-black uppercase tracking-tight">SALERNO JET</h1>
+                            <h1 id="display-mezzo" class="font-black uppercase tracking-tight">VESUVIO JET</h1>
                         </div>
-                        <div class="btn-group no-print">
+                        <div class="btn-group no-print flex gap-1">
                             <button onclick="salvaTxt()" class="bg-slate-700 px-2 py-1.5 rounded-lg font-bold text-[10px]">TXT</button>
                             <button onclick="document.getElementById('import-file').click()" class="bg-slate-700 px-2 py-1.5 rounded-lg font-bold text-[10px]">IMP</button>
                             <input type="file" id="import-file" class="hidden" accept=".txt" onchange="importaTxt(this)">
                             <button onclick="window.print()" class="bg-blue-600 px-2 py-1.5 rounded-lg font-bold text-[10px]">PDF</button>
                         </div>
                     </div>
-                    <select id="mezzo-select-inv" onchange="caricaMezzo(this.value)" class="no-print bg-slate-800 border-none text-white text-xs rounded-lg p-2 font-bold flex-grow">
-                        <option value="salerno">SALERNO JET (Report 03/05)</option>
-                        <option value="napoli">NAPOLI JET</option>
-                        <option value="amalfi">AMALFI JET</option>
-                        <option value="super">SUPER JET</option>
-                        <option value="capri">CAPRI JET</option>
-                        <option value="ischia">ISCHIA JET</option>
+                    <select id="mezzo-select-inv" onchange="aggiornaTitoloMezzo(this.value)" class="no-print bg-slate-800 border-none text-white text-xs rounded-lg p-2 font-bold flex-grow">
                     </select>
                 </div>
             </div>
@@ -122,13 +126,15 @@
 
             <div class="p-4 bg-slate-50 border-t-2 border-black flex flex-col items-center">
                 <span class="text-[10px] uppercase font-black text-slate-500 mb-2 tracking-widest">Firma Responsabile</span>
-                <canvas id="signature-pad"></canvas>
+                <div class="w-full max-w-md">
+                    <canvas id="signature-pad"></canvas>
+                </div>
                 <button onclick="clearSignature()" class="no-print mt-2 text-[10px] text-red-500 font-bold uppercase">Cancella Firma</button>
             </div>
         </div>
     </main>
 
-    <div id="main-keypad" class="keypad no-print">
+    <div id="main-keypad" class="keypad no-print hidden">
         <button class="key" onclick="press('7')">7</button>
         <button class="key" onclick="press('8')">8</button>
         <button class="key" onclick="press('9')">9</button>
@@ -150,6 +156,8 @@
     </div>
 
     <script>
+        const listaBarche = ["NAPOLI JET", "SALERNO JET", "AMALFI JET", "SUPER JET", "CAPRI JET", "ISCHIA JET", "TREMITI JET", "VESUVIO JET", "JUMBO JET", "SORRENTO JET", "GIUNONE JET", "EUROPA JET", "CITTÀ DI SORRENTO", "APOLLO", "FRECCIA D ARGENTO", "BLIZ", "ISCHIA MAR 3", "URAGANO", "ACQUARIUS", "RAID"];
+
         const catalogoOrdine = [
             { c: "Bevande", i: ["Acqua Naturale", "Acqua Frizzante", "Acqua 2 Litri", "Coca", "Coca 0", "Fanta", "Sprite", "Lemonsoda", "The Pesca", "The Limone", "Birra Peroni", "Peroni Capri", "Spritz", "Red Bull", "Gatorade", "Vino Aglianico", "Vino Falanghina", "Vino 0,25", "Prosecco 0,25", "Succhi", "Limoncello/Amaro"] },
             { c: "Caffetteria", i: ["Caffè", "Decaffeinato", "Cialde", "Ginseng", "Orzo", "Latte", "Dietor", "Thè / Camomilla"] },
@@ -157,18 +165,24 @@
             { c: "Extra", i: ["Borse G", "Borse M", "Cappelli", "Impermeabili", "Maglie"] }
         ];
 
-        const dbInventario = {
-            salerno: [
-                {n:"💧 ACQUA",v:"350"}, {n:"🥜 ARACHIDI",v:"10"}, {n:"🛍️ BORSE P.",v:"245"}, {n:"🛍️ BORSE M.",v:"0"}, {n:"👜 BORSE G.",v:"28"}, {n:"🍫 BUENO/BISCUITS",v:"86"}, {n:"🧢 CAPPELLI",v:"117"}, {n:"🍬 CARAMELLE",v:"128"}, {n:"☕ CIALDE",v:"124"}, {n:"☕ DECA",v:"4"}, {n:"🍬 DIETOR",v:"15"}, {n:"🌾 FITNESS",v:"4"}, {n:"🍟 FONZIES/PAT.",v:"36"}, {n:"☕ GINSENG",v:"17"}, {n:"🧥 IMPERMEAB.",v:"50"}, {n:"🥛 LATTE",v:"6"}, {n:"🥤 LATTINE",v:"331"}, {n:"👕 MAGLIE",v:"89"}, {n:"🥢 MIKADO",v:"50"}, {n:"🧁 MUFFIN",v:"60"}, {n:"🥜 NIK NOK",v:"26"}, {n:"☕ ORZO",v:"50"}, {n:"🍪 PAVESINI",v:"14"}, {n:"🍺 PERONI",v:"149"}, {n:"🍋 PERONI CAPRI",v:"53"}, {n:"🥔 PRINGLES",v:"23"}, {n:"🍷 PROSECCO/VINO",v:"102"}, {n:"⚡ RED BULL/GAT.",v:"36"}, {n:"🍪 RINGO/OREO",v:"121"}, {n:"🥨 RITZ/CIPSTER",v:"22"}, {n:"🍹 SPRITZ",v:"33"}, {n:"🧃 SUCCO",v:"24"}, {n:"🍵 THE/CAMOM.",v:"57"}, {n:"🍪 TUC",v:"9"}, {n:"🍫 TWIX/KITKAT",v:"95"}
-            ],
-            default: ["💧 ACQUA", "🥜 ARACHIDI", "🛍️ BORSE P.", "🛍️ BORSE M.", "👜 BORSE G.", "🍫 BUENO/BISCUITS", "🧢 CAPPELLI", "🍬 CARAMELLE", "☕ CIALDE", "☕ DECA", "🍬 DIETOR", "🌾 FITNESS", "🍟 FONZIES/PAT.", "☕ GINSENG", "🧥 IMPERMEAB.", "🥤 LATTINE", "👕 MAGLIE", "🥢 MIKADO", "🧁 MUFFIN", "🥜 NIK NOK", "☕ ORZO", "🍪 PAVESINI", "🍺 PERONI", "🍋 PERONI CAPRI", "🥔 PRINGLES", "🍷 PROSECCO/VINO", "⚡ RED BULL/GAT.", "🍪 RINGO/OREO", "🥨 RITZ/CIPSTER", "🍹 SPRITZ", "🧃 SUCCO", "🍵 THE/CAMOM.", "🍪 TUC", "🍫 TWIX/KITKAT"]
-        };
+        const inventarioVesuvioJet = [
+            {n: "💧 ACQUA", v: "323"}, {n: "🥜 ARACHIDI", v: "16"}, {n: "🛍️ BORSE P.", v: "228"}, {n: "🛍️ BORSE M.", v: "0"}, {n: "👜 BORSE G.", v: "21"}, {n: "🍫 BUENO/BISCUITS", v: "60"}, {n: "🧢 CAPPELLI", v: "63"}, {n: "🍬 CARAMELLE", v: "85"}, {n: "☕ CIALDE", v: "136"}, {n: "☕ DECA", v: "10"}, {n: "🍬 DIETOR", v: "40"}, {n: "🌾 FITNESS", v: "45"}, {n: "🍟 FONZIES/PAT.", v: "54"}, {n: "☕ GINSENG", v: "11"}, {n: "🧥 IMPERMEAB.", v: "30"}, {n: "🥛 LATTE", v: "3"}, {n: "🥤 LATTINE", v: "210"}, {n: "👕 MAGLIE", v: "50"}, {n: "🥢 MIKADO", v: "23"}, {n: "🧁 MUFFIN", v: "27"}, {n: "🥜 NIK NOK", v: "23"}, {n: "☕ ORZO", v: "0"}, {n: "🍪 PAVESINI", v: "20"}, {n: "🍺 PERONI", v: "107"}, {n: "🍋 PERONI CAPRI", v: "44"}, {n: "🥔 PRINGLES", v: "58"}, {n: "🍷 PROSECCO/VINO", v: "79"}, {n: "⚡ RED BULL/GAT.", v: "48"}, {n: "🍪 RINGO/OREO", v: "108"}, {n: "🥨 RITZ/CIPSTER", v: "21"}, {n: "🍹 SPRITZ", v: "41"}, {n: "🧃 SUCCO", v: "23"}, {n: "🍵 THE/CAMOM.", v: "45"}, {n: "🍪 TUC", v: "22"}, {n: "🍫 TWIX/KITKAT", v: "90"}
+        ];
 
         let selectedElement = null;
 
         function init() {
+            const selectInv = document.getElementById('mezzo-select-inv');
+            listaBarche.forEach(barca => {
+                let opt = document.createElement('option');
+                opt.value = barca;
+                opt.innerText = barca;
+                if(barca === "VESUVIO JET") opt.selected = true;
+                selectInv.appendChild(opt);
+            });
+
             const container = document.getElementById('ordine-container');
-            const savedCarico = JSON.parse(localStorage.getItem('carico_salerno_jet')) || {};
+            const savedCarico = JSON.parse(localStorage.getItem('carico_app_jet')) || {};
             
             catalogoOrdine.forEach(cat => {
                 let h = document.createElement('div'); h.className = 'category-label'; h.innerText = cat.c; container.appendChild(h);
@@ -182,14 +196,32 @@
                 });
             });
 
-            const savedInv = JSON.parse(localStorage.getItem('inventario_salerno_jet'));
-            if (savedInv) {
-                caricaMezzo(null, savedInv);
-            } else {
-                caricaMezzo('salerno');
-            }
+            const savedInv = JSON.parse(localStorage.getItem('inventario_app_jet'));
+            if (savedInv) caricaTabellaInventario(savedInv);
+            else caricaTabellaInventario(inventarioVesuvioJet);
             
             initCanvas();
+        }
+
+        function aggiornaTitoloMezzo(valore) {
+            document.getElementById('display-mezzo').innerText = valore;
+            saveState();
+        }
+
+        function caricaTabellaInventario(dati) {
+            const body = document.getElementById('inventory-body');
+            body.innerHTML = "";
+            dati.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-200 transition";
+                const total = item.v.toString().split('+').reduce((a, b) => a + (parseInt(b.trim()) || 0), 0);
+                tr.innerHTML = `
+                    <td class="p-2 border no-print text-center"><input type="checkbox" onchange="this.parentElement.parentElement.classList.toggle('row-checked')" class="w-5 h-5"></td>
+                    <td class="p-2 border font-bold item-name">${item.n}</td>
+                    <td class="p-1 border"><input type="text" oninput="updateT(this)" class="item-value w-full bg-transparent font-mono text-blue-800 font-bold outline-none" value="${item.v}"></td>
+                    <td class="p-1 border text-center font-black bg-slate-50 total-cell">${total}</td>`;
+                body.appendChild(tr);
+            });
         }
 
         function switchTab(tab) {
@@ -198,6 +230,7 @@
             document.getElementById('main-keypad').classList.toggle('hidden', tab !== 'ordine');
             document.getElementById('tab-ordine').classList.toggle('active-tab', tab === 'ordine');
             document.getElementById('tab-inventario').classList.toggle('active-tab', tab === 'inventario');
+            if(tab === 'inventario') resizeCanvas();
         }
 
         function selectRow(el, id) {
@@ -223,7 +256,7 @@
             document.querySelectorAll('.qty-box').forEach(box => {
                 carico[box.id.replace('qty-', '')] = box.innerText;
             });
-            localStorage.setItem('carico_salerno_jet', JSON.stringify(carico));
+            localStorage.setItem('carico_app_jet', JSON.stringify(carico));
 
             const inv = [];
             document.querySelectorAll('#inventory-body tr').forEach(r => {
@@ -233,7 +266,7 @@
                     inv.push({ n: nameNode.innerText, v: valNode.value });
                 }
             });
-            localStorage.setItem('inventario_salerno_jet', JSON.stringify(inv));
+            localStorage.setItem('inventario_app_jet', JSON.stringify(inv));
         }
 
         function resetCarico() {
@@ -243,7 +276,8 @@
         }
 
         function copiaOrdine() {
-            let t = `📦 *ORDINE CARICO*\n📅 ${new Date().toLocaleDateString()}\n--------------------------\n`;
+            const mezzo = document.getElementById('display-mezzo').innerText;
+            let t = `📦 *ORDINE CARICO - ${mezzo}*\n📅 ${new Date().toLocaleDateString()}\n--------------------------\n`;
             let hasItems = false;
             document.querySelectorAll('.qty-box').forEach(box => {
                 if(box.innerText !== "0") {
@@ -252,29 +286,10 @@
                     hasItems = true;
                 }
             });
-            if(!hasItems) return alert("Nessun prodotto inserito!");
+            if(!hasItems) return alert("Inserisci almeno un prodotto!");
             const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el); el.select();
             document.execCommand('copy'); document.body.removeChild(el);
-            alert("Ordine Copiato!");
-        }
-
-        function caricaMezzo(id, datiImportati = null) {
-            const select = document.getElementById('mezzo-select-inv');
-            if (id) document.getElementById('display-mezzo').innerText = select.options[select.selectedIndex].text;
-            const body = document.getElementById('inventory-body');
-            body.innerHTML = "";
-            const dati = datiImportati || dbInventario[id] || dbInventario.default.map(n => ({n, v:"0"}));
-            dati.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-200 transition";
-                const total = item.v.toString().split('+').reduce((a, b) => a + (parseInt(b.trim()) || 0), 0);
-                tr.innerHTML = `
-                    <td class="p-2 border no-print text-center"><input type="checkbox" onchange="this.parentElement.parentElement.classList.toggle('row-checked')" class="w-5 h-5"></td>
-                    <td class="p-2 border font-bold item-name">${item.n}</td>
-                    <td class="p-1 border"><input type="text" oninput="updateT(this)" class="item-value w-full bg-transparent font-mono text-blue-800 font-bold outline-none" value="${item.v}"></td>
-                    <td class="p-1 border text-center font-black bg-slate-50 total-cell">${total}</td>`;
-                body.appendChild(tr);
-            });
+            alert("Ordine Copiato! Incollalo su WhatsApp.");
         }
 
         function updateT(i){ 
@@ -302,7 +317,8 @@
         }
 
         function salvaCaricoTxt() {
-            let contenuto = `ORDINE CARICO\nDATA: ${new Date().toLocaleString()}\n\n`;
+            const mezzo = document.getElementById('display-mezzo').innerText;
+            let contenuto = `ORDINE CARICO - ${mezzo}\nDATA: ${new Date().toLocaleString()}\n\n`;
             document.querySelectorAll('.qty-box').forEach(box => {
                 if(box.innerText !== "0") {
                     contenuto += `${box.id.replace('qty-','').replace(/_/g,' ')}: ${box.innerText}\n`;
@@ -311,7 +327,7 @@
             const blob = new Blob([contenuto], { type: 'text/plain' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `Carico_${new Date().toISOString().slice(0,10)}.txt`;
+            a.download = `Carico_${mezzo.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.txt`;
             a.click();
         }
 
@@ -329,7 +345,7 @@
                     }
                 });
                 if (datiCaricati.length > 0) {
-                    caricaMezzo(null, datiCaricati);
+                    caricaTabellaInventario(datiCaricati);
                     saveState();
                     alert("Dati importati!");
                 }
@@ -337,32 +353,80 @@
             reader.readAsText(file);
         }
 
+        // GESTIONE FIRMA MIGLIORATA
         let canvas, ctx, drawing = false;
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const rect = canvas.parentNode.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = 180;
+            // Ripristina le proprietà del contesto dopo il ridimensionamento
+            ctx.lineWidth = 3;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = "#000";
+        }
+
         function initCanvas() {
             canvas = document.getElementById('signature-pad');
             if(!canvas) return;
             ctx = canvas.getContext('2d');
-            const ratio = window.devicePixelRatio || 1;
-            canvas.width = canvas.offsetWidth * ratio;
-            canvas.height = canvas.offsetHeight * ratio;
-            ctx.scale(ratio, ratio);
-            ctx.lineWidth = 2; ctx.lineCap = "round"; ctx.strokeStyle = "#000";
-            const getP = (e) => {
-                const r = canvas.getBoundingClientRect();
-                const x = e.touches ? e.touches[0].clientX : e.clientX;
-                const y = e.touches ? e.touches[0].clientY : e.clientY;
-                return { x: x - r.left, y: y - r.top };
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
             };
-            const start = (e) => { drawing = true; ctx.beginPath(); const p = getP(e); ctx.moveTo(p.x, p.y); };
-            const move = (e) => { if(drawing){ const p = getP(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); } };
-            const stop = () => drawing = false;
-            canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); window.addEventListener('mouseup', stop);
-            canvas.addEventListener('touchstart', start, {passive:false}); canvas.addEventListener('touchmove', move, {passive:false}); window.addEventListener('touchend', stop);
+
+            const startDrawing = (e) => {
+                drawing = true;
+                const pos = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+                if (e.touches) e.preventDefault(); 
+            };
+
+            const draw = (e) => {
+                if (!drawing) return;
+                const pos = getPos(e);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                if (e.touches) e.preventDefault();
+            };
+
+            const stopDrawing = () => {
+                drawing = false;
+            };
+
+            // Eventi Mouse
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            window.addEventListener('mouseup', stopDrawing);
+
+            // Eventi Touch (Mobile)
+            canvas.addEventListener('touchstart', startDrawing, { passive: false });
+            canvas.addEventListener('touchmove', draw, { passive: false });
+            canvas.addEventListener('touchend', stopDrawing);
         }
-        function clearSignature() { if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); }
-        window.onload = init;
+
+        function clearSignature() { 
+            if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); 
+        }
+
+        window.onload = () => {
+            init();
+            // Piccolo ritardo per assicurarsi che il layout sia pronto per il canvas
+            setTimeout(resizeCanvas, 300);
+        };
     </script>
 </body>
 </html>
 
-
+```
