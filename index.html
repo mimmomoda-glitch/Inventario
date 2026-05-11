@@ -1,430 +1,415 @@
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Gestione Flotta Jet</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Bar Pocket Manager - NAV-PRO</title>
     <style>
-        :root { 
-            --bg: #0f172a; 
-            --card: #1e293b; 
-            --text: #f8fafc; 
-            --cyan: #22d3ee; 
-            --amber: #fbbf24; 
-            --border: #334155; 
-            --key-bg: #334155;
-        }
-        
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
-        .active-tab { border-bottom: 4px solid var(--cyan); color: var(--cyan) !important; }
-        
-        .category-label { color: var(--amber); font-weight: bold; margin: 20px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; text-transform: uppercase; font-size: 13px; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 12px; border-radius: 10px; margin-bottom: 6px; border: 1px solid var(--border); }
-        .item-row.selected { border-color: var(--cyan); background: #1e293b; box-shadow: 0 0 10px rgba(34, 211, 238, 0.2); }
-        .qty-box { width: 70px; height: 35px; background: #000; border: 1px solid var(--border); color: var(--cyan); text-align: center; border-radius: 5px; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
-
-        .keypad { position: fixed; bottom: 0; left: 0; width: 100%; background: #1e293b; padding: 8px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; box-sizing: border-box; border-top: 2px solid var(--cyan); z-index: 1000; }
-        .key { background: var(--key-bg); color: white; border: none; padding: 12px 0; font-size: 18px; font-weight: bold; border-radius: 6px; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
-        .key:active { background: var(--cyan); color: #000; }
-        .key.op { background: #475569; color: var(--amber); }
-        .key.del { background: #7f1d1d; }
-        .action-key { grid-column: span 2; font-size: 12px; height: 45px; }
-
-        .row-checked { background-color: #f1f5f9 !important; }
-        
-        /* Stile Canvas Migliorato */
-        #signature-pad { 
-            touch-action: none; 
-            background-color: #fff; 
-            border: 2px solid #cbd5e1; 
-            border-radius: 8px; 
-            width: 100%; 
-            height: 180px;
-            display: block;
+        :root {
+            --primary: #2c3e50;
+            --accent: #e67e22;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --pend: #2980b9;
+            --bg: #f8f9fa;
         }
 
-        .header-container { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px; }
-        .title-box { flex: 1; min-width: 0; }
-        .title-box h1 { font-size: 1.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+            color: var(--primary);
+            user-select: none;
+        }
 
-        @media print { 
-            @page { margin: 1cm; }
-            .no-print, .keypad, header { display: none !important; } 
-            body { background: white !important; color: black !important; padding: 0 !important; } 
-            #section-inventario { display: block !important; padding: 0 !important; width: 100% !important; }
-            .bg-white { box-shadow: none !important; border: none !important; }
-            .bg-slate-900 { background: white !important; color: black !important; border-bottom: 2px solid black !important; padding: 10px 0 !important; }
-            .inventory-table { width: 100% !important; border: 2px solid black !important; }
-            .inventory-table th { background: #eee !important; color: black !important; border: 1px solid black !important; font-size: 12pt !important; }
-            .inventory-table td { border: 1px solid black !important; color: black !important; font-size: 11pt !important; padding: 6px !important; }
-            .item-value { color: black !important; font-weight: bold !important; font-size: 11pt !important; }
-            .total-cell { background: #f9f9f9 !important; color: black !important; font-weight: 900 !important; font-size: 12pt !important; }
-            #display-mezzo { color: black !important; font-size: 20pt !important; }
-            #signature-pad { border: 1px solid black !important; height: 150px !important; }
+        .tabs {
+            display: flex;
+            background: var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 5px;
+            color: white;
+            border: none;
+            background: none;
+            font-weight: bold;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        .tab-btn.active {
+            opacity: 1;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .content {
+            padding: 15px;
+            padding-bottom: 140px;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .mini-dash {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat { text-align: center; }
+        .stat span { font-size: 0.65rem; color: #7f8c8d; text-transform: uppercase; display: block; }
+        .stat b { font-size: 1rem; color: var(--primary); }
+        .stat.highlight b { color: var(--success); font-size: 1.3rem; }
+
+        .product-card {
+            background: white;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--accent);
+        }
+
+        .prod-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .prod-name { font-weight: bold; font-size: 1rem; }
+        
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .field label { font-size: 0.6rem; font-weight: bold; color: #95a5a6; text-transform: uppercase; }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            text-align: center;
+            background: #fff;
+        }
+
+        .info-row {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #eee;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+        }
+
+        .bottom-actions {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: white;
+            padding: 12px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 200;
+        }
+
+        .btn-group { display: flex; gap: 8px; }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            color: white;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .btn-danger { background: var(--danger); }
+        .btn-success { background: var(--success); }
+        .btn-neutral { background: var(--primary); }
+
+        .report-section {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .badge {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            background: #eee;
+            color: #666;
         }
     </style>
 </head>
-<body class="pb-80">
+<body>
 
-    <header class="bg-slate-900 sticky top-0 z-50 shadow-xl no-print">
-        <div class="flex justify-around p-4 text-slate-400 font-black text-xs tracking-widest uppercase">
-            <button id="tab-ordine" onclick="switchTab('ordine')" class="pb-2 px-2">📦 Carico</button>
-            <button id="tab-inventario" onclick="switchTab('inventario')" class="active-tab pb-2 px-2">📋 Inventario</button>
+<div class="tabs">
+    <button class="tab-btn active" onclick="openTab('tab-vendite')">💰 Oggi</button>
+    <button class="tab-btn" onclick="openTab('tab-magazzino')">📦 Stock</button>
+    <button class="tab-btn" onclick="openTab('tab-report')">📊 Storico</button>
+</div>
+
+<div class="content">
+    
+    <div class="mini-dash">
+        <div class="stat highlight" style="grid-column: span 2;">
+            <span>Incasso Netto Oggi</span>
+            <b id="m-netto">€ 0.00</b>
         </div>
-    </header>
-
-    <main id="section-ordine" class="hidden p-4 max-w-2xl mx-auto">
-        <div class="header-container mb-4">
-            <div class="title-box">
-                <h1 class="text-cyan-400 font-black">ORDINE CARICO</h1>
-            </div>
-            <div class="btn-group flex gap-2">
-                <button onclick="salvaCaricoTxt()" class="bg-slate-700 px-2 py-1.5 rounded text-[10px] font-bold uppercase text-white">Salva</button>
-                <button onclick="resetCarico()" class="bg-red-900 px-2 py-1.5 rounded text-[10px] font-bold uppercase text-white">Reset</button>
-            </div>
+        <div class="stat">
+            <span>Passeggeri</span>
+            <b id="count-pas">0</b>
         </div>
-        <div id="ordine-container"></div>
-    </main>
-
-    <main id="section-inventario" class="p-4 max-w-4xl mx-auto">
-        <div class="bg-white shadow-2xl rounded-xl overflow-hidden text-black">
-            <div class="bg-slate-900 text-white p-4">
-                <div class="flex flex-col gap-4">
-                    <div class="header-container">
-                        <div class="title-box">
-                            <h1 id="display-mezzo" class="font-black uppercase tracking-tight">VESUVIO JET</h1>
-                        </div>
-                        <div class="btn-group no-print flex gap-1">
-                            <button onclick="salvaTxt()" class="bg-slate-700 px-2 py-1.5 rounded-lg font-bold text-[10px]">TXT</button>
-                            <button onclick="document.getElementById('import-file').click()" class="bg-slate-700 px-2 py-1.5 rounded-lg font-bold text-[10px]">IMP</button>
-                            <input type="file" id="import-file" class="hidden" accept=".txt" onchange="importaTxt(this)">
-                            <button onclick="window.print()" class="bg-blue-600 px-2 py-1.5 rounded-lg font-bold text-[10px]">PDF</button>
-                        </div>
-                    </div>
-                    <select id="mezzo-select-inv" onchange="aggiornaTitoloMezzo(this.value)" class="no-print bg-slate-800 border-none text-white text-xs rounded-lg p-2 font-bold flex-grow">
-                    </select>
-                </div>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full border-collapse inventory-table">
-                    <thead class="bg-slate-100">
-                        <tr class="text-slate-600 uppercase text-[10px] font-black border-b-2 border-black">
-                            <th class="py-2 px-1 border no-print w-8 text-center">OK</th>
-                            <th class="py-2 px-2 border text-left">Articolo</th>
-                            <th class="py-2 px-2 border text-left w-24">Conteggio</th>
-                            <th class="py-2 px-2 border text-center w-16">Tot</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventory-body" class="text-black text-xs md:text-sm"></tbody>
-                </table>
-            </div>
-
-            <div class="p-4 bg-slate-50 border-t-2 border-black flex flex-col items-center">
-                <span class="text-[10px] uppercase font-black text-slate-500 mb-2 tracking-widest">Firma Responsabile</span>
-                <div class="w-full max-w-md">
-                    <canvas id="signature-pad"></canvas>
-                </div>
-                <button onclick="clearSignature()" class="no-print mt-2 text-[10px] text-red-500 font-bold uppercase">Cancella Firma</button>
-            </div>
+        <div class="stat">
+            <span>Pendolari</span>
+            <b id="count-pen" style="color:var(--pend)">0</b>
         </div>
-    </main>
-
-    <div id="main-keypad" class="keypad no-print hidden">
-        <button class="key" onclick="press('7')">7</button>
-        <button class="key" onclick="press('8')">8</button>
-        <button class="key" onclick="press('9')">9</button>
-        <button class="key op" onclick="press(':')">:</button>
-        <button class="key" onclick="press('4')">4</button>
-        <button class="key" onclick="press('5')">5</button>
-        <button class="key" onclick="press('6')">6</button>
-        <button class="key op" onclick="press('*')">*</button>
-        <button class="key" onclick="press('1')">1</button>
-        <button class="key" onclick="press('2')">2</button>
-        <button class="key" onclick="press('3')">3</button>
-        <button class="key op" onclick="press('-')">-</button>
-        <button class="key del" onclick="press('DEL')">⌫</button>
-        <button class="key" onclick="press('0')">0</button>
-        <button class="key op" onclick="press('+')">+</button>
-        <button class="key op" onclick="press('.')">.</button>
-        <button class="key action-key bg-cyan-500 text-slate-900" onclick="copiaOrdine()">📋 COPIA WHATSAPP</button>
-        <button class="key action-key bg-emerald-600 text-white" onclick="window.print()">🖨️ PDF / STAMPA</button>
     </div>
 
-    <script>
-        const listaBarche = ["NAPOLI JET", "SALERNO JET", "AMALFI JET", "SUPER JET", "CAPRI JET", "ISCHIA JET", "TREMITI JET", "VESUVIO JET", "JUMBO JET", "SORRENTO JET", "GIUNONE JET", "EUROPA JET", "CITTÀ DI SORRENTO", "APOLLO", "FRECCIA D ARGENTO", "BLIZ", "ISCHIA MAR 3", "URAGANO", "ACQUARIUS", "RAID"];
+    <!-- TAB VENDITE GIORNALIERE -->
+    <div id="tab-vendite" class="tab-content active">
+        <div id="prod-list-vendite"></div>
+    </div>
 
-        const catalogoOrdine = [
-            { c: "Bevande", i: ["Acqua Naturale", "Acqua Frizzante", "Acqua 2 Litri", "Coca", "Coca 0", "Fanta", "Sprite", "Lemonsoda", "The Pesca", "The Limone", "Birra Peroni", "Peroni Capri", "Spritz", "Red Bull", "Gatorade", "Vino Aglianico", "Vino Falanghina", "Vino 0,25", "Prosecco 0,25", "Succhi", "Limoncello/Amaro"] },
-            { c: "Caffetteria", i: ["Caffè", "Decaffeinato", "Cialde", "Ginseng", "Orzo", "Latte", "Dietor", "Thè / Camomilla"] },
-            { c: "Snack & Food", i: ["Patatine", "Fonzies", "Pringles", "Ritz", "Tuc", "Arachidi", "Nik Nok", "Mikado", "Mars", "Snickers", "Twix", "Kit Kat", "M&M's", "Kinder Bueno", "Bready", "Kinder Biscuit", "Kinder Card", "Gomme", "Caramelle", "Muffin", "Oreo", "Ringo", "Fitness", "Pavesini"] },
-            { c: "Extra", i: ["Borse G", "Borse M", "Cappelli", "Impermeabili", "Maglie"] }
-        ];
+    <!-- TAB MAGAZZINO E CARICHI -->
+    <div id="tab-magazzino" class="tab-content">
+        <div id="prod-list-magazzino"></div>
+    </div>
 
-        const inventarioVesuvioJet = [
-            {n: "💧 ACQUA", v: "323"}, {n: "🥜 ARACHIDI", v: "16"}, {n: "🛍️ BORSE P.", v: "228"}, {n: "🛍️ BORSE M.", v: "0"}, {n: "👜 BORSE G.", v: "21"}, {n: "🍫 BUENO/BISCUITS", v: "60"}, {n: "🧢 CAPPELLI", v: "63"}, {n: "🍬 CARAMELLE", v: "85"}, {n: "☕ CIALDE", v: "136"}, {n: "☕ DECA", v: "10"}, {n: "🍬 DIETOR", v: "40"}, {n: "🌾 FITNESS", v: "45"}, {n: "🍟 FONZIES/PAT.", v: "54"}, {n: "☕ GINSENG", v: "11"}, {n: "🧥 IMPERMEAB.", v: "30"}, {n: "🥛 LATTE", v: "3"}, {n: "🥤 LATTINE", v: "210"}, {n: "👕 MAGLIE", v: "50"}, {n: "🥢 MIKADO", v: "23"}, {n: "🧁 MUFFIN", v: "27"}, {n: "🥜 NIK NOK", v: "23"}, {n: "☕ ORZO", v: "0"}, {n: "🍪 PAVESINI", v: "20"}, {n: "🍺 PERONI", v: "107"}, {n: "🍋 PERONI CAPRI", v: "44"}, {n: "🥔 PRINGLES", v: "58"}, {n: "🍷 PROSECCO/VINO", v: "79"}, {n: "⚡ RED BULL/GAT.", v: "48"}, {n: "🍪 RINGO/OREO", v: "108"}, {n: "🥨 RITZ/CIPSTER", v: "21"}, {n: "🍹 SPRITZ", v: "41"}, {n: "🧃 SUCCO", v: "23"}, {n: "🍵 THE/CAMOM.", v: "45"}, {n: "🍪 TUC", v: "22"}, {n: "🍫 TWIX/KITKAT", v: "90"}
-        ];
+    <!-- TAB REPORT E STORICO -->
+    <div id="tab-report" class="tab-content">
+        <div class="report-section">
+            <h3 style="margin-top:0">Storico Periodo Accumulato</h3>
+            <div id="period-stats" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+                <div class="stat" style="background:#f1f2f6; padding:10px; border-radius:8px;">
+                    <span>Tot. Passeggeri</span>
+                    <b id="tot-v-pas">0</b>
+                </div>
+                <div class="stat" style="background:#f1f2f6; padding:10px; border-radius:8px;">
+                    <span>Tot. Pendolari</span>
+                    <b id="tot-v-pen">0</b>
+                </div>
+            </div>
+            <div id="report-period-items"></div>
+        </div>
 
-        let selectedElement = null;
+        <div class="report-section" style="border-top: 4px solid var(--danger);">
+            <h3 style="color:var(--danger)">Chiusura Giornaliera</h3>
+            <p style="font-size:0.75rem;">Sposta i dati di oggi nello storico e aggiorna le scorte per domani.</p>
+            <button class="btn btn-danger" style="width:100%" onclick="chiudiGiornata()">SALVA E AZZERA OGGI</button>
+        </div>
+    </div>
 
-        function init() {
-            const selectInv = document.getElementById('mezzo-select-inv');
-            listaBarche.forEach(barca => {
-                let opt = document.createElement('option');
-                opt.value = barca;
-                opt.innerText = barca;
-                if(barca === "VESUVIO JET") opt.selected = true;
-                selectInv.appendChild(opt);
-            });
+</div>
 
-            const container = document.getElementById('ordine-container');
-            const savedCarico = JSON.parse(localStorage.getItem('carico_app_jet')) || {};
+<div class="bottom-actions">
+    <div class="btn-group">
+        <button class="btn btn-neutral" onclick="update()">RICONTROLLA</button>
+        <button class="btn btn-success" onclick="openTab('tab-report')">VAI AI TOTALI</button>
+    </div>
+</div>
+
+<script>
+    // Database prodotti corretto con tutti gli item e vendite iniziali
+    let prodotti = [
+        {id: 'acq', n: "Acqua", i: "💧", p: 2, pen: 1, q: 299, c: 168, vPas: 109, vPen: 0, vPasTot: 109, vPenTot: 0},
+        {id: 'ara', n: "Arachidi / Frutta S.", i: "🥜", p: 2.5, pen: 1, q: 16, c: 24, vPas: 11, vPen: 0, vPasTot: 11, vPenTot: 0},
+        {id: 'bp', n: "Borse Piccole", i: "👜", p: 6, pen: 5, q: 228, c: 0, vPas: 28, vPen: 0, vPasTot: 28, vPenTot: 0},
+        {id: 'bg', n: "Borse Grandi", i: "👜", p: 10, pen: 10, q: 21, c: 0, vPas: 1, vPen: 0, vPasTot: 1, vPenTot: 0},
+        {id: 'bue', n: "Bueno/B-Ready/Biscuits", i: "🍫", p: 3, pen: 1, q: 60, c: 0, vPas: 12, vPen: 0, vPasTot: 12, vPenTot: 0},
+        {id: 'cap', n: "Cappelli", i: "🧢", p: 5, pen: 5, q: 63, c: 0, vPas: 9, vPen: 0, vPasTot: 9, vPenTot: 0},
+        {id: 'cpe', n: "Cappuccino Extra", i: "☕✨", p: 3.5, pen: 1.5, q: 0, c: 0, vPas: 0, vPen: 0, vPasTot: 0, vPenTot: 0},
+        {id: 'car', n: "Caramelle / Gomme", i: "🍬", p: 2.5, pen: 1, q: 85, c: 0, vPas: 5, vPen: 0, vPasTot: 5, vPenTot: 0},
+        {id: 'cia', n: "Cialde", i: "☕", p: 2, pen: 1, q: 136, c: 300, vPas: 82, vPen: 0, vPasTot: 82, vPenTot: 0},
+        {id: 'dec', n: "Deca", i: "☕", p: 2, pen: 1, q: 10, c: 0, vPas: 0, vPen: 0, vPasTot: 0, vPenTot: 0},
+        {id: 'fit', n: "Fitness / Cereal Yo", i: "🌾", p: 2.5, pen: 1, q: 24, c: 0, vPas: 6, vPen: 0, vPasTot: 6, vPenTot: 0},
+        {id: 'fon', n: "Fonzies / Patatine", i: "🍟", p: 2.5, pen: 1, q: 75, c: 92, vPas: 33, vPen: 0, vPasTot: 33, vPenTot: 0},
+        {id: 'gin', n: "Ginseng", i: "☕", p: 2, pen: 1, q: 11, c: 0, vPas: 0, vPen: 0, vPasTot: 0, vPenTot: 0},
+        {id: 'ltn', n: "Lattine", i: "🥤", p: 2.5, pen: 1.5, q: 233, c: 144, vPas: 58, vPen: 0, vPasTot: 58, vPenTot: 0},
+        {id: 'mik', n: "Mikado", i: "🥖", p: 3, pen: 1, q: 23, c: 0, vPas: 1, vPen: 0, vPasTot: 1, vPenTot: 0},
+        {id: 'muf', n: "Muffin", i: "🧁", p: 3, pen: 1, q: 27, c: 0, vPas: 4, vPen: 0, vPasTot: 4, vPenTot: 0},
+        {id: 'nik', n: "Nik Nok", i: "🥜", p: 2.5, pen: 1, q: 23, c: 24, vPas: 4, vPen: 0, vPasTot: 4, vPenTot: 0},
+        {id: 'per', n: "Peroni", i: "🍺", p: 4.5, pen: 1.5, q: 107, c: 120, vPas: 73, vPen: 0, vPasTot: 73, vPenTot: 0},
+        {id: 'pca', n: "Peroni Capri", i: "🍋", p: 7.5, pen: 5.5, q: 44, c: 24, vPas: 7, vPen: 0, vPasTot: 7, vPenTot: 0},
+        {id: 'pri', n: "Pringles", i: "🥔", p: 3.5, pen: 2, q: 60, c: 48, vPas: 18, vPen: 0, vPasTot: 18, vPenTot: 0},
+        {id: 'vin', n: "Prosecco / Vino", i: "🍷", p: 6, pen: 3, q: 79, c: 24, vPas: 18, vPen: 0, vPasTot: 18, vPenTot: 0},
+        {id: 'red', n: "Red Bull / Gatorade", i: "⚡", p: 4.5, pen: 2.5, q: 40, c: 0, vPas: 8, vPen: 0, vPasTot: 8, vPenTot: 0},
+        {id: 'rin', n: "Ringo / Oreo / Baiocchi", i: "🍪", p: 2.5, pen: 1, q: 108, c: 0, vPas: 14, vPen: 0, vPasTot: 14, vPenTot: 0},
+        {id: 'riz', n: "Ritz / Cipster", i: "🍪", p: 2.5, pen: 1, q: 21, c: 0, vPas: 4, vPen: 0, vPasTot: 4, vPenTot: 0},
+        {id: 'spr', n: "Spritz", i: "🍹", p: 8, pen: 5, q: 41, c: 48, vPas: 29, vPen: 0, vPasTot: 29, vPenTot: 0},
+        {id: 'tuc', n: "Tuc", i: "🍪", p: 2.5, pen: 1, q: 22, c: 0, vPas: 6, vPen: 0, vPasTot: 6, vPenTot: 0},
+        {id: 'twi', n: "Twix/KitKat/M&M...", i: "🍫", p: 2.5, pen: 1.5, q: 90, c: 0, vPas: 28, vPen: 0, vPasTot: 28, vPenTot: 0}
+    ];
+
+    function openTab(id) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        const btns = document.querySelectorAll('.tab-btn');
+        if(id === 'tab-vendite') btns[0].classList.add('active');
+        if(id === 'tab-magazzino') btns[1].classList.add('active');
+        if(id === 'tab-report') btns[2].classList.add('active');
+        window.scrollTo(0,0);
+    }
+
+    function init() {
+        const vList = document.getElementById('prod-list-vendite');
+        const mList = document.getElementById('prod-list-magazzino');
+        vList.innerHTML = ''; mList.innerHTML = '';
+
+        prodotti.forEach(p => {
+            vList.innerHTML += `
+                <div class="product-card">
+                    <div class="prod-header">
+                        <span class="prod-name">${p.i} ${p.n}</span>
+                        <span class="badge">Periodo: ${p.vPasTot + p.vPenTot}</span>
+                    </div>
+                    <div class="input-group">
+                        <div class="field">
+                            <label>OGGI PAS.</label>
+                            <input type="number" id="vpas-${p.id}" value="${p.vPas}" onchange="update()">
+                        </div>
+                        <div class="field">
+                            <label>OGGI PEN.</label>
+                            <input type="number" id="vpen-${p.id}" value="${p.vPen}" onchange="update()">
+                        </div>
+                    </div>
+                </div>`;
+
+            mList.innerHTML += `
+                <div class="product-card" style="border-left-color: var(--pend)">
+                    <div class="prod-header">
+                        <span class="prod-name">${p.i} ${p.n}</span>
+                    </div>
+                    <div class="input-group">
+                        <div class="field">
+                            <label>INIZIO GIORNO</label>
+                            <input type="number" id="q-${p.id}" value="${p.q}" onchange="update()">
+                        </div>
+                        <div class="field">
+                            <label>CARICO DDT</label>
+                            <input type="number" id="c-${p.id}" value="${p.c}" onchange="update()">
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <span>Rimanenza: <b id="rem-${p.id}">0</b></span>
+                        <span>Disp. Tot: ${(p.q + p.c)}</span>
+                    </div>
+                </div>`;
+        });
+        update();
+    }
+
+    function update() {
+        let incassoOggi = 0;
+        let totPasPeriodo = 0;
+        let totPenPeriodo = 0;
+        let reportPeriodoHtml = '';
+
+        prodotti.forEach(p => {
+            const vPasInput = document.getElementById(`vpas-${p.id}`);
+            const vPenInput = document.getElementById(`vpen-${p.id}`);
+            const qInput = document.getElementById(`q-${p.id}`);
+            const cInput = document.getElementById(`c-${p.id}`);
+
+            if(!vPasInput) return;
+
+            const vPas = parseInt(vPasInput.value) || 0;
+            const vPen = parseInt(vPenInput.value) || 0;
+            const q = parseInt(qInput.value) || 0;
+            const c = parseInt(cInput.value) || 0;
+
+            // Sincronizzo oggetto locale
+            p.vPas = vPas; p.vPen = vPen; p.q = q; p.c = c;
+
+            // Rimanenza
+            const rem = (q + c) - (vPas + vPen);
+            document.getElementById(`rem-${p.id}`).innerText = rem;
+            document.getElementById(`rem-${p.id}`).style.color = rem < 0 ? 'var(--danger)' : 'var(--success)';
+
+            // Calcolo Incasso di "Oggi" basato sui campi input
+            incassoOggi += (vPas * p.p) + (vPen * p.pen);
             
-            catalogoOrdine.forEach(cat => {
-                let h = document.createElement('div'); h.className = 'category-label'; h.innerText = cat.c; container.appendChild(h);
-                cat.i.forEach(art => {
-                    let r = document.createElement('div'); r.className = 'item-row';
-                    r.onclick = () => selectRow(r, art);
-                    const safeId = art.replace(/[^a-zA-Z0-9]/g, '_');
-                    const savedVal = savedCarico[safeId] || "0";
-                    r.innerHTML = `<span class="name text-sm">${art}</span><div class="qty-box" id="qty-${safeId}">${savedVal}</div>`;
-                    container.appendChild(r);
-                });
-            });
+            // Storico Totale del periodo
+            totPasPeriodo += p.vPasTot;
+            totPenPeriodo += p.vPenTot;
 
-            const savedInv = JSON.parse(localStorage.getItem('inventario_app_jet'));
-            if (savedInv) caricaTabellaInventario(savedInv);
-            else caricaTabellaInventario(inventarioVesuvioJet);
-            
-            initCanvas();
-        }
-
-        function aggiornaTitoloMezzo(valore) {
-            document.getElementById('display-mezzo').innerText = valore;
-            saveState();
-        }
-
-        function caricaTabellaInventario(dati) {
-            const body = document.getElementById('inventory-body');
-            body.innerHTML = "";
-            dati.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-200 transition";
-                const total = item.v.toString().split('+').reduce((a, b) => a + (parseInt(b.trim()) || 0), 0);
-                tr.innerHTML = `
-                    <td class="p-2 border no-print text-center"><input type="checkbox" onchange="this.parentElement.parentElement.classList.toggle('row-checked')" class="w-5 h-5"></td>
-                    <td class="p-2 border font-bold item-name">${item.n}</td>
-                    <td class="p-1 border"><input type="text" oninput="updateT(this)" class="item-value w-full bg-transparent font-mono text-blue-800 font-bold outline-none" value="${item.v}"></td>
-                    <td class="p-1 border text-center font-black bg-slate-50 total-cell">${total}</td>`;
-                body.appendChild(tr);
-            });
-        }
-
-        function switchTab(tab) {
-            document.getElementById('section-ordine').classList.toggle('hidden', tab !== 'ordine');
-            document.getElementById('section-inventario').classList.toggle('hidden', tab !== 'inventario');
-            document.getElementById('main-keypad').classList.toggle('hidden', tab !== 'ordine');
-            document.getElementById('tab-ordine').classList.toggle('active-tab', tab === 'ordine');
-            document.getElementById('tab-inventario').classList.toggle('active-tab', tab === 'inventario');
-            if(tab === 'inventario') resizeCanvas();
-        }
-
-        function selectRow(el, id) {
-            document.querySelectorAll('.item-row').forEach(r => r.classList.remove('selected'));
-            el.classList.add('selected');
-            const safeId = id.replace(/[^a-zA-Z0-9]/g, '_');
-            selectedElement = document.getElementById(`qty-${safeId}`);
-        }
-
-        function press(val) {
-            if (!selectedElement) return;
-            let current = selectedElement.innerText;
-            if (val === 'DEL') {
-                selectedElement.innerText = current.length > 1 ? current.slice(0, -1) : "0";
-            } else {
-                selectedElement.innerText = (current === "0" && val !== '.') ? val : current + val;
+            if(p.vPasTot + p.vPenTot > 0) {
+                reportPeriodoHtml += `
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:5px; border-bottom:1px solid #f0f0f0; padding-bottom:5px;">
+                    <span>${p.i} ${p.n}</span>
+                    <span><b>${p.vPasTot + p.vPenTot}</b> <small>(Pas:${p.vPasTot}/Pen:${p.vPenTot})</small></span>
+                </div>`;
             }
-            saveState();
-        }
+        });
 
-        function saveState() {
-            const carico = {};
-            document.querySelectorAll('.qty-box').forEach(box => {
-                carico[box.id.replace('qty-', '')] = box.innerText;
-            });
-            localStorage.setItem('carico_app_jet', JSON.stringify(carico));
+        // Visualizzazione Dashboard
+        document.getElementById('m-netto').innerText = `€ ${incassoOggi.toFixed(2)}`;
+        document.getElementById('tot-v-pas').innerText = totPasPeriodo;
+        document.getElementById('tot-v-pen').innerText = totPenPeriodo;
+        document.getElementById('report-period-items').innerHTML = reportPeriodoHtml;
+        
+        document.getElementById('count-pas').innerText = prodotti.reduce((a,b) => a + b.vPas, 0);
+        document.getElementById('count-pen').innerText = prodotti.reduce((a,b) => a + b.vPen, 0);
+    }
 
-            const inv = [];
-            document.querySelectorAll('#inventory-body tr').forEach(r => {
-                const nameNode = r.querySelector('.item-name');
-                const valNode = r.querySelector('.item-value');
-                if (nameNode && valNode) {
-                    inv.push({ n: nameNode.innerText, v: valNode.value });
-                }
-            });
-            localStorage.setItem('inventario_app_jet', JSON.stringify(inv));
-        }
+    function chiudiGiornata() {
+        if(!confirm("Vuoi chiudere il turno?\n\nLe vendite di oggi verranno sommate allo storico e le rimanenze diventeranno lo stock di domani.")) return;
 
-        function resetCarico() {
-            if(!confirm("Cancellare tutto l'ordine attuale?")) return;
-            document.querySelectorAll('.qty-box').forEach(box => box.innerText = "0");
-            saveState();
-        }
+        prodotti.forEach(p => {
+            // Sommo i valori attuali allo storico
+            p.vPasTot += p.vPas;
+            p.vPenTot += p.vPen;
 
-        function copiaOrdine() {
-            const mezzo = document.getElementById('display-mezzo').innerText;
-            let t = `📦 *ORDINE CARICO - ${mezzo}*\n📅 ${new Date().toLocaleDateString()}\n--------------------------\n`;
-            let hasItems = false;
-            document.querySelectorAll('.qty-box').forEach(box => {
-                if(box.innerText !== "0") {
-                    const name = box.id.replace('qty-','').replace(/_/g,' ');
-                    t += `▪️ *${name}:* ${box.innerText}\n`;
-                    hasItems = true;
-                }
-            });
-            if(!hasItems) return alert("Inserisci almeno un prodotto!");
-            const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el); el.select();
-            document.execCommand('copy'); document.body.removeChild(el);
-            alert("Ordine Copiato! Incollalo su WhatsApp.");
-        }
-
-        function updateT(i){ 
-            const s = i.value.split('+').reduce((a,b)=>a+(parseInt(b.trim())||0),0); 
-            const row = i.parentElement.parentElement;
-            const totalCell = row.querySelector('.total-cell');
-            if (totalCell) totalCell.innerText = s; 
-            saveState();
-        }
-
-        function salvaTxt() {
-            const mezzo = document.getElementById('display-mezzo').innerText;
-            let contenuto = `INVENTARIO: ${mezzo}\nDATA: ${new Date().toLocaleString()}\n\n`;
-            document.querySelectorAll('#inventory-body tr').forEach(r => {
-                const nome = r.querySelector('.item-name')?.innerText;
-                const valore = r.querySelector('.item-value')?.value;
-                const totale = r.querySelector('.total-cell')?.innerText;
-                if (nome) contenuto += `${nome} | ${valore} | TOT: ${totale}\n`;
-            });
-            const blob = new Blob([contenuto], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `Inventario_${mezzo.replace(/\s+/g, '_')}.txt`;
-            a.click();
-        }
-
-        function salvaCaricoTxt() {
-            const mezzo = document.getElementById('display-mezzo').innerText;
-            let contenuto = `ORDINE CARICO - ${mezzo}\nDATA: ${new Date().toLocaleString()}\n\n`;
-            document.querySelectorAll('.qty-box').forEach(box => {
-                if(box.innerText !== "0") {
-                    contenuto += `${box.id.replace('qty-','').replace(/_/g,' ')}: ${box.innerText}\n`;
-                }
-            });
-            const blob = new Blob([contenuto], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `Carico_${mezzo.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.txt`;
-            a.click();
-        }
-
-        function importaTxt(input) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const righe = e.target.result.split('\n');
-                const datiCaricati = [];
-                righe.forEach(riga => {
-                    if (riga.includes("|")) {
-                        const parti = riga.split("|");
-                        datiCaricati.push({ n: parti[0].trim(), v: parti[1].trim() });
-                    }
-                });
-                if (datiCaricati.length > 0) {
-                    caricaTabellaInventario(datiCaricati);
-                    saveState();
-                    alert("Dati importati!");
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        // GESTIONE FIRMA MIGLIORATA
-        let canvas, ctx, drawing = false;
-
-        function resizeCanvas() {
-            if (!canvas) return;
-            const rect = canvas.parentNode.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = 180;
-            // Ripristina le proprietà del contesto dopo il ridimensionamento
-            ctx.lineWidth = 3;
-            ctx.lineCap = "round";
-            ctx.strokeStyle = "#000";
-        }
-
-        function initCanvas() {
-            canvas = document.getElementById('signature-pad');
-            if(!canvas) return;
-            ctx = canvas.getContext('2d');
+            // Calcolo scorta per domani
+            p.q = (p.q + p.c) - (p.vPas + p.vPen);
+            p.c = 0;
             
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
+            // Azzero l'oggi
+            p.vPas = 0;
+            p.vPen = 0;
+        });
 
-            const getPos = (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                return {
-                    x: clientX - rect.left,
-                    y: clientY - rect.top
-                };
-            };
+        alert("Turno salvato con successo!");
+        init();
+        openTab('tab-report');
+    }
 
-            const startDrawing = (e) => {
-                drawing = true;
-                const pos = getPos(e);
-                ctx.beginPath();
-                ctx.moveTo(pos.x, pos.y);
-                if (e.touches) e.preventDefault(); 
-            };
+    window.onload = init;
+</script>
 
-            const draw = (e) => {
-                if (!drawing) return;
-                const pos = getPos(e);
-                ctx.lineTo(pos.x, pos.y);
-                ctx.stroke();
-                if (e.touches) e.preventDefault();
-            };
-
-            const stopDrawing = () => {
-                drawing = false;
-            };
-
-            // Eventi Mouse
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            window.addEventListener('mouseup', stopDrawing);
-
-            // Eventi Touch (Mobile)
-            canvas.addEventListener('touchstart', startDrawing, { passive: false });
-            canvas.addEventListener('touchmove', draw, { passive: false });
-            canvas.addEventListener('touchend', stopDrawing);
-        }
-
-        function clearSignature() { 
-            if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); 
-        }
-
-        window.onload = () => {
-            init();
-            // Piccolo ritardo per assicurarsi che il layout sia pronto per il canvas
-            setTimeout(resizeCanvas, 300);
-        };
-    </script>
 </body>
 </html>
 
