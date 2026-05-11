@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -82,7 +81,7 @@
 </div>
 
 <script>
-    // DATI AGGIORNATI (Cappuccino Extra a €3.50)
+    // DATI AGGIORNATI (Aggiunto Caffè Americano Extra)
     let prodotti = JSON.parse(localStorage.getItem('barDataV6')) || [
         {id:'acq', n:"Acqua", i:"💧", p:2.0, pen:1.0, q:299, c:168, vPas:109, vPen:0, o:0},
         {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1.0, q:16, c:24, vPas:11, vPen:0, o:0},
@@ -91,6 +90,7 @@
         {id:'bg', n:"Borse Grandi", i:"👜", p:10.0, pen:10.0, q:21, c:0, vPas:1, vPen:0, o:0},
         {id:'bue', n:"Bueno/Biscuit", i:"🍫", p:3.0, pen:1.0, q:60, c:0, vPas:12, vPen:0, o:0},
         {id:'cap', n:"Cappelli", i:"🧢", p:5.0, pen:5.0, q:63, c:0, vPas:9, vPen:0, o:0},
+        {id:'cae', n:"Caffè Americano Extra", i:"☕🇺🇸", p:3.5, pen:2.5, q:0, c:0, vPas:0, vPen:0, o:0},
         {id:'ce', n:"Cappuccino Extra", i:"☕✨", p:3.5, pen:2.5, q:0, c:0, vPas:0, vPen:0, o:0},
         {id:'car', n:"Caramelle / Gomme", i:"🍬", p:2.5, pen:1.0, q:85, c:0, vPas:5, vPen:0, o:3},
         {id:'cia', n:"Cialde", i:"☕", p:2.0, pen:1.0, q:136, c:300, vPas:82, vPen:0, o:0},
@@ -139,13 +139,14 @@
     }
 
     function init() {
-        // Forza aggiornamento prezzo per Cappuccino Extra se esiste già in memoria
-        const ceIdx = prodotti.findIndex(p => p.id === 'ce');
-        if (ceIdx !== -1) {
-            prodotti[ceIdx].p = 3.5;
-        } else {
-            prodotti.push({id:'ce', n:"Cappuccino Extra", i:"☕✨", p:3.5, pen:2.5, q:0, c:0, vPas:0, vPen:0, o:0});
+        // Verifica e inserimento Caffè Americano Extra se mancante nel salvataggio
+        if (!prodotti.find(p => p.id === 'cae')) {
+            prodotti.push({id:'cae', n:"Caffè Americano Extra", i:"☕🇺🇸", p:3.5, pen:2.5, q:0, c:0, vPas:0, vPen:0, o:0});
         }
+        
+        // Verifica prezzo Cappuccino Extra
+        const ceIdx = prodotti.findIndex(p => p.id === 'ce');
+        if (ceIdx !== -1) prodotti[ceIdx].p = 3.5;
         
         prodotti = prodotti.filter(p => p.id !== 'tu');
         
@@ -156,8 +157,8 @@
             vList.innerHTML += `<div class="product-card" data-name="${p.n}">
                 <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
                 <div class="input-group">
-                    <div class="field"><label>PASSEGGERI (€${p.p})</label><div class="stepper"><button onclick="step('vpas-${p.id}', -1)">-</button><input type="number" id="vpas-${p.id}" value="${p.vPas}" onchange="update()"><button onclick="step('vpas-${p.id}', 1)">+</button></div></div>
-                    <div class="field"><label>PENDOLARI (€${p.pen})</label><div class="stepper"><button onclick="step('vpen-${p.id}', -1)">-</button><input type="number" id="vpen-${p.id}" value="${p.vPen}" onchange="update()"><button onclick="step('vpen-${p.id}', 1)">+</button></div></div>
+                    <div class="field"><label>PASSEGGERI (€${p.p.toFixed(2)})</label><div class="stepper"><button onclick="step('vpas-${p.id}', -1)">-</button><input type="number" id="vpas-${p.id}" value="${p.vPas}" onchange="update()"><button onclick="step('vpas-${p.id}', 1)">+</button></div></div>
+                    <div class="field"><label>PENDOLARI (€${p.pen.toFixed(2)})</label><div class="stepper"><button onclick="step('vpen-${p.id}', -1)">-</button><input type="number" id="vpen-${p.id}" value="${p.vPen}" onchange="update()"><button onclick="step('vpen-${p.id}', 1)">+</button></div></div>
                 </div></div>`;
             
             mList.innerHTML += `<div class="product-card" data-name="${p.n}" style="border-left-color:var(--pend)">
