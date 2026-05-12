@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -12,7 +11,7 @@
         }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--primary); user-select: none; }
         .tabs { display: flex; background: var(--primary); position: sticky; top: 0; z-index: 100; }
-        .tab-btn { flex: 1; padding: 15px 5px; color: white; border: none; background: none; font-weight: bold; font-size: 0.65rem; text-transform: uppercase; opacity: 0.6; }
+        .tab-btn { flex: 1; padding: 15px 2px; color: white; border: none; background: none; font-weight: bold; font-size: 0.6rem; text-transform: uppercase; opacity: 0.6; }
         .tab-btn.active { opacity: 1; border-bottom: 4px solid var(--accent); }
         .content { padding: 10px; padding-bottom: 160px; }
         .tab-content { display: none; }
@@ -31,6 +30,7 @@
         .stepper { display: flex; align-items: center; background: #f1f2f6; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; }
         .stepper button { width: 38px; height: 42px; border: none; background: #e0e0e0; font-size: 1.4rem; font-weight: bold; color: var(--primary); cursor: pointer; touch-action: manipulation; }
         .stepper input { flex: 1; width: 30px; border: none; background: transparent; text-align: center; font-size: 1.1rem; font-weight: bold; color: var(--primary); }
+        .price-input { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; width: 100%; box-sizing: border-box; }
         .info-row { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; display: flex; justify-content: space-between; font-size: 0.75rem; color: #7f8c8d; }
         .bottom-actions { position: fixed; bottom: 0; width: 100%; background: white; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 200; }
         .btn-row { display: flex; gap: 8px; }
@@ -39,16 +39,18 @@
         .btn-neutral { background: var(--primary); }
         .btn-danger { background: var(--danger); }
         .btn-wa { background: #25D366; color: white; }
-        .search-bar { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        .badge-info { font-size: 0.6rem; background: #eee; padding: 2px 5px; border-radius: 4px; margin-top: 2px; }
+        .search-bar-container { position: relative; width: 100%; margin-bottom: 10px; }
+        .search-bar { width: 100%; padding: 10px; padding-right: 35px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        .clear-search { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: #ddd; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="tabs">
-    <button class="tab-btn active" onclick="openTab('tab-vendite')">💰 Vendite</button>
-    <button class="tab-btn" onclick="openTab('tab-magazzino')">📦 Magazzino</button>
-    <button class="tab-btn" onclick="openTab('tab-report')">📊 Totali</button>
+    <button class="tab-btn active" onclick="openTab('tab-vendite')">💰 VENDITE</button>
+    <button class="tab-btn" onclick="openTab('tab-magazzino')">📦 STOCK</button>
+    <button class="tab-btn" onclick="openTab('tab-prezzi')">🏷️ LISTINO</button>
+    <button class="tab-btn" onclick="openTab('tab-report')">📊 REPORT</button>
 </div>
 
 <div class="content">
@@ -61,10 +63,14 @@
         <div class="stat"><span>Pendolari</span><b id="count-pen" style="color:var(--pend)">0</b></div>
     </div>
 
-    <input type="text" id="search" class="search-bar" placeholder="Cerca prodotto..." onkeyup="filterProducts()">
+    <div class="search-bar-container">
+        <input type="text" id="search" class="search-bar" placeholder="Cerca prodotto..." onkeyup="filterProducts()">
+        <button id="clear-btn" class="clear-search" onclick="clearSearch()">✕</button>
+    </div>
 
     <div id="tab-vendite" class="tab-content active"></div>
     <div id="tab-magazzino" class="tab-content"></div>
+    <div id="tab-prezzi" class="tab-content"></div>
     <div id="tab-report" class="tab-content">
         <div style="background:white; padding:15px; border-radius:12px;">
             <h3 style="margin:0 0 10px 0">Riepilogo Odierno</h3>
@@ -77,14 +83,13 @@
 <div class="bottom-actions">
     <button class="btn btn-wa" onclick="condividiWhatsApp()">📲 COPIA PER WHATSAPP</button>
     <div class="btn-row">
-        <button class="btn btn-neutral" onclick="update()">AGGIORNA</button>
-        <button class="btn btn-success" onclick="openTab('tab-report')">RIEPILOGO</button>
+        <button class="btn btn-neutral" onclick="openTab('tab-vendite')">TORNA A VENDITE</button>
+        <button class="btn btn-success" onclick="openTab('tab-report')">VAI AL REPORT</button>
     </div>
 </div>
 
 <script>
-    // Logica: vPas è il TOTALE, vPen è "DI CUI PENDOLARI"
-    let prodotti = JSON.parse(localStorage.getItem('barDataV7')) || [
+    let prodotti = JSON.parse(localStorage.getItem('barDataV9')) || [
         {id:'acq', n:"Acqua", i:"💧", p:2.0, pen:1.0, q:299, c:168, vPas:0, vPen:0, o:0},
         {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1.0, q:16, c:24, vPas:0, vPen:0, o:0},
         {id:'bp', n:"Borse Piccole", i:"👜", p:6.0, pen:5.0, q:228, c:0, vPas:0, vPen:0, o:0},
@@ -131,56 +136,34 @@
         const btns = document.querySelectorAll('.tab-btn');
         if(id==='tab-vendite') btns[0].classList.add('active');
         if(id==='tab-magazzino') btns[1].classList.add('active');
-        if(id==='tab-report') btns[2].classList.add('active');
+        if(id==='tab-prezzi') btns[2].classList.add('active');
+        if(id==='tab-report') btns[3].classList.add('active');
+        window.scrollTo(0,0);
     }
 
-    function step(id, delta, isTotalInput = false, prodId = '') {
+    function step(id, delta, isTotalInput, prodId) {
         const input = document.getElementById(id);
         const newVal = Math.max(0, (parseInt(input.value) || 0) + delta);
         input.value = newVal;
-        
-        // Se cambio il Totale, assicuro che i pendolari non superino il totale
-        if(isTotalInput) {
-            const penInput = document.getElementById(`vpen-${prodId}`);
-            if(parseInt(penInput.value) > newVal) penInput.value = newVal;
-        } else {
-            // Se cambio i pendolari, non possono superare il totale
-            const totInput = document.getElementById(`vpas-${prodId}`);
-            if(newVal > parseInt(totInput.value)) input.value = totInput.value;
-        }
-        update();
+        validateInputs(prodId, isTotalInput);
     }
 
     function init() {
         const vList = document.getElementById('tab-vendite');
         const mList = document.getElementById('tab-magazzino');
-        vList.innerHTML = ''; mList.innerHTML = '';
+        const pList = document.getElementById('tab-prezzi');
+        vList.innerHTML = ''; mList.innerHTML = ''; pList.innerHTML = '';
         
         prodotti.forEach(p => {
+            // Vendite
             vList.innerHTML += `<div class="product-card" data-name="${p.n}">
-                <div class="prod-header">
-                    <span class="prod-name">${p.i} ${p.n}</span>
-                    <div class="badge-info">Std: €${p.p.toFixed(2)} | Pen: €${p.pen.toFixed(2)}</div>
-                </div>
+                <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span> <span id="label-prezzi-${p.id}" class="badge-info">€${p.p.toFixed(2)} | €${p.pen.toFixed(2)}</span></div>
                 <div class="input-group">
-                    <div class="field">
-                        <label>TOTALE VENDUTI</label>
-                        <div class="stepper">
-                            <button onclick="step('vpas-${p.id}', -1, true, '${p.id}')">-</button>
-                            <input type="number" id="vpas-${p.id}" value="${p.vPas}" onchange="validateInputs('${p.id}', true)">
-                            <button onclick="step('vpas-${p.id}', 1, true, '${p.id}')">+</button>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label>DI CUI PENDOLARI</label>
-                        <div class="stepper">
-                            <button onclick="step('vpen-${p.id}', -1, false, '${p.id}')">-</button>
-                            <input type="number" id="vpen-${p.id}" value="${p.vPen}" onchange="validateInputs('${p.id}', false)">
-                            <button onclick="step('vpen-${p.id}', 1, false, '${p.id}')">+</button>
-                        </div>
-                    </div>
+                    <div class="field"><label>VENDUTI TOTALE</label><div class="stepper"><button onclick="step('vpas-${p.id}', -1, true, '${p.id}')">-</button><input type="number" id="vpas-${p.id}" value="${p.vPas}" onchange="validateInputs('${p.id}', true)"><button onclick="step('vpas-${p.id}', 1, true, '${p.id}')">+</button></div></div>
+                    <div class="field"><label>DI CUI PENDOLARI</label><div class="stepper"><button onclick="step('vpen-${p.id}', -1, false, '${p.id}')">-</button><input type="number" id="vpen-${p.id}" value="${p.vPen}" onchange="validateInputs('${p.id}', false)"><button onclick="step('vpen-${p.id}', 1, false, '${p.id}')">+</button></div></div>
                 </div></div>`;
             
+            // Stock
             mList.innerHTML += `<div class="product-card" data-name="${p.n}" style="border-left-color:var(--pend)">
                 <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
                 <div class="input-group" style="grid-template-columns: 1fr 1fr 1fr;">
@@ -188,8 +171,27 @@
                     <div class="field"><label>CARICO</label><div class="stepper"><input type="number" id="c-${p.id}" value="${p.c}" onchange="update()"></div></div>
                     <div class="field"><label>OMAGGIO</label><div class="stepper"><input type="number" id="o-${p.id}" value="${p.o}" onchange="update()"></div></div>
                 </div>
-                <div class="info-row"><span>Disp: ${(p.q+p.c)}</span><span><b>Reale: <span id="rem-${p.id}">0</span></b></span></div></div>`;
+                <div class="info-row"><span>Disp: ${(p.q+p.c)}</span><span><b>Rimanenza: <span id="rem-${p.id}">0</span></b></span></div></div>`;
+
+            // Listino
+            pList.innerHTML += `<div class="product-card" data-name="${p.n}" style="border-left-color:var(--warning)">
+                <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
+                <div class="input-group">
+                    <div class="field"><label>PREZZO STD (€)</label><input type="number" step="0.1" class="price-input" id="p-std-${p.id}" value="${p.p}" onchange="updatePrices('${p.id}')"></div>
+                    <div class="field"><label>PREZZO PEN (€)</label><input type="number" step="0.1" class="price-input" id="p-pen-${p.id}" value="${p.pen}" onchange="updatePrices('${p.id}')"></div>
+                </div></div>`;
         });
+        update();
+    }
+
+    function updatePrices(prodId) {
+        const p = prodotti.find(item => item.id === prodId);
+        if(p) {
+            p.p = parseFloat(document.getElementById(`p-std-${prodId}`).value) || 0;
+            p.pen = parseFloat(document.getElementById(`p-pen-${prodId}`).value) || 0;
+            const lbl = document.getElementById(`label-prezzi-${prodId}`);
+            if(lbl) lbl.innerText = `€${p.p.toFixed(2)} | €${p.pen.toFixed(2)}`;
+        }
         update();
     }
 
@@ -198,21 +200,24 @@
         const pen = document.getElementById(`vpen-${prodId}`);
         let tVal = parseInt(tot.value) || 0;
         let pVal = parseInt(pen.value) || 0;
-        
-        if(isTotal) {
-            if(pVal > tVal) pen.value = tVal;
-        } else {
-            if(pVal > tVal) pen.value = tVal;
-        }
+        if(pVal > tVal) pen.value = tVal;
         update();
     }
 
     function filterProducts() {
         const query = document.getElementById('search').value.toLowerCase();
-        document.querySelectorAll('#tab-vendite .product-card, #tab-magazzino .product-card').forEach(card => {
+        const clearBtn = document.getElementById('clear-btn');
+        clearBtn.style.display = query.length > 0 ? 'block' : 'none';
+        
+        document.querySelectorAll('.product-card').forEach(card => {
             const name = card.getAttribute('data-name').toLowerCase();
             card.style.display = name.includes(query) ? 'block' : 'none';
         });
+    }
+
+    function clearSearch() {
+        document.getElementById('search').value = '';
+        filterProducts();
     }
 
     function update() {
@@ -224,13 +229,12 @@
             const cEl = document.getElementById(`c-${p.id}`);
             const oEl = document.getElementById(`o-${p.id}`);
 
-            if (totEl) p.vPas = parseInt(totEl.value) || 0; // Qui vPas agisce da Totale
-            if (penEl) p.vPen = parseInt(penEl.value) || 0; // Qui vPen agisce da "Di cui"
+            if (totEl) p.vPas = parseInt(totEl.value) || 0;
+            if (penEl) p.vPen = parseInt(penEl.value) || 0;
             if (qEl) p.q = parseInt(qEl.value) || 0;
             if (cEl) p.c = parseInt(cEl.value) || 0;
             if (oEl) p.o = parseInt(oEl.value) || 0;
 
-            // Calcolo effettivo per scorte: (p.vPas è già il totale venduto)
             let rem = (p.q + p.c) - (p.vPas + p.o);
             const remEl = document.getElementById(`rem-${p.id}`);
             if(remEl) {
@@ -238,25 +242,22 @@
                 remEl.style.color = rem < 0 ? 'var(--danger)' : 'var(--success)';
             }
 
-            // Calcolo incasso: Pendolari (prezzo pen) + Restanti (prezzo std)
             let nStandard = p.vPas - p.vPen;
             incasso += (nStandard * p.p) + (p.vPen * p.pen);
-            
-            pTot += nStandard; 
-            fTot += p.vPen;
+            pTot += nStandard; fTot += p.vPen;
 
             if(p.vPas > 0) {
-                rHtml += `<div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:5px 0; border-bottom:1px solid #eee;">
-                    <span>${p.n} (T:${p.vPas})</span>
-                    <span>Std:${nStandard} | Pen:${p.vPen} (€${((nStandard * p.p) + (p.vPen * p.pen)).toFixed(2)})</span>
+                rHtml += `<div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:8px 0; border-bottom:1px solid #eee;">
+                    <span>${p.n} (${p.vPas})</span>
+                    <span>S:${nStandard} | P:${p.vPen} <b>€${((nStandard * p.p) + (p.vPen * p.pen)).toFixed(2)}</b></span>
                 </div>`;
             }
         });
         document.getElementById('m-netto').innerText = `€ ${incasso.toFixed(2)}`;
         document.getElementById('count-pas').innerText = pTot;
         document.getElementById('count-pen').innerText = fTot;
-        document.getElementById('report-items').innerHTML = rHtml || '<p style="font-size:0.8rem;color:#aaa">Nessuna vendita</p>';
-        localStorage.setItem('barDataV7', JSON.stringify(prodotti));
+        document.getElementById('report-items').innerHTML = rHtml || '<p style="font-size:0.8rem;color:#aaa;text-align:center;padding:20px;">Nessuna vendita registrata</p>';
+        localStorage.setItem('barDataV9', JSON.stringify(prodotti));
     }
 
     function condividiWhatsApp() {
@@ -264,21 +265,22 @@
         prodotti.forEach(p => { 
             if(p.vPas > 0) {
                 let nStd = p.vPas - p.vPen;
-                msg += `▪️ ${p.n}: Tot ${p.vPas} (Std:${nStd}, Pen:${p.vPen}) - €${((nStd*p.p)+(p.vPen*p.pen)).toFixed(2)}\n`; 
+                msg += `▪️ ${p.n}: ${p.vPas} (S:${nStd}, P:${p.vPen}) - €${((nStd*p.p)+(p.vPen*p.pen)).toFixed(2)}\n`; 
             }
         });
         const el = document.createElement('textarea'); el.value = msg; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-        alert("Report copiato!");
+        alert("Report copiato negli appunti!");
     }
 
     function chiudiGiornata() {
-        if(!confirm("Azzerare le vendite e aggiornare le scorte iniziali?")) return;
+        if(!confirm("Azzerare le vendite e aggiornare le scorte iniziali per domani?")) return;
         prodotti.forEach(p => { 
             p.q = (p.q + p.c) - (p.vPas + p.o); 
             p.c = 0; p.vPas = 0; p.vPen = 0; p.o = 0;
         });
-        localStorage.setItem('barDataV7', JSON.stringify(prodotti));
+        localStorage.setItem('barDataV9', JSON.stringify(prodotti));
         init();
+        openTab('tab-vendite');
     }
     window.onload = init;
 </script>
