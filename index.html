@@ -11,36 +11,54 @@
             --danger: #e74c3c; --warning: #f39c12; --pend: #2980b9; --bg: #f8f9fa;
         }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--primary); user-select: none; overflow-x: hidden; }
+        
+        /* Navigazione */
         .tabs { display: flex; background: var(--primary); position: sticky; top: 0; z-index: 100; }
         .tab-btn { flex: 1; padding: 15px 2px; color: white; border: none; background: none; font-weight: bold; font-size: 0.6rem; text-transform: uppercase; opacity: 0.6; }
         .tab-btn.active { opacity: 1; border-bottom: 4px solid var(--accent); }
+        
         .content { padding: 10px; padding-bottom: 220px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
+        /* Dashboard */
         .mini-dash { background: white; padding: 15px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .stat { text-align: center; }
         .stat span { font-size: 0.65rem; color: #7f8c8d; display: block; text-transform: uppercase; }
         .stat b { font-size: 1rem; }
         .stat.highlight b { color: var(--success); font-size: 1.3rem; }
         
+        /* Card Prodotto */
         .product-card { background: white; margin-bottom: 10px; border-radius: 12px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid var(--accent); }
         .prod-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .prod-name { font-weight: bold; font-size: 0.95rem; }
         
+        /* Campi Input con Stepper */
         .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .field { display: flex; flex-direction: column; gap: 4px; }
         .field label { font-size: 0.55rem; font-weight: bold; color: #95a5a6; text-transform: uppercase; text-align: center; }
         
+        .stepper-container {
+            display: flex; align-items: center; background: #f1f2f6; border-radius: 8px; 
+            border: 1px solid #ddd; overflow: hidden; height: 45px;
+        }
+        .step-btn {
+            width: 35px; height: 100%; border: none; background: #e0e0e0;
+            font-size: 1.2rem; font-weight: bold; color: var(--primary);
+            cursor: pointer; touch-action: manipulation;
+        }
+        .step-btn:active { background: #ccc; }
+        
         .numpad-trigger { 
-            background: #f1f2f6; border-radius: 8px; border: 1px solid #ddd; 
-            padding: 10px 5px; text-align: center; font-size: 1.1rem; font-weight: bold; 
-            color: var(--primary); width: 100%; box-sizing: border-box; outline: none;
+            flex: 1; height: 100%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; font-weight: bold; color: var(--primary); 
+            background: transparent; border: none; padding: 0; outline: none;
         }
 
         .price-input { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; width: 100%; box-sizing: border-box; }
         .info-row { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; display: flex; justify-content: space-between; font-size: 0.7rem; color: #7f8c8d; }
         
+        /* Overlay Tastierino */
         #numpad-overlay { 
             position: fixed; bottom: 0; left: 0; width: 100%; background: #d1d4d9; 
             z-index: 1000; display: none; padding: 12px; box-sizing: border-box;
@@ -60,6 +78,7 @@
         .num-btn.close { background: var(--success); color: white; grid-column: span 2; }
         .num-btn.clear { background: var(--danger); color: white; }
 
+        /* Azioni Finali */
         .bottom-actions { position: fixed; bottom: 0; width: 100%; background: white; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 200; }
         .btn-row { display: flex; gap: 8px; }
         .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; color: white; font-size: 0.85rem; text-align: center; }
@@ -72,9 +91,10 @@
         .search-bar { width: 100%; padding: 10px; padding-right: 35px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
         .clear-search { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: #ddd; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: none; cursor: pointer; }
         
-        .stock-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1.2fr; gap: 5px; }
+        .stock-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .total-badge { background: #1a252f; color: #f1c40f !important; border: 1px solid #f1c40f !important; }
         .dep-highlight { background: #eef7ff !important; color: #2980b9 !important; }
+        .badge-info { font-size: 0.7rem; background: #eee; padding: 2px 6px; border-radius: 4px; color: #666; }
     </style>
 </head>
 <body>
@@ -113,6 +133,7 @@
     </div>
 </div>
 
+<!-- TASTIERINO NUMERICO -->
 <div id="numpad-overlay">
     <div class="numpad-header">
         <span id="numpad-title" style="font-size: 0.8rem; color: #7f8c8d;">Valore</span>
@@ -133,7 +154,7 @@
         <button class="num-btn clear" onclick="pressClear()">C</button>
         <button class="num-btn" onclick="pressNum(0)">0</button>
         <button class="num-btn op" onclick="pressDelete()">⌫</button>
-        <button class="num-btn close" onclick="closeNumpad()">OK (CONFERMA)</button>
+        <button class="num-btn close" onclick="closeNumpad()">OK</button>
     </div>
 </div>
 
@@ -151,7 +172,7 @@
     let firstVal = null;
     let isResetting = false;
 
-    // Database iniziale
+    // Database Prodotti
     const defaultData = [
         {id:'acq', n:"Acqua", i:"💧", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:358},
         {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:45},
@@ -191,8 +212,8 @@
         {id:'tu', n:"TU", i:"⚓", p:0, pen:0, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:0}
     ];
 
-    const DB_VERSION = 'barData_v28_cargo_fix';
-    let prodotti = JSON.parse(localStorage.getItem(DB_VERSION)) || defaultData;
+    const DB_KEY = 'barData_v31_fixed_numpad';
+    let prodotti = JSON.parse(localStorage.getItem(DB_KEY)) || defaultData;
 
     function openTab(id) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -203,64 +224,119 @@
         closeNumpad();
     }
 
+    /* LOGICA STEPPER (Più e Meno) */
+    function step(fieldId, delta) {
+        const parts = fieldId.split('-');
+        const fieldKey = parts[0];
+        const pId = parts[1];
+        const p = prodotti.find(item => item.id === pId);
+        
+        if (p) {
+            let newVal = (p[fieldKey] || 0) + delta;
+            if (newVal < 0) newVal = 0;
+            
+            // Applica logica vincoli
+            if (fieldKey === 'vPen') {
+                newVal = Math.min(newVal, p.vPas);
+            } else if (fieldKey === 'dep') {
+                newVal = Math.min(newVal, p.fis);
+            } else if (fieldKey === 'q') {
+                newVal = Math.min(newVal, p.fis);
+            }
+            
+            // Sincronizzazione automatica stock
+            if (fieldKey === 'fis') {
+                p.fis = newVal;
+                p.q = Math.max(0, p.fis - p.dep);
+            } else if (fieldKey === 'dep') {
+                p.dep = newVal;
+                p.q = p.fis - p.dep;
+            } else if (fieldKey === 'q') {
+                p.q = newVal;
+                p.dep = p.fis - p.q;
+            } else {
+                p[fieldKey] = newVal;
+            }
+            update();
+        }
+    }
+
+    /* FUNZIONI TASTIERINO */
     function openNumpad(id, title) {
         currentInputId = id;
         currentOp = null; firstVal = null; isResetting = false;
+        
         const parts = id.split('-');
-        const field = parts[0];
-        const p = prodotti.find(item => item.id === parts[1]);
-        let val = p ? p[field] : 0;
+        const fieldKey = parts[0];
+        const pId = parts[1];
+        
+        const p = prodotti.find(item => item.id === pId);
+        let val = p ? p[fieldKey] : 0;
+        
         document.getElementById('numpad-title').innerText = title;
-        document.getElementById('numpad-display').innerText = val;
+        document.getElementById('numpad-display').innerText = val || 0;
         document.getElementById('numpad-overlay').style.display = 'block';
     }
 
     function pressNum(num) {
         const d = document.getElementById('numpad-display');
-        d.innerText = (d.innerText === "0" || isResetting) ? num : d.innerText + num;
+        if (d.innerText === "0" || isResetting) {
+            d.innerText = num;
+        } else {
+            d.innerText += num;
+        }
         isResetting = false;
     }
 
     function pressOp(op) {
         firstVal = parseInt(document.getElementById('numpad-display').innerText) || 0;
-        currentOp = op; isResetting = true;
+        currentOp = op; 
+        isResetting = true;
     }
 
-    function pressClear() { document.getElementById('numpad-display').innerText = "0"; firstVal = null; currentOp = null; }
+    function pressClear() { 
+        document.getElementById('numpad-display').innerText = "0"; 
+        firstVal = null; 
+        currentOp = null; 
+    }
+    
     function pressDelete() {
         const d = document.getElementById('numpad-display');
-        d.innerText = d.innerText.length > 1 ? d.innerText.slice(0, -1) : "0";
+        if (d.innerText.length > 1) {
+            d.innerText = d.innerText.slice(0, -1);
+        } else {
+            d.innerText = "0";
+        }
     }
 
     function closeNumpad() {
         if (currentInputId) {
             let val = parseInt(document.getElementById('numpad-display').innerText) || 0;
+            
             if (currentOp && firstVal !== null) {
                 if (currentOp === '+') val = firstVal + val;
                 if (currentOp === 'x') val = firstVal * val;
             }
+            
             const parts = currentInputId.split('-');
-            const field = parts[0];
-            const p = prodotti.find(item => item.id === parts[1]);
+            const fieldKey = parts[0];
+            const pId = parts[1];
+            const p = prodotti.find(item => item.id === pId);
             
             if(p) {
-                if(field === 'fis') {
+                if(fieldKey === 'fis') {
                     p.fis = val;
                     p.q = Math.max(0, p.fis - p.dep);
-                }
-                else if(field === 'dep') {
+                } else if(fieldKey === 'dep') {
                     p.dep = Math.min(val, p.fis);
                     p.q = p.fis - p.dep;
-                }
-                else if(field === 'q') {
+                } else if(fieldKey === 'q') {
                     p.q = Math.min(val, p.fis);
                     p.dep = p.fis - p.q;
-                }
-                else if(field === 'vpen') {
+                } else if(fieldKey === 'vPen') {
                     p.vPen = Math.min(val, p.vPas);
-                } 
-                else {
-                    p[field] = val;
+                } else {
+                    p[fieldKey] = val;
                 }
             }
             update();
@@ -272,25 +348,73 @@
     function init() {
         const vL = document.getElementById('tab-vendite'), mL = document.getElementById('tab-magazzino'), pL = document.getElementById('tab-prezzi');
         vL.innerHTML = ''; mL.innerHTML = ''; pL.innerHTML = '';
+        
         prodotti.forEach(p => {
+            // Tab Vendite
             vL.innerHTML += `<div class="product-card" data-name="${p.n}">
                 <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span> <span id="label-p-${p.id}" class="badge-info">€${p.p.toFixed(1)} | €${p.pen.toFixed(1)}</span></div>
                 <div class="input-group">
-                    <div class="field"><label>TOT VENDUTI</label><input readonly class="numpad-trigger" id="vpas-${p.id}" value="${p.vPas}" onclick="openNumpad('vpas-${p.id}', '${p.n}: Totale')"></div>
-                    <div class="field"><label>DI CUI PEND.</label><input readonly class="numpad-trigger" id="vpen-${p.id}" value="${p.vPen}" onclick="openNumpad('vpen-${p.id}', '${p.n}: Pendolari')"></div>
+                    <div class="field">
+                        <label>TOT VENDUTI</label>
+                        <div class="stepper-container">
+                            <button class="step-btn" onclick="step('vPas-${p.id}', -1)">–</button>
+                            <div class="numpad-trigger" onclick="openNumpad('vPas-${p.id}', '${p.n}: Totale')"><span id="txt-vPas-${p.id}">${p.vPas}</span></div>
+                            <button class="step-btn" onclick="step('vPas-${p.id}', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>DI CUI PEND.</label>
+                        <div class="stepper-container">
+                            <button class="step-btn" onclick="step('vPen-${p.id}', -1)">–</button>
+                            <div class="numpad-trigger" onclick="openNumpad('vPen-${p.id}', '${p.n}: Pendolari')"><span id="txt-vPen-${p.id}">${p.vPen}</span></div>
+                            <button class="step-btn" onclick="step('vPen-${p.id}', 1)">+</button>
+                        </div>
+                    </div>
                 </div></div>`;
+            
+            // Tab Stock
             mL.innerHTML += `<div class="product-card" data-name="${p.n}" style="border-left-color:var(--pend)">
                 <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
                 <div class="stock-grid">
-                    <div class="field"><label>TOT. FISICO</label><input readonly class="numpad-trigger total-badge" id="fis-${p.id}" value="${p.fis}" onclick="openNumpad('fis-${p.id}', '${p.n}: Fisico Totale')"></div>
-                    <div class="field"><label>BAR</label><input readonly class="numpad-trigger" id="q-${p.id}" value="${p.q}" onclick="openNumpad('q-${p.id}', '${p.n}: Bar')"></div>
-                    <div class="field"><label>DEPOSITO</label><input readonly class="numpad-trigger dep-highlight" id="dep-${p.id}" value="${p.dep}" onclick="openNumpad('dep-${p.id}', '${p.n}: Magazzino')"></div>
-                    <div class="field"><label>CARICO DDT</label><input readonly class="numpad-trigger" id="c-${p.id}" value="${p.c}" onclick="openNumpad('c-${p.id}', '${p.n}: Carico DDT')"></div>
+                    <div class="field">
+                        <label>FISICO TOT.</label>
+                        <div class="stepper-container total-badge">
+                            <button class="step-btn" style="background:#2c3e50;color:white" onclick="step('fis-${p.id}', -1)">–</button>
+                            <div class="numpad-trigger" onclick="openNumpad('fis-${p.id}', '${p.n}: Fisico Totale')"><span id="txt-fis-${p.id}">${p.fis}</span></div>
+                            <button class="step-btn" style="background:#2c3e50;color:white" onclick="step('fis-${p.id}', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>BAR</label>
+                        <div class="stepper-container">
+                            <button class="step-btn" onclick="step('q-${p.id}', -1)">–</button>
+                            <div class="numpad-trigger" onclick="openNumpad('q-${p.id}', '${p.n}: Bar')"><span id="txt-q-${p.id}">${p.q}</span></div>
+                            <button class="step-btn" onclick="step('q-${p.id}', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>DEPOSITO</label>
+                        <div class="stepper-container dep-highlight">
+                            <button class="step-btn" style="background:#d6eaf8" onclick="step('dep-${p.id}', -1)">–</button>
+                            <div class="numpad-trigger" onclick="openNumpad('dep-${p.id}', '${p.n}: Magazzino')"><span id="txt-dep-${p.id}">${p.dep}</span></div>
+                            <button class="step-btn" style="background:#d6eaf8" onclick="step('dep-${p.id}', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>CARICO DDT</label>
+                        <div class="stepper-container">
+                            <button class="step-btn" onclick="step('c-${p.id}', -1)">–</button>
+                            <div class="numpad-trigger" onclick="openNumpad('c-${p.id}', '${p.n}: Carico DDT')"><span id="txt-c-${p.id}">${p.c}</span></div>
+                            <button class="step-btn" onclick="step('c-${p.id}', 1)">+</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="info-row">
-                    <span>Disponibile Bar: <b id="rem-${p.id}">0</b></span>
+                    <span>Disp. Bar: <b id="rem-${p.id}">0</b></span>
                     <span><b>OMAGGI:</b> <span id="o-label-${p.id}" style="text-decoration:underline" onclick="openNumpad('o-${p.id}', '${p.n}: Omaggi')">${p.o}</span></span>
                 </div></div>`;
+            
+            // Tab Prezzi
             pL.innerHTML += `<div class="product-card" data-name="${p.n}" style="border-left-color:var(--warning)">
                 <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
                 <div class="input-group">
@@ -303,7 +427,7 @@
 
     function updatePrices(id, val, key) {
         const p = prodotti.find(i => i.id === id);
-        if(p) { p[key] = parseFloat(val) || 0; document.getElementById(`label-p-${id}`).innerText = `€${p.p.toFixed(1)} | €${p.pen.toFixed(1)}`; }
+        if(p) { p[key] = parseFloat(val) || 0; }
         update();
     }
 
@@ -318,20 +442,20 @@
     function update() {
         let inc = 0, pT = 0, fT = 0, rH = '';
         prodotti.forEach(p => {
-            const vpasEl = document.getElementById(`vpas-${p.id}`), 
-                  vpenEl = document.getElementById(`vpen-${p.id}`), 
-                  qEl = document.getElementById(`q-${p.id}`), 
-                  cEl = document.getElementById(`c-${p.id}`), 
-                  depEl = document.getElementById(`dep-${p.id}`),
-                  fisEl = document.getElementById(`fis-${p.id}`),
+            const vpasT = document.getElementById(`txt-vPas-${p.id}`), 
+                  vpenT = document.getElementById(`txt-vPen-${p.id}`), 
+                  qT = document.getElementById(`txt-q-${p.id}`), 
+                  cT = document.getElementById(`txt-c-${p.id}`), 
+                  depT = document.getElementById(`txt-dep-${p.id}`),
+                  fisT = document.getElementById(`txt-fis-${p.id}`),
                   oLabel = document.getElementById(`o-label-${p.id}`);
             
-            if(vpasEl) vpasEl.value = p.vPas; 
-            if(vpenEl) vpenEl.value = p.vPen; 
-            if(qEl) qEl.value = p.q; 
-            if(cEl) cEl.value = p.c; 
-            if(depEl) depEl.value = p.dep;
-            if(fisEl) fisEl.value = p.fis;
+            if(vpasT) vpasT.innerText = p.vPas; 
+            if(vpenT) vpenT.innerText = p.vPen; 
+            if(qT) qT.innerText = p.q; 
+            if(cT) cT.innerText = p.c; 
+            if(depT) depT.innerText = p.dep;
+            if(fisT) fisT.innerText = p.fis;
             if(oLabel) oLabel.innerText = p.o;
             
             let rem = (p.q + p.c) - (p.vPas + p.o);
@@ -348,7 +472,7 @@
         document.getElementById('m-netto').innerText = `€ ${inc.toFixed(2)}`;
         document.getElementById('count-pas').innerText = pT; document.getElementById('count-pen').innerText = fT;
         document.getElementById('report-items').innerHTML = rH || '<p style="text-align:center;color:#aaa;">Nessuna vendita oggi</p>';
-        localStorage.setItem(DB_VERSION, JSON.stringify(prodotti));
+        localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
     }
 
     function condividiWhatsApp() {
@@ -361,20 +485,15 @@
     function chiudiGiornata() {
         if(!confirm("Confermi la chiusura? La merce rimasta (Bar + Deposito + Carico) diventerà il nuovo 'Fisico' di domani.")) return;
         prodotti.forEach(p => { 
-            // 1. Calcolo quanto resta effettivamente al BAR (Scorta + Carico - Venduti - Omaggi)
-            let rimanenzaBar = (p.q + p.c) - (p.vPas + p.o);
-            p.q = Math.max(0, rimanenzaBar);
-            
-            // 2. Il deposito resta quello che era (non viene influenzato dalle vendite bar)
-            // 3. Il NUOVO FISICO è la somma di ciò che resta al bar + deposito
+            let rimanenzaBarEffettiva = (p.q + p.c) - (p.vPas + p.o);
+            p.q = Math.max(0, rimanenzaBarEffettiva);
             p.fis = p.q + p.dep;
-
-            // 4. Azzeramento campi giornalieri (il carico è ora 'assorbito' nel fisico)
             p.c = 0; p.vPas = 0; p.vPen = 0; p.o = 0; 
         });
-        localStorage.setItem(DB_VERSION, JSON.stringify(prodotti));
+        localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
         init(); openTab('tab-vendite');
     }
+    
     window.onload = init;
 </script>
 </body>
