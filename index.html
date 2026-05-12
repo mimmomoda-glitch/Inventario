@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -12,28 +11,24 @@
         }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--primary); user-select: none; overflow-x: hidden; }
         
-        /* Navigazione */
-        .tabs { display: flex; background: var(--primary); position: sticky; top: 0; z-index: 100; }
-        .tab-btn { flex: 1; padding: 15px 2px; color: white; border: none; background: none; font-weight: bold; font-size: 0.6rem; text-transform: uppercase; opacity: 0.6; }
+        .tabs { display: flex; background: var(--primary); position: sticky; top: 0; z-index: 100; overflow-x: auto; }
+        .tab-btn { flex: 1; padding: 15px 5px; color: white; border: none; background: none; font-weight: bold; font-size: 0.6rem; text-transform: uppercase; opacity: 0.6; min-width: 80px; }
         .tab-btn.active { opacity: 1; border-bottom: 4px solid var(--accent); }
         
         .content { padding: 10px; padding-bottom: 220px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
-        /* Dashboard */
         .mini-dash { background: white; padding: 15px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .stat { text-align: center; }
         .stat span { font-size: 0.65rem; color: #7f8c8d; display: block; text-transform: uppercase; }
         .stat b { font-size: 1rem; }
         .stat.highlight b { color: var(--success); font-size: 1.3rem; }
         
-        /* Card Prodotto */
         .product-card { background: white; margin-bottom: 10px; border-radius: 12px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid var(--accent); }
         .prod-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .prod-name { font-weight: bold; font-size: 0.95rem; }
         
-        /* Campi Input con Stepper */
         .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .field { display: flex; flex-direction: column; gap: 4px; }
         .field label { font-size: 0.55rem; font-weight: bold; color: #95a5a6; text-transform: uppercase; text-align: center; }
@@ -43,58 +38,49 @@
             border: 1px solid #ddd; overflow: hidden; height: 45px;
         }
         .step-btn {
-            width: 35px; height: 100%; border: none; background: #e0e0e0;
-            font-size: 1.2rem; font-weight: bold; color: var(--primary);
+            width: 40px; height: 100%; border: none; background: #e0e0e0;
+            font-size: 1.4rem; font-weight: bold; color: var(--primary);
             cursor: pointer; touch-action: manipulation;
         }
         .step-btn:active { background: #ccc; }
         
         .numpad-trigger { 
             flex: 1; height: 100%; display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; font-weight: bold; color: var(--primary); 
-            background: transparent; border: none; padding: 0; outline: none;
+            font-size: 1.2rem; font-weight: bold; color: var(--primary); 
+            background: transparent; border: none; outline: none;
         }
 
-        .price-input { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; width: 100%; box-sizing: border-box; }
         .info-row { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; display: flex; justify-content: space-between; font-size: 0.7rem; color: #7f8c8d; }
         
-        /* Overlay Tastierino */
+        /* Prezzi nel listino */
+        .price-edit-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #fdfdfd; padding: 10px; border-radius: 8px; border: 1px solid #eee; margin-top: 5px; }
+        .price-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-weight: bold; }
+
         #numpad-overlay { 
             position: fixed; bottom: 0; left: 0; width: 100%; background: #d1d4d9; 
             z-index: 1000; display: none; padding: 12px; box-sizing: border-box;
             box-shadow: 0 -5px 25px rgba(0,0,0,0.3); border-radius: 24px 24px 0 0;
         }
-        .numpad-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: white; padding: 12px; border-radius: 12px; border: 1px solid #bdc3c7; }
-        .numpad-header b { font-size: 1.4rem; color: var(--primary); font-family: monospace; }
+        .numpad-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: white; padding: 12px; border-radius: 12px; }
+        .numpad-header b { font-size: 1.6rem; color: var(--primary); }
         .numpad-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .num-btn { 
-            background: white; border: none; padding: 18px 0; border-radius: 12px; 
-            font-size: 1.3rem; font-weight: bold; box-shadow: 0 3px 0 #abb1b8;
-            transition: all 0.1s; touch-action: manipulation;
+            background: white; border: none; padding: 20px 0; border-radius: 12px; 
+            font-size: 1.4rem; font-weight: bold; box-shadow: 0 3px 0 #abb1b8;
         }
-        .num-btn:active { background: #eee; transform: translateY(2px); box-shadow: none; }
-        .num-btn.op { background: #ecf0f1; color: var(--primary); }
+        .num-btn:active { transform: translateY(2px); box-shadow: none; }
         .num-btn.math { background: #f39c12; color: white; }
         .num-btn.close { background: var(--success); color: white; grid-column: span 2; }
         .num-btn.clear { background: var(--danger); color: white; }
 
-        /* Azioni Finali */
         .bottom-actions { position: fixed; bottom: 0; width: 100%; background: white; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 200; }
-        .btn-row { display: flex; gap: 8px; }
         .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; color: white; font-size: 0.85rem; text-align: center; }
         .btn-success { background: var(--success); }
         .btn-neutral { background: var(--primary); }
         .btn-danger { background: var(--danger); }
         .btn-wa { background: #25D366; color: white; }
         
-        .search-bar-container { position: relative; width: 100%; margin-bottom: 10px; }
-        .search-bar { width: 100%; padding: 10px; padding-right: 35px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        .clear-search { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: #ddd; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: none; cursor: pointer; }
-        
-        .stock-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .total-badge { background: #1a252f; color: #f1c40f !important; border: 1px solid #f1c40f !important; }
-        .dep-highlight { background: #eef7ff !important; color: #2980b9 !important; }
-        .badge-info { font-size: 0.7rem; background: #eee; padding: 2px 6px; border-radius: 4px; color: #666; }
+        .search-bar { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; margin-bottom: 10px; font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -112,14 +98,11 @@
             <span>Incasso Netto</span>
             <b id="m-netto">€ 0.00</b>
         </div>
-        <div class="stat"><span>Std</span><b id="count-pas">0</b></div>
-        <div class="stat"><span>Pen</span><b id="count-pen" style="color:var(--pend)">0</b></div>
+        <div class="stat"><span>Pieno</span><b id="count-pas">0</b></div>
+        <div class="stat"><span>Sconto SC</span><b id="count-pen" style="color:var(--pend)">0</b></div>
     </div>
 
-    <div class="search-bar-container">
-        <input type="text" id="search" class="search-bar" placeholder="Cerca prodotto..." onkeyup="filterProducts()">
-        <button id="clear-btn" class="clear-search" onclick="clearSearch()">✕</button>
-    </div>
+    <input type="text" id="search" class="search-bar" placeholder="Cerca prodotto..." onkeyup="filterProducts()">
 
     <div id="tab-vendite" class="tab-content active"></div>
     <div id="tab-magazzino" class="tab-content"></div>
@@ -133,11 +116,10 @@
     </div>
 </div>
 
-<!-- TASTIERINO NUMERICO -->
 <div id="numpad-overlay">
     <div class="numpad-header">
-        <span id="numpad-title" style="font-size: 0.8rem; color: #7f8c8d;">Valore</span>
-        <b id="numpad-display">0</b>
+        <span id="numpad-title" style="padding-left:10px; color:#7f8c8d">Valore</span>
+        <b id="numpad-display" style="padding-right:15px">0</b>
     </div>
     <div class="numpad-grid">
         <button class="num-btn" onclick="pressNum(1)">1</button>
@@ -153,16 +135,16 @@
         <button class="num-btn" onclick="pressNum(9)">9</button>
         <button class="num-btn clear" onclick="pressClear()">C</button>
         <button class="num-btn" onclick="pressNum(0)">0</button>
-        <button class="num-btn op" onclick="pressDelete()">⌫</button>
+        <button class="num-btn" onclick="pressDelete()">⌫</button>
         <button class="num-btn close" onclick="closeNumpad()">OK</button>
     </div>
 </div>
 
 <div class="bottom-actions">
-    <button class="btn btn-wa" onclick="condividiWhatsApp()">📲 COPIA PER WHATSAPP</button>
-    <div class="btn-row">
+    <button class="btn btn-wa" onclick="condividiWhatsApp()">📲 COPIA REPORT</button>
+    <div style="display:flex; gap:8px;">
         <button class="btn btn-neutral" onclick="openTab('tab-vendite')">VENDITE</button>
-        <button class="btn btn-success" onclick="openTab('tab-report')">REPORT</button>
+        <button class="btn btn-success" onclick="openTab('tab-report')">VAI AI TOTALI</button>
     </div>
 </div>
 
@@ -172,326 +154,235 @@
     let firstVal = null;
     let isResetting = false;
 
-    // Database Prodotti
+    const DB_KEY = 'barData_v44'; // Versione aggiornata
     const defaultData = [
         {id:'acq', n:"Acqua", i:"💧", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:358},
-        {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:45},
-        {id:'bp', n:"Borse Piccole", i:"👜", p:6, pen:5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:428},
-        {id:'bm', n:"Borse Medie", i:"👜", p:7, pen:7, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:0},
-        {id:'bg', n:"Borse Grandi", i:"👜", p:10, pen:10, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:41},
-        {id:'bue', n:"Bueno/B-Ready/Biscuits", i:"🍫", p:3, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:108},
+        {id:'ara', n:"Arachidi", i:"🥜", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:45},
+        {id:'bp', n:"Borse P", i:"👜", p:6, pen:5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:428},
+        {id:'bg', n:"Borse G", i:"👜", p:10, pen:10, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:41},
+        {id:'bue', n:"Bueno/Snack", i:"🍫", p:3, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:108},
         {id:'cap', n:"Cappelli", i:"🧢", p:5, pen:5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:117},
-        {id:'car', n:"Caramelle / Gomme", i:"🍬", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:162},
         {id:'cia', n:"Cialde", i:"☕", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:490},
-        {id:'dec', n:"Deca", i:"☕", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:20},
-        {id:'die', n:"Dietor", i:"🍬", p:0, pen:0, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:80},
-        {id:'fit', n:"Fitness / Cereal Yo", i:"🌾", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:42},
-        {id:'fon', n:"Fonzies / Patatine", i:"🍟", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:209},
-        {id:'gin', n:"Ginseng", i:"☕", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:22},
-        {id:'imp', n:"Impermeabili", i:"🧥", p:3.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:60},
-        {id:'lat', n:"Latte", i:"🥛", p:0.5, pen:0.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:6},
+        {id:'fon', n:"Patatine", i:"🍟", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:209},
         {id:'ltn', n:"Lattine", i:"🥤", p:2.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:552},
-        {id:'mag', n:"Maglie", i:"👕", p:5, pen:5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:100},
-        {id:'mik', n:"Mikado", i:"🥖", p:3, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:45},
-        {id:'muf', n:"Muffin", i:"🧁", p:3, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:50},
-        {id:'nik', n:"Nik Nok", i:"🥜", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:66},
-        {id:'orz', n:"Orzo", i:"☕", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:0},
-        {id:'pav', n:"Pavesini", i:"🍪", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:40},
         {id:'per', n:"Peroni", i:"🍺", p:4.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:261},
         {id:'pec', n:"Peroni Capri", i:"🍋", p:7.5, pen:5.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:105},
         {id:'pri', n:"Pringles", i:"🥔", p:3.5, pen:2, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:150},
-        {id:'vin', n:"Prosecco / Vino", i:"🍷", p:6, pen:3, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:164},
-        {id:'red', n:"Red Bull / Gatorade", i:"⚡", p:4.5, pen:2.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:72},
-        {id:'rin', n:"Ringo / Oreo / Baiocchi", i:"🍪", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:202},
-        {id:'rit', n:"Ritz / Cipster", i:"🍪", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:38},
         {id:'spr', n:"Spritz", i:"🍹", p:8, pen:5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:101},
-        {id:'suc', n:"Succo", i:"🧃", p:3.5, pen:2, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:46},
-        {id:'the', n:"The Camomilla", i:"🍵", p:2.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:90},
-        {id:'tuc', n:"Tuc", i:"🍪", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:38},
-        {id:'twi', n:"Twix/KitKat/M&M...", i:"🍫", p:2.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:152},
-        {id:'tu', n:"TU", i:"⚓", p:0, pen:0, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:0}
+        {id:'suc', n:"Succo", i:"🧃", p:3.5, pen:2, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:46}
     ];
 
-    const DB_KEY = 'barData_v31_fixed_numpad';
     let prodotti = JSON.parse(localStorage.getItem(DB_KEY)) || defaultData;
 
     function openTab(id) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        const map = {'tab-vendite':'btn-vendite', 'tab-magazzino':'btn-magazzino', 'tab-prezzi':'btn-prezzi', 'tab-report':'btn-report'};
+        const map = {'tab-vendite':'btn-vendite', 'tab-magazzino':'btn-magazzino', 'tab-report':'btn-report', 'tab-prezzi':'btn-prezzi'};
         if(map[id]) document.getElementById(map[id]).classList.add('active');
-        closeNumpad();
     }
 
-    /* LOGICA STEPPER (Più e Meno) */
     function step(fieldId, delta) {
-        const parts = fieldId.split('-');
-        const fieldKey = parts[0];
-        const pId = parts[1];
-        const p = prodotti.find(item => item.id === pId);
-        
-        if (p) {
-            let newVal = (p[fieldKey] || 0) + delta;
-            if (newVal < 0) newVal = 0;
-            
-            // Applica logica vincoli
-            if (fieldKey === 'vPen') {
-                newVal = Math.min(newVal, p.vPas);
-            } else if (fieldKey === 'dep') {
-                newVal = Math.min(newVal, p.fis);
-            } else if (fieldKey === 'q') {
-                newVal = Math.min(newVal, p.fis);
-            }
-            
-            // Sincronizzazione automatica stock
-            if (fieldKey === 'fis') {
-                p.fis = newVal;
-                p.q = Math.max(0, p.fis - p.dep);
-            } else if (fieldKey === 'dep') {
-                p.dep = newVal;
-                p.q = p.fis - p.dep;
-            } else if (fieldKey === 'q') {
-                p.q = newVal;
-                p.dep = p.fis - p.q;
-            } else {
-                p[fieldKey] = newVal;
-            }
+        const [field, id] = fieldId.split('-');
+        const p = prodotti.find(x => x.id === id);
+        if(!p) return;
+
+        if(field === 'vPas') p.vPas = Math.max(0, p.vPas + delta);
+        else if(field === 'vPen') p.vPen = Math.max(0, p.vPen + delta);
+        else if(field === 'fis') p.fis = Math.max(0, p.fis + delta);
+        else if(field === 'q') {
+            if(delta > 0) { if(p.fis > 0) { p.q++; p.fis--; } } 
+            else { if(p.q > 0) { p.q--; p.fis++; } }
+        }
+        else if(field === 'dep') {
+            if(delta > 0) { if(p.fis > 0) { p.dep++; p.fis--; } } 
+            else { if(p.dep > 0) { p.dep--; p.fis++; } }
+        }
+        update();
+    }
+
+    function changePrice(pId, type, val) {
+        const p = prodotti.find(x => x.id === pId);
+        if(p) {
+            p[type] = parseFloat(val) || 0;
             update();
         }
     }
 
-    /* FUNZIONI TASTIERINO */
     function openNumpad(id, title) {
         currentInputId = id;
         currentOp = null; firstVal = null; isResetting = false;
-        
-        const parts = id.split('-');
-        const fieldKey = parts[0];
-        const pId = parts[1];
-        
-        const p = prodotti.find(item => item.id === pId);
-        let val = p ? p[fieldKey] : 0;
-        
+        const [field, pId] = id.split('-');
+        const p = prodotti.find(x => x.id === pId);
         document.getElementById('numpad-title').innerText = title;
-        document.getElementById('numpad-display').innerText = val || 0;
+        document.getElementById('numpad-display').innerText = p[field] || 0;
         document.getElementById('numpad-overlay').style.display = 'block';
     }
 
-    function pressNum(num) {
+    function pressNum(n) {
         const d = document.getElementById('numpad-display');
-        if (d.innerText === "0" || isResetting) {
-            d.innerText = num;
-        } else {
-            d.innerText += num;
-        }
+        d.innerText = (d.innerText === "0" || isResetting) ? n : d.innerText + n;
         isResetting = false;
     }
-
-    function pressOp(op) {
-        firstVal = parseInt(document.getElementById('numpad-display').innerText) || 0;
-        currentOp = op; 
-        isResetting = true;
-    }
-
-    function pressClear() { 
-        document.getElementById('numpad-display').innerText = "0"; 
-        firstVal = null; 
-        currentOp = null; 
-    }
-    
-    function pressDelete() {
-        const d = document.getElementById('numpad-display');
-        if (d.innerText.length > 1) {
-            d.innerText = d.innerText.slice(0, -1);
-        } else {
-            d.innerText = "0";
-        }
+    function pressOp(op) { firstVal = parseInt(document.getElementById('numpad-display').innerText); currentOp = op; isResetting = true; }
+    function pressClear() { document.getElementById('numpad-display').innerText = "0"; }
+    function pressDelete() { 
+        let d = document.getElementById('numpad-display');
+        d.innerText = d.innerText.length > 1 ? d.innerText.slice(0, -1) : "0";
     }
 
     function closeNumpad() {
         if (currentInputId) {
             let val = parseInt(document.getElementById('numpad-display').innerText) || 0;
-            
             if (currentOp && firstVal !== null) {
                 if (currentOp === '+') val = firstVal + val;
                 if (currentOp === 'x') val = firstVal * val;
             }
+            const [field, pId] = currentInputId.split('-');
+            const p = prodotti.find(x => x.id === pId);
             
-            const parts = currentInputId.split('-');
-            const fieldKey = parts[0];
-            const pId = parts[1];
-            const p = prodotti.find(item => item.id === pId);
-            
-            if(p) {
-                if(fieldKey === 'fis') {
-                    p.fis = val;
-                    p.q = Math.max(0, p.fis - p.dep);
-                } else if(fieldKey === 'dep') {
-                    p.dep = Math.min(val, p.fis);
-                    p.q = p.fis - p.dep;
-                } else if(fieldKey === 'q') {
-                    p.q = Math.min(val, p.fis);
-                    p.dep = p.fis - p.q;
-                } else if(fieldKey === 'vPen') {
-                    p.vPen = Math.min(val, p.vPas);
-                } else {
-                    p[fieldKey] = val;
+            if(field === 'q' || field === 'dep') {
+                let diff = val - p[field];
+                if(diff > 0 && p.fis >= diff) {
+                    p[field] = val; p.fis -= diff;
+                } else if(diff < 0) {
+                    p[field] = val; p.fis += Math.abs(diff);
                 }
+            } else {
+                p[field] = val;
             }
             update();
         }
         document.getElementById('numpad-overlay').style.display = 'none';
-        currentInputId = null;
     }
 
     function init() {
-        const vL = document.getElementById('tab-vendite'), mL = document.getElementById('tab-magazzino'), pL = document.getElementById('tab-prezzi');
+        const vL = document.getElementById('tab-vendite'), 
+              mL = document.getElementById('tab-magazzino'),
+              pL = document.getElementById('tab-prezzi');
         vL.innerHTML = ''; mL.innerHTML = ''; pL.innerHTML = '';
         
         prodotti.forEach(p => {
-            // Tab Vendite
+            // Scheda Vendite
             vL.innerHTML += `<div class="product-card" data-name="${p.n}">
-                <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span> <span id="label-p-${p.id}" class="badge-info">€${p.p.toFixed(1)} | €${p.pen.toFixed(1)}</span></div>
+                <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span> <span style="font-size:0.7rem; color:#888">€${p.p} / €${p.pen}</span></div>
                 <div class="input-group">
-                    <div class="field">
-                        <label>TOT VENDUTI</label>
+                    <div class="field"><label>PIENO</label>
                         <div class="stepper-container">
                             <button class="step-btn" onclick="step('vPas-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('vPas-${p.id}', '${p.n}: Totale')"><span id="txt-vPas-${p.id}">${p.vPas}</span></div>
+                            <div class="numpad-trigger" onclick="openNumpad('vPas-${p.id}', 'Pieno ${p.n}')"><span id="txt-vPas-${p.id}">${p.vPas}</span></div>
                             <button class="step-btn" onclick="step('vPas-${p.id}', 1)">+</button>
                         </div>
                     </div>
-                    <div class="field">
-                        <label>DI CUI PEND.</label>
-                        <div class="stepper-container">
+                    <div class="field"><label>SC</label>
+                        <div class="stepper-container" style="background:#e8f4fd; border-color:var(--pend)">
                             <button class="step-btn" onclick="step('vPen-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('vPen-${p.id}', '${p.n}: Pendolari')"><span id="txt-vPen-${p.id}">${p.vPen}</span></div>
+                            <div class="numpad-trigger" onclick="openNumpad('vPen-${p.id}', 'Sconto ${p.n}')"><span id="txt-vPen-${p.id}" style="color:var(--pend)">${p.vPen}</span></div>
                             <button class="step-btn" onclick="step('vPen-${p.id}', 1)">+</button>
                         </div>
                     </div>
                 </div></div>`;
             
-            // Tab Stock
-            mL.innerHTML += `<div class="product-card" data-name="${p.n}" style="border-left-color:var(--pend)">
+            // Scheda Magazzino
+            mL.innerHTML += `<div class="product-card" style="border-left-color:var(--pend)" data-name="${p.n}">
                 <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
-                <div class="stock-grid">
-                    <div class="field">
-                        <label>FISICO TOT.</label>
-                        <div class="stepper-container total-badge">
-                            <button class="step-btn" style="background:#2c3e50;color:white" onclick="step('fis-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('fis-${p.id}', '${p.n}: Fisico Totale')"><span id="txt-fis-${p.id}">${p.fis}</span></div>
-                            <button class="step-btn" style="background:#2c3e50;color:white" onclick="step('fis-${p.id}', 1)">+</button>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                    <div class="field" style="grid-column: span 2;"><label>FISICO DISPONIBILE (IN MAGAZZINO)</label>
+                        <div class="stepper-container" style="background:#2c3e50; border-color:#1a252f">
+                            <button class="step-btn" style="background:#34495e; color:white" onclick="step('fis-${p.id}', -1)">–</button>
+                            <div class="numpad-trigger" onclick="openNumpad('fis-${p.id}', 'Stock ${p.n}')"><span id="txt-fis-${p.id}" style="color:#f1c40f">${p.fis}</span></div>
+                            <button class="step-btn" style="background:#34495e; color:white" onclick="step('fis-${p.id}', 1)">+</button>
                         </div>
                     </div>
-                    <div class="field">
-                        <label>BAR</label>
+                    <div class="field"><label>BAR</label>
                         <div class="stepper-container">
                             <button class="step-btn" onclick="step('q-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('q-${p.id}', '${p.n}: Bar')"><span id="txt-q-${p.id}">${p.q}</span></div>
+                            <div class="numpad-trigger" onclick="openNumpad('q-${p.id}', 'Bar ${p.n}')"><span id="txt-q-${p.id}">${p.q}</span></div>
                             <button class="step-btn" onclick="step('q-${p.id}', 1)">+</button>
                         </div>
                     </div>
-                    <div class="field">
-                        <label>DEPOSITO</label>
-                        <div class="stepper-container dep-highlight">
-                            <button class="step-btn" style="background:#d6eaf8" onclick="step('dep-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('dep-${p.id}', '${p.n}: Magazzino')"><span id="txt-dep-${p.id}">${p.dep}</span></div>
-                            <button class="step-btn" style="background:#d6eaf8" onclick="step('dep-${p.id}', 1)">+</button>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label>CARICO DDT</label>
+                    <div class="field"><label>DEPOSITO</label>
                         <div class="stepper-container">
-                            <button class="step-btn" onclick="step('c-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('c-${p.id}', '${p.n}: Carico DDT')"><span id="txt-c-${p.id}">${p.c}</span></div>
-                            <button class="step-btn" onclick="step('c-${p.id}', 1)">+</button>
+                            <button class="step-btn" onclick="step('dep-${p.id}', -1)">–</button>
+                            <div class="numpad-trigger" onclick="openNumpad('dep-${p.id}', 'Dep ${p.n}')"><span id="txt-dep-${p.id}">${p.dep}</span></div>
+                            <button class="step-btn" onclick="step('dep-${p.id}', 1)">+</button>
                         </div>
                     </div>
                 </div>
-                <div class="info-row">
-                    <span>Disp. Bar: <b id="rem-${p.id}">0</b></span>
-                    <span><b>OMAGGI:</b> <span id="o-label-${p.id}" style="text-decoration:underline" onclick="openNumpad('o-${p.id}', '${p.n}: Omaggi')">${p.o}</span></span>
-                </div></div>`;
-            
-            // Tab Prezzi
-            pL.innerHTML += `<div class="product-card" data-name="${p.n}" style="border-left-color:var(--warning)">
+                <div class="info-row"><span>Stock Reale: <b>${p.fis + p.q + p.dep}</b></span><span>DDT: <b onclick="openNumpad('c-${p.id}', 'Carico')">${p.c}</b></span></div></div>`;
+
+            // Scheda Listino Prezzi
+            pL.innerHTML += `<div class="product-card" style="border-left-color:var(--warning)" data-name="${p.n}">
                 <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
-                <div class="input-group">
-                    <div class="field"><label>STD (€)</label><input type="number" step="0.1" class="price-input" value="${p.p}" onchange="updatePrices('${p.id}', this.value, 'p')"></div>
-                    <div class="field"><label>PEN (€)</label><input type="number" step="0.1" class="price-input" value="${p.pen}" onchange="updatePrices('${p.id}', this.value, 'pen')"></div>
-                </div></div>`;
+                <div class="price-edit-row">
+                    <div class="field"><label>PREZZO PIENO (€)</label>
+                        <input type="number" step="0.1" class="price-input" value="${p.p}" onchange="changePrice('${p.id}', 'p', this.value)">
+                    </div>
+                    <div class="field"><label>SCONTO SC (€)</label>
+                        <input type="number" step="0.1" class="price-input" value="${p.pen}" onchange="changePrice('${p.id}', 'pen', this.value)">
+                    </div>
+                </div>
+            </div>`;
         });
         update();
     }
-
-    function updatePrices(id, val, key) {
-        const p = prodotti.find(i => i.id === id);
-        if(p) { p[key] = parseFloat(val) || 0; }
-        update();
-    }
-
-    function filterProducts() {
-        const q = document.getElementById('search').value.toLowerCase();
-        document.getElementById('clear-btn').style.display = q ? 'block' : 'none';
-        document.querySelectorAll('.product-card').forEach(c => c.style.display = c.getAttribute('data-name').toLowerCase().includes(q) ? 'block' : 'none');
-    }
-
-    function clearSearch() { document.getElementById('search').value = ''; filterProducts(); }
 
     function update() {
         let inc = 0, pT = 0, fT = 0, rH = '';
         prodotti.forEach(p => {
-            const vpasT = document.getElementById(`txt-vPas-${p.id}`), 
-                  vpenT = document.getElementById(`txt-vPen-${p.id}`), 
-                  qT = document.getElementById(`txt-q-${p.id}`), 
-                  cT = document.getElementById(`txt-c-${p.id}`), 
-                  depT = document.getElementById(`txt-dep-${p.id}`),
-                  fisT = document.getElementById(`txt-fis-${p.id}`),
-                  oLabel = document.getElementById(`o-label-${p.id}`);
+            if(document.getElementById(`txt-vPas-${p.id}`)) document.getElementById(`txt-vPas-${p.id}`).innerText = p.vPas; 
+            if(document.getElementById(`txt-vPen-${p.id}`)) document.getElementById(`txt-vPen-${p.id}`).innerText = p.vPen;
+            if(document.getElementById(`txt-q-${p.id}`)) document.getElementById(`txt-q-${p.id}`).innerText = p.q;
+            if(document.getElementById(`txt-dep-${p.id}`)) document.getElementById(`txt-dep-${p.id}`).innerText = p.dep;
+            if(document.getElementById(`txt-fis-${p.id}`)) document.getElementById(`txt-fis-${p.id}`).innerText = p.fis;
             
-            if(vpasT) vpasT.innerText = p.vPas; 
-            if(vpenT) vpenT.innerText = p.vPen; 
-            if(qT) qT.innerText = p.q; 
-            if(cT) cT.innerText = p.c; 
-            if(depT) depT.innerText = p.dep;
-            if(fisT) fisT.innerText = p.fis;
-            if(oLabel) oLabel.innerText = p.o;
-            
-            let rem = (p.q + p.c) - (p.vPas + p.o);
-            const remEl = document.getElementById(`rem-${p.id}`);
-            if(remEl) { 
-                remEl.innerText = rem; 
-                remEl.style.color = rem < 5 ? 'var(--danger)' : 'var(--success)'; 
+            let incProdotto = (p.vPas * p.p) + (p.vPen * p.pen);
+            inc += incProdotto;
+            pT += p.vPas; fT += p.vPen;
+
+            let totVenduti = p.vPas + p.vPen;
+            if(totVenduti > 0) {
+                rH += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
+                    <span>${p.n} <b>(${totVenduti})</b> <br><small style="color:#888">Pieni: ${p.vPas} | SC: ${p.vPen}</small></span>
+                    <span>€${incProdotto.toFixed(2)}</span>
+                </div>`;
             }
-            
-            let nS = p.vPas - p.vPen;
-            inc += (nS * p.p) + (p.vPen * p.pen); pT += nS; fT += p.vPen;
-            if(p.vPas > 0) rH += `<div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:8px 0; border-bottom:1px solid #eee;"><span>${p.n} (${p.vPas})</span><span>S:${nS}|P:${p.vPen} <b>€${((nS*p.p)+(p.vPen*p.pen)).toFixed(2)}</b></span></div>`;
         });
         document.getElementById('m-netto').innerText = `€ ${inc.toFixed(2)}`;
-        document.getElementById('count-pas').innerText = pT; document.getElementById('count-pen').innerText = fT;
-        document.getElementById('report-items').innerHTML = rH || '<p style="text-align:center;color:#aaa;">Nessuna vendita oggi</p>';
+        document.getElementById('count-pas').innerText = pT; 
+        document.getElementById('count-pen').innerText = fT;
+        document.getElementById('report-items').innerHTML = rH || '<p style="text-align:center;color:#999">Nessuna vendita</p>';
         localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
+    }
+
+    function filterProducts() {
+        const q = document.getElementById('search').value.toLowerCase();
+        document.querySelectorAll('.product-card').forEach(c => c.style.display = c.getAttribute('data-name').toLowerCase().includes(q) ? 'block' : 'none');
     }
 
     function condividiWhatsApp() {
-        let m = `💰 *REPORT BAR*\n💵 *INCASSO:* ${document.getElementById('m-netto').innerText}\n👥 S: ${document.getElementById('count-pas').innerText} | P: ${document.getElementById('count-pen').innerText}\n\n`;
-        prodotti.forEach(p => { if(p.vPas > 0) m += `▪️ ${p.n}: ${p.vPas} (S:${p.vPas-p.vPen},P:${p.vPen})\n`; });
+        let m = `📊 *REPORT BAR*\n💰 INCASSO: ${document.getElementById('m-netto').innerText}\n👥 PIENI: ${document.getElementById('count-pas').innerText} | SC: ${document.getElementById('count-pen').innerText}\n\n`;
+        prodotti.forEach(p => { 
+            let tot = p.vPas + p.vPen;
+            if(tot > 0) m += `• ${p.n}: ${tot} (Pieno:${p.vPas}, SC:${p.vPen})\n`; 
+        });
         const el = document.createElement('textarea'); el.value = m; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-        alert("Report copiato negli appunti!");
+        alert("Report copiato!");
     }
 
     function chiudiGiornata() {
-        if(!confirm("Confermi la chiusura? La merce rimasta (Bar + Deposito + Carico) diventerà il nuovo 'Fisico' di domani.")) return;
+        if(!confirm("Azzerare le vendite e aggiornare lo stock?")) return;
         prodotti.forEach(p => { 
-            let rimanenzaBarEffettiva = (p.q + p.c) - (p.vPas + p.o);
-            p.q = Math.max(0, rimanenzaBarEffettiva);
-            p.fis = p.q + p.dep;
-            p.c = 0; p.vPas = 0; p.vPen = 0; p.o = 0; 
+            let venduti = p.vPas + p.vPen;
+            let rimanente = venduti;
+            
+            let sB = Math.min(p.q, rimanente); p.q -= sB; rimanente -= sB;
+            let sD = Math.min(p.dep, rimanente); p.dep -= sD; rimanente -= sD;
+            p.fis = Math.max(0, p.fis - rimanente);
+            p.fis += p.c;
+            p.c = 0; p.vPas = 0; p.vPen = 0; 
         });
-        localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
-        init(); openTab('tab-vendite');
+        update(); init();
     }
     
     window.onload = init;
