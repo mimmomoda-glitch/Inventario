@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -9,29 +10,56 @@
             --primary: #2c3e50; --accent: #e67e22; --success: #27ae60;
             --danger: #e74c3c; --warning: #f39c12; --pend: #2980b9; --bg: #f8f9fa;
         }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--primary); user-select: none; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--primary); user-select: none; overflow-x: hidden; }
         .tabs { display: flex; background: var(--primary); position: sticky; top: 0; z-index: 100; }
         .tab-btn { flex: 1; padding: 15px 2px; color: white; border: none; background: none; font-weight: bold; font-size: 0.6rem; text-transform: uppercase; opacity: 0.6; }
         .tab-btn.active { opacity: 1; border-bottom: 4px solid var(--accent); }
-        .content { padding: 10px; padding-bottom: 160px; }
+        .content { padding: 10px; padding-bottom: 220px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        
         .mini-dash { background: white; padding: 15px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .stat { text-align: center; }
         .stat span { font-size: 0.65rem; color: #7f8c8d; display: block; text-transform: uppercase; }
         .stat b { font-size: 1rem; }
         .stat.highlight b { color: var(--success); font-size: 1.3rem; }
+        
         .product-card { background: white; margin-bottom: 10px; border-radius: 12px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid var(--accent); }
         .prod-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .prod-name { font-weight: bold; font-size: 0.95rem; }
+        
         .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .field { display: flex; flex-direction: column; gap: 4px; }
-        .field label { font-size: 0.55rem; font-weight: bold; color: #95a5a6; text-transform: uppercase; }
-        .stepper { display: flex; align-items: center; background: #f1f2f6; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; }
-        .stepper button { width: 32px; height: 38px; border: none; background: #e0e0e0; font-size: 1.2rem; font-weight: bold; color: var(--primary); cursor: pointer; touch-action: manipulation; }
-        .stepper input { flex: 1; width: 30px; border: none; background: transparent; text-align: center; font-size: 1rem; font-weight: bold; color: var(--primary); }
+        .field label { font-size: 0.55rem; font-weight: bold; color: #95a5a6; text-transform: uppercase; text-align: center; }
+        
+        .numpad-trigger { 
+            background: #f1f2f6; border-radius: 8px; border: 1px solid #ddd; 
+            padding: 10px 5px; text-align: center; font-size: 1.1rem; font-weight: bold; 
+            color: var(--primary); width: 100%; box-sizing: border-box; outline: none;
+        }
+
         .price-input { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; width: 100%; box-sizing: border-box; }
         .info-row { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; display: flex; justify-content: space-between; font-size: 0.7rem; color: #7f8c8d; }
+        
+        #numpad-overlay { 
+            position: fixed; bottom: 0; left: 0; width: 100%; background: #d1d4d9; 
+            z-index: 1000; display: none; padding: 12px; box-sizing: border-box;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.3); border-radius: 24px 24px 0 0;
+        }
+        .numpad-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: white; padding: 12px; border-radius: 12px; border: 1px solid #bdc3c7; }
+        .numpad-header b { font-size: 1.4rem; color: var(--primary); font-family: monospace; }
+        .numpad-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .num-btn { 
+            background: white; border: none; padding: 18px 0; border-radius: 12px; 
+            font-size: 1.3rem; font-weight: bold; box-shadow: 0 3px 0 #abb1b8;
+            transition: all 0.1s; touch-action: manipulation;
+        }
+        .num-btn:active { background: #eee; transform: translateY(2px); box-shadow: none; }
+        .num-btn.op { background: #ecf0f1; color: var(--primary); }
+        .num-btn.math { background: #f39c12; color: white; }
+        .num-btn.close { background: var(--success); color: white; grid-column: span 2; }
+        .num-btn.clear { background: var(--danger); color: white; }
+
         .bottom-actions { position: fixed; bottom: 0; width: 100%; background: white; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 200; }
         .btn-row { display: flex; gap: 8px; }
         .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; color: white; font-size: 0.85rem; text-align: center; }
@@ -39,28 +67,33 @@
         .btn-neutral { background: var(--primary); }
         .btn-danger { background: var(--danger); }
         .btn-wa { background: #25D366; color: white; }
+        
         .search-bar-container { position: relative; width: 100%; margin-bottom: 10px; }
         .search-bar { width: 100%; padding: 10px; padding-right: 35px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
         .clear-search { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: #ddd; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: none; cursor: pointer; }
+        
+        .stock-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1.2fr; gap: 5px; }
+        .total-badge { background: #1a252f; color: #f1c40f !important; border: 1px solid #f1c40f !important; }
+        .dep-highlight { background: #eef7ff !important; color: #2980b9 !important; }
     </style>
 </head>
 <body>
 
 <div class="tabs">
-    <button class="tab-btn active" onclick="openTab('tab-vendite')">💰 VENDITE</button>
-    <button class="tab-btn" onclick="openTab('tab-magazzino')">📦 STOCK</button>
-    <button class="tab-btn" onclick="openTab('tab-prezzi')">🏷️ LISTINO</button>
-    <button class="tab-btn" onclick="openTab('tab-report')">📊 REPORT</button>
+    <button class="tab-btn active" id="btn-vendite" onclick="openTab('tab-vendite')">💰 VENDITE</button>
+    <button class="tab-btn" id="btn-magazzino" onclick="openTab('tab-magazzino')">📦 STOCK</button>
+    <button class="tab-btn" id="btn-prezzi" onclick="openTab('tab-prezzi')">🏷️ LISTINO</button>
+    <button class="tab-btn" id="btn-report" onclick="openTab('tab-report')">📊 REPORT</button>
 </div>
 
 <div class="content">
     <div class="mini-dash">
         <div class="stat highlight" style="grid-column: span 2;">
-            <span>Incasso Netto Attuale</span>
+            <span>Incasso Netto</span>
             <b id="m-netto">€ 0.00</b>
         </div>
-        <div class="stat"><span>Standard</span><b id="count-pas">0</b></div>
-        <div class="stat"><span>Pendolari</span><b id="count-pen" style="color:var(--pend)">0</b></div>
+        <div class="stat"><span>Std</span><b id="count-pas">0</b></div>
+        <div class="stat"><span>Pen</span><b id="count-pen" style="color:var(--pend)">0</b></div>
     </div>
 
     <div class="search-bar-container">
@@ -80,6 +113,30 @@
     </div>
 </div>
 
+<div id="numpad-overlay">
+    <div class="numpad-header">
+        <span id="numpad-title" style="font-size: 0.8rem; color: #7f8c8d;">Valore</span>
+        <b id="numpad-display">0</b>
+    </div>
+    <div class="numpad-grid">
+        <button class="num-btn" onclick="pressNum(1)">1</button>
+        <button class="num-btn" onclick="pressNum(2)">2</button>
+        <button class="num-btn" onclick="pressNum(3)">3</button>
+        <button class="num-btn math" onclick="pressOp('+')">+</button>
+        <button class="num-btn" onclick="pressNum(4)">4</button>
+        <button class="num-btn" onclick="pressNum(5)">5</button>
+        <button class="num-btn" onclick="pressNum(6)">6</button>
+        <button class="num-btn math" onclick="pressOp('x')">×</button>
+        <button class="num-btn" onclick="pressNum(7)">7</button>
+        <button class="num-btn" onclick="pressNum(8)">8</button>
+        <button class="num-btn" onclick="pressNum(9)">9</button>
+        <button class="num-btn clear" onclick="pressClear()">C</button>
+        <button class="num-btn" onclick="pressNum(0)">0</button>
+        <button class="num-btn op" onclick="pressDelete()">⌫</button>
+        <button class="num-btn close" onclick="closeNumpad()">OK (CONFERMA)</button>
+    </div>
+</div>
+
 <div class="bottom-actions">
     <button class="btn btn-wa" onclick="condividiWhatsApp()">📲 COPIA PER WHATSAPP</button>
     <div class="btn-row">
@@ -89,223 +146,234 @@
 </div>
 
 <script>
-    // Versione V10: Aggiunta colonna Deposito e logica di scarico dal deposito al carico bar
-    let prodotti = JSON.parse(localStorage.getItem('barDataV10')) || [
-        {id:'acq', n:"Acqua", i:"💧", p:2.0, pen:1.0, q:299, c:168, dep:500, vPas:0, vPen:0, o:0},
-        {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1.0, q:16, c:24, dep:100, vPas:0, vPen:0, o:0},
-        {id:'bp', n:"Borse Piccole", i:"👜", p:6.0, pen:5.0, q:228, c:0, dep:0, vPas:0, vPen:0, o:0},
-        {id:'bm', n:"Borse Medie", i:"👜", p:7.0, pen:7.0, q:0, c:0, dep:0, vPas:0, vPen:0, o:0},
-        {id:'bg', n:"Borse Grandi", i:"👜", p:10.0, pen:10.0, q:21, c:0, dep:0, vPas:0, vPen:0, o:0},
-        {id:'bue', n:"Bueno/Biscuit", i:"🍫", p:3.0, pen:1.0, q:60, c:0, dep:50, vPas:0, vPen:0, o:0},
-        {id:'cap', n:"Cappelli", i:"🧢", p:5.0, pen:5.0, q:63, c:0, dep:20, vPas:0, vPen:0, o:0},
-        {id:'cae', n:"Caffè Americano Extra", i:"☕🇺🇸", p:3.5, pen:2.5, q:0, c:0, dep:0, vPas:0, vPen:0, o:0},
-        {id:'ce', n:"Cappuccino Extra", i:"☕✨", p:3.5, pen:2.5, q:0, c:0, dep:0, vPas:0, vPen:0, o:0},
-        {id:'car', n:"Caramelle / Gomme", i:"🍬", p:2.5, pen:1.0, q:85, c:0, dep:40, vPas:0, vPen:0, o:0},
-        {id:'cia', n:"Cialde", i:"☕", p:2.0, pen:1.0, q:136, c:300, dep:1000, vPas:0, vPen:0, o:0},
-        {id:'dec', n:"Deca", i:"☕", p:2.0, pen:1.0, q:10, c:0, dep:50, vPas:0, vPen:0, o:0},
-        {id:'die', n:"Dietor", i:"🍬", p:0.0, pen:0.0, q:40, c:0, dep:0, vPas:0, vPen:0, o:0},
-        {id:'fit', n:"Fitness / Cereal Yo", i:"🌾", p:2.5, pen:1.0, q:24, c:0, dep:30, vPas:0, vPen:0, o:0},
-        {id:'fon', n:"Fonzies / Patatine", i:"🍟", p:2.5, pen:1.0, q:75, c:92, dep:200, vPas:0, vPen:0, o:0},
-        {id:'gin', n:"Ginseng", i:"☕", p:2.0, pen:1.0, q:11, c:0, dep:50, vPas:0, vPen:0, o:0},
-        {id:'imp', n:"Impermeabili", i:"🧥", p:3.5, pen:1.0, q:30, c:0, dep:100, vPas:0, vPen:0, o:0},
-        {id:'lat', n:"Latte", i:"🥛", p:0.5, pen:0.5, q:3, c:0, dep:12, vPas:0, vPen:0, o:0},
-        {id:'ltn', n:"Lattine", i:"🥤", p:2.5, pen:1.5, q:233, c:144, dep:300, vPas:0, vPen:0, o:0},
-        {id:'mag', n:"Maglie", i:"👕", p:5.0, pen:5.0, q:50, c:0, dep:50, vPas:0, vPen:0, o:0},
-        {id:'mik', n:"Mikado", i:"🥖", p:3.0, pen:1.0, q:23, c:0, dep:30, vPas:0, vPen:0, o:0},
-        {id:'muf', n:"Muffin", i:"🧁", p:3.0, pen:1.0, q:27, c:0, dep:30, vPas:0, vPen:0, o:0},
-        {id:'nik', n:"Nik Nok", i:"🥜", p:2.5, pen:1.0, q:23, c:24, dep:48, vPas:0, vPen:0, o:0},
-        {id:'orz', n:"Orzo", i:"☕", p:2.0, pen:1.0, q:0, c:0, dep:20, vPas:0, vPen:0, o:0},
-        {id:'pav', n:"Pavesini", i:"🍪", p:2.5, pen:1.0, q:20, c:0, dep:20, vPas:0, vPen:0, o:0},
-        {id:'per', n:"Peroni", i:"🍺", p:4.5, pen:1.5, q:107, c:120, dep:240, vPas:0, vPen:0, o:0},
-        {id:'pca', n:"Peroni Capri", i:"🍋", p:7.5, pen:5.5, q:44, c:24, dep:48, vPas:0, vPen:0, o:0},
-        {id:'pri', n:"Pringles", i:"🥔", p:3.5, pen:2.0, q:60, c:48, dep:96, vPas:0, vPen:0, o:0},
-        {id:'vin', n:"Prosecco / Vino", i:"🍷", p:6.0, pen:3.0, q:79, c:24, dep:60, vPas:0, vPen:0, o:0},
-        {id:'red', n:"Red Bull / Gatorade", i:"⚡", p:4.5, pen:2.5, q:40, c:0, dep:48, vPas:0, vPen:0, o:0},
-        {id:'rin', n:"Ringo / Oreo / Bai.", i:"🍪", p:2.5, pen:1.0, q:108, c:0, dep:50, vPas:0, vPen:0, o:0},
-        {id:'riz', n:"Ritz / Cipster", i:"🍪", p:2.5, pen:1.0, q:21, c:0, dep:30, vPas:0, vPen:0, o:0},
-        {id:'spr', i:"🍹", n:"Spritz", p:8.0, pen:5.0, q:41, c:48, dep:96, vPas:0, vPen:0, o:0},
-        {id:'suc', i:"🧃", n:"Succo", p:3.5, pen:2.0, q:23, c:0, dep:30, vPas:0, vPen:0, o:0},
-        {id:'the', i:"🍵", n:"The Camomilla", p:2.5, pen:1.5, q:45, c:0, dep:50, vPas:0, vPen:0, o:0},
-        {id:'tuc', i:"🍪", n:"Tuc", p:2.5, pen:1.0, q:22, c:0, dep:30, vPas:0, vPen:0, o:0},
-        {id:'twi', i:"🍫", n:"Twix/KitKat/M&M", p:2.5, pen:1.5, q:90, c:0, dep:60, vPas:0, vPen:0, o:0}
+    let currentInputId = null;
+    let currentOp = null;
+    let firstVal = null;
+    let isResetting = false;
+
+    // Database iniziale
+    const defaultData = [
+        {id:'acq', n:"Acqua", i:"💧", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:358},
+        {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:45},
+        {id:'bp', n:"Borse Piccole", i:"👜", p:6, pen:5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:428},
+        {id:'bm', n:"Borse Medie", i:"👜", p:7, pen:7, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:0},
+        {id:'bg', n:"Borse Grandi", i:"👜", p:10, pen:10, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:41},
+        {id:'bue', n:"Bueno/B-Ready/Biscuits", i:"🍫", p:3, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:108},
+        {id:'cap', n:"Cappelli", i:"🧢", p:5, pen:5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:117},
+        {id:'car', n:"Caramelle / Gomme", i:"🍬", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:162},
+        {id:'cia', n:"Cialde", i:"☕", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:490},
+        {id:'dec', n:"Deca", i:"☕", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:20},
+        {id:'die', n:"Dietor", i:"🍬", p:0, pen:0, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:80},
+        {id:'fit', n:"Fitness / Cereal Yo", i:"🌾", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:42},
+        {id:'fon', n:"Fonzies / Patatine", i:"🍟", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:209},
+        {id:'gin', n:"Ginseng", i:"☕", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:22},
+        {id:'imp', n:"Impermeabili", i:"🧥", p:3.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:60},
+        {id:'lat', n:"Latte", i:"🥛", p:0.5, pen:0.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:6},
+        {id:'ltn', n:"Lattine", i:"🥤", p:2.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:552},
+        {id:'mag', n:"Maglie", i:"👕", p:5, pen:5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:100},
+        {id:'mik', n:"Mikado", i:"🥖", p:3, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:45},
+        {id:'muf', n:"Muffin", i:"🧁", p:3, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:50},
+        {id:'nik', n:"Nik Nok", i:"🥜", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:66},
+        {id:'orz', n:"Orzo", i:"☕", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:0},
+        {id:'pav', n:"Pavesini", i:"🍪", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:40},
+        {id:'per', n:"Peroni", i:"🍺", p:4.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:261},
+        {id:'pec', n:"Peroni Capri", i:"🍋", p:7.5, pen:5.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:105},
+        {id:'pri', n:"Pringles", i:"🥔", p:3.5, pen:2, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:150},
+        {id:'vin', n:"Prosecco / Vino", i:"🍷", p:6, pen:3, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:164},
+        {id:'red', n:"Red Bull / Gatorade", i:"⚡", p:4.5, pen:2.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:72},
+        {id:'rin', n:"Ringo / Oreo / Baiocchi", i:"🍪", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:202},
+        {id:'rit', n:"Ritz / Cipster", i:"🍪", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:38},
+        {id:'spr', n:"Spritz", i:"🍹", p:8, pen:5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:101},
+        {id:'suc', n:"Succo", i:"🧃", p:3.5, pen:2, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:46},
+        {id:'the', n:"The Camomilla", i:"🍵", p:2.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:90},
+        {id:'tuc', n:"Tuc", i:"🍪", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:38},
+        {id:'twi', n:"Twix/KitKat/M&M...", i:"🍫", p:2.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:152},
+        {id:'tu', n:"TU", i:"⚓", p:0, pen:0, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:0}
     ];
+
+    const DB_VERSION = 'barData_v28_cargo_fix';
+    let prodotti = JSON.parse(localStorage.getItem(DB_VERSION)) || defaultData;
 
     function openTab(id) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        const btns = document.querySelectorAll('.tab-btn');
-        if(id==='tab-vendite') btns[0].classList.add('active');
-        if(id==='tab-magazzino') btns[1].classList.add('active');
-        if(id==='tab-prezzi') btns[2].classList.add('active');
-        if(id==='tab-report') btns[3].classList.add('active');
-        window.scrollTo(0,0);
+        const map = {'tab-vendite':'btn-vendite', 'tab-magazzino':'btn-magazzino', 'tab-prezzi':'btn-prezzi', 'tab-report':'btn-report'};
+        if(map[id]) document.getElementById(map[id]).classList.add('active');
+        closeNumpad();
     }
 
-    function step(id, delta, isTotalInput, prodId) {
-        const input = document.getElementById(id);
-        const newVal = Math.max(0, (parseInt(input.value) || 0) + delta);
-        input.value = newVal;
-        validateInputs(prodId, isTotalInput);
+    function openNumpad(id, title) {
+        currentInputId = id;
+        currentOp = null; firstVal = null; isResetting = false;
+        const parts = id.split('-');
+        const field = parts[0];
+        const p = prodotti.find(item => item.id === parts[1]);
+        let val = p ? p[field] : 0;
+        document.getElementById('numpad-title').innerText = title;
+        document.getElementById('numpad-display').innerText = val;
+        document.getElementById('numpad-overlay').style.display = 'block';
+    }
+
+    function pressNum(num) {
+        const d = document.getElementById('numpad-display');
+        d.innerText = (d.innerText === "0" || isResetting) ? num : d.innerText + num;
+        isResetting = false;
+    }
+
+    function pressOp(op) {
+        firstVal = parseInt(document.getElementById('numpad-display').innerText) || 0;
+        currentOp = op; isResetting = true;
+    }
+
+    function pressClear() { document.getElementById('numpad-display').innerText = "0"; firstVal = null; currentOp = null; }
+    function pressDelete() {
+        const d = document.getElementById('numpad-display');
+        d.innerText = d.innerText.length > 1 ? d.innerText.slice(0, -1) : "0";
+    }
+
+    function closeNumpad() {
+        if (currentInputId) {
+            let val = parseInt(document.getElementById('numpad-display').innerText) || 0;
+            if (currentOp && firstVal !== null) {
+                if (currentOp === '+') val = firstVal + val;
+                if (currentOp === 'x') val = firstVal * val;
+            }
+            const parts = currentInputId.split('-');
+            const field = parts[0];
+            const p = prodotti.find(item => item.id === parts[1]);
+            
+            if(p) {
+                if(field === 'fis') {
+                    p.fis = val;
+                    p.q = Math.max(0, p.fis - p.dep);
+                }
+                else if(field === 'dep') {
+                    p.dep = Math.min(val, p.fis);
+                    p.q = p.fis - p.dep;
+                }
+                else if(field === 'q') {
+                    p.q = Math.min(val, p.fis);
+                    p.dep = p.fis - p.q;
+                }
+                else if(field === 'vpen') {
+                    p.vPen = Math.min(val, p.vPas);
+                } 
+                else {
+                    p[field] = val;
+                }
+            }
+            update();
+        }
+        document.getElementById('numpad-overlay').style.display = 'none';
+        currentInputId = null;
     }
 
     function init() {
-        const vList = document.getElementById('tab-vendite');
-        const mList = document.getElementById('tab-magazzino');
-        const pList = document.getElementById('tab-prezzi');
-        vList.innerHTML = ''; mList.innerHTML = ''; pList.innerHTML = '';
-        
+        const vL = document.getElementById('tab-vendite'), mL = document.getElementById('tab-magazzino'), pL = document.getElementById('tab-prezzi');
+        vL.innerHTML = ''; mL.innerHTML = ''; pL.innerHTML = '';
         prodotti.forEach(p => {
-            // Vendite
-            vList.innerHTML += `<div class="product-card" data-name="${p.n}">
-                <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span> <span id="label-prezzi-${p.id}" class="badge-info">€${p.p.toFixed(2)} | €${p.pen.toFixed(2)}</span></div>
+            vL.innerHTML += `<div class="product-card" data-name="${p.n}">
+                <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span> <span id="label-p-${p.id}" class="badge-info">€${p.p.toFixed(1)} | €${p.pen.toFixed(1)}</span></div>
                 <div class="input-group">
-                    <div class="field"><label>VENDUTI TOTALE</label><div class="stepper"><button onclick="step('vpas-${p.id}', -1, true, '${p.id}')">-</button><input type="number" id="vpas-${p.id}" value="${p.vPas}" onchange="validateInputs('${p.id}', true)"><button onclick="step('vpas-${p.id}', 1, true, '${p.id}')">+</button></div></div>
-                    <div class="field"><label>DI CUI PENDOLARI</label><div class="stepper"><button onclick="step('vpen-${p.id}', -1, false, '${p.id}')">-</button><input type="number" id="vpen-${p.id}" value="${p.vPen}" onchange="validateInputs('${p.id}', false)"><button onclick="step('vpen-${p.id}', 1, false, '${p.id}')">+</button></div></div>
+                    <div class="field"><label>TOT VENDUTI</label><input readonly class="numpad-trigger" id="vpas-${p.id}" value="${p.vPas}" onclick="openNumpad('vpas-${p.id}', '${p.n}: Totale')"></div>
+                    <div class="field"><label>DI CUI PEND.</label><input readonly class="numpad-trigger" id="vpen-${p.id}" value="${p.vPen}" onclick="openNumpad('vpen-${p.id}', '${p.n}: Pendolari')"></div>
                 </div></div>`;
-            
-            // Stock (AGGIORNATO CON DEPOSITO)
-            mList.innerHTML += `<div class="product-card" data-name="${p.n}" style="border-left-color:var(--pend)">
+            mL.innerHTML += `<div class="product-card" data-name="${p.n}" style="border-left-color:var(--pend)">
                 <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
-                <div class="input-group" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
-                    <div class="field"><label>DEPOSITO</label><div class="stepper"><input type="number" id="dep-${p.id}" value="${p.dep || 0}" onchange="update()"></div></div>
-                    <div class="field"><label>IN BAR</label><div class="stepper"><input type="number" id="q-${p.id}" value="${p.q}" onchange="update()"></div></div>
-                    <div class="field"><label>CARICO</label><div class="stepper"><input type="number" id="c-${p.id}" value="${p.c}" onchange="handleCarico('${p.id}')"></div></div>
-                    <div class="field"><label>OMAG.</label><div class="stepper"><input type="number" id="o-${p.id}" value="${p.o}" onchange="update()"></div></div>
+                <div class="stock-grid">
+                    <div class="field"><label>TOT. FISICO</label><input readonly class="numpad-trigger total-badge" id="fis-${p.id}" value="${p.fis}" onclick="openNumpad('fis-${p.id}', '${p.n}: Fisico Totale')"></div>
+                    <div class="field"><label>BAR</label><input readonly class="numpad-trigger" id="q-${p.id}" value="${p.q}" onclick="openNumpad('q-${p.id}', '${p.n}: Bar')"></div>
+                    <div class="field"><label>DEPOSITO</label><input readonly class="numpad-trigger dep-highlight" id="dep-${p.id}" value="${p.dep}" onclick="openNumpad('dep-${p.id}', '${p.n}: Magazzino')"></div>
+                    <div class="field"><label>CARICO DDT</label><input readonly class="numpad-trigger" id="c-${p.id}" value="${p.c}" onclick="openNumpad('c-${p.id}', '${p.n}: Carico DDT')"></div>
                 </div>
                 <div class="info-row">
                     <span>Disponibile Bar: <b id="rem-${p.id}">0</b></span>
+                    <span><b>OMAGGI:</b> <span id="o-label-${p.id}" style="text-decoration:underline" onclick="openNumpad('o-${p.id}', '${p.n}: Omaggi')">${p.o}</span></span>
                 </div></div>`;
-
-            // Listino
-            pList.innerHTML += `<div class="product-card" data-name="${p.n}" style="border-left-color:var(--warning)">
+            pL.innerHTML += `<div class="product-card" data-name="${p.n}" style="border-left-color:var(--warning)">
                 <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
                 <div class="input-group">
-                    <div class="field"><label>PREZZO STD (€)</label><input type="number" step="0.1" class="price-input" id="p-std-${p.id}" value="${p.p}" onchange="updatePrices('${p.id}')"></div>
-                    <div class="field"><label>PREZZO PEN (€)</label><input type="number" step="0.1" class="price-input" id="p-pen-${p.id}" value="${p.pen}" onchange="updatePrices('${p.id}')"></div>
+                    <div class="field"><label>STD (€)</label><input type="number" step="0.1" class="price-input" value="${p.p}" onchange="updatePrices('${p.id}', this.value, 'p')"></div>
+                    <div class="field"><label>PEN (€)</label><input type="number" step="0.1" class="price-input" value="${p.pen}" onchange="updatePrices('${p.id}', this.value, 'pen')"></div>
                 </div></div>`;
         });
         update();
     }
 
-    function handleCarico(prodId) {
-        const p = prodotti.find(item => item.id === prodId);
-        const inputCarico = document.getElementById(`c-${prodId}`);
-        const inputDeposito = document.getElementById(`dep-${prodId}`);
-        
-        let nuovoCarico = parseInt(inputCarico.value) || 0;
-        let vecchioCarico = p.c || 0;
-        let differenza = nuovoCarico - vecchioCarico;
-
-        // Sottrai la differenza dal deposito
-        p.dep = (p.dep || 0) - differenza;
-        inputDeposito.value = p.dep;
-
-        update();
-    }
-
-    function updatePrices(prodId) {
-        const p = prodotti.find(item => item.id === prodId);
-        if(p) {
-            p.p = parseFloat(document.getElementById(`p-std-${prodId}`).value) || 0;
-            p.pen = parseFloat(document.getElementById(`p-pen-${prodId}`).value) || 0;
-            const lbl = document.getElementById(`label-prezzi-${prodId}`);
-            if(lbl) lbl.innerText = `€${p.p.toFixed(2)} | €${p.pen.toFixed(2)}`;
-        }
-        update();
-    }
-
-    function validateInputs(prodId, isTotal) {
-        const tot = document.getElementById(`vpas-${prodId}`);
-        const pen = document.getElementById(`vpen-${prodId}`);
-        let tVal = parseInt(tot.value) || 0;
-        let pVal = parseInt(pen.value) || 0;
-        if(pVal > tVal) pen.value = tVal;
+    function updatePrices(id, val, key) {
+        const p = prodotti.find(i => i.id === id);
+        if(p) { p[key] = parseFloat(val) || 0; document.getElementById(`label-p-${id}`).innerText = `€${p.p.toFixed(1)} | €${p.pen.toFixed(1)}`; }
         update();
     }
 
     function filterProducts() {
-        const query = document.getElementById('search').value.toLowerCase();
-        const clearBtn = document.getElementById('clear-btn');
-        clearBtn.style.display = query.length > 0 ? 'block' : 'none';
-        
-        document.querySelectorAll('.product-card').forEach(card => {
-            const name = card.getAttribute('data-name').toLowerCase();
-            card.style.display = name.includes(query) ? 'block' : 'none';
-        });
+        const q = document.getElementById('search').value.toLowerCase();
+        document.getElementById('clear-btn').style.display = q ? 'block' : 'none';
+        document.querySelectorAll('.product-card').forEach(c => c.style.display = c.getAttribute('data-name').toLowerCase().includes(q) ? 'block' : 'none');
     }
 
-    function clearSearch() {
-        document.getElementById('search').value = '';
-        filterProducts();
-    }
+    function clearSearch() { document.getElementById('search').value = ''; filterProducts(); }
 
     function update() {
-        let incasso = 0, pTot = 0, fTot = 0, rHtml = '';
+        let inc = 0, pT = 0, fT = 0, rH = '';
         prodotti.forEach(p => {
-            const totEl = document.getElementById(`vpas-${p.id}`);
-            const penEl = document.getElementById(`vpen-${p.id}`);
-            const qEl = document.getElementById(`q-${p.id}`);
-            const cEl = document.getElementById(`c-${p.id}`);
-            const oEl = document.getElementById(`o-${p.id}`);
-            const depEl = document.getElementById(`dep-${p.id}`);
-
-            if (totEl) p.vPas = parseInt(totEl.value) || 0;
-            if (penEl) p.vPen = parseInt(penEl.value) || 0;
-            if (qEl) p.q = parseInt(qEl.value) || 0;
-            if (cEl) p.c = parseInt(cEl.value) || 0;
-            if (oEl) p.o = parseInt(oEl.value) || 0;
-            if (depEl) p.dep = parseInt(depEl.value) || 0;
-
-            // Logica Stock Bar: Inizio + Carico - Venduti - Omaggi
+            const vpasEl = document.getElementById(`vpas-${p.id}`), 
+                  vpenEl = document.getElementById(`vpen-${p.id}`), 
+                  qEl = document.getElementById(`q-${p.id}`), 
+                  cEl = document.getElementById(`c-${p.id}`), 
+                  depEl = document.getElementById(`dep-${p.id}`),
+                  fisEl = document.getElementById(`fis-${p.id}`),
+                  oLabel = document.getElementById(`o-label-${p.id}`);
+            
+            if(vpasEl) vpasEl.value = p.vPas; 
+            if(vpenEl) vpenEl.value = p.vPen; 
+            if(qEl) qEl.value = p.q; 
+            if(cEl) cEl.value = p.c; 
+            if(depEl) depEl.value = p.dep;
+            if(fisEl) fisEl.value = p.fis;
+            if(oLabel) oLabel.innerText = p.o;
+            
             let rem = (p.q + p.c) - (p.vPas + p.o);
             const remEl = document.getElementById(`rem-${p.id}`);
-            if(remEl) {
-                remEl.innerText = rem;
-                remEl.style.color = rem < 5 ? 'var(--danger)' : 'var(--success)';
+            if(remEl) { 
+                remEl.innerText = rem; 
+                remEl.style.color = rem < 5 ? 'var(--danger)' : 'var(--success)'; 
             }
-
-            let nStandard = p.vPas - p.vPen;
-            incasso += (nStandard * p.p) + (p.vPen * p.pen);
-            pTot += nStandard; fTot += p.vPen;
-
-            if(p.vPas > 0) {
-                rHtml += `<div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:8px 0; border-bottom:1px solid #eee;">
-                    <span>${p.n} (${p.vPas})</span>
-                    <span>S:${nStandard} | P:${p.vPen} <b>€${((nStandard * p.p) + (p.vPen * p.pen)).toFixed(2)}</b></span>
-                </div>`;
-            }
+            
+            let nS = p.vPas - p.vPen;
+            inc += (nS * p.p) + (p.vPen * p.pen); pT += nS; fT += p.vPen;
+            if(p.vPas > 0) rH += `<div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:8px 0; border-bottom:1px solid #eee;"><span>${p.n} (${p.vPas})</span><span>S:${nS}|P:${p.vPen} <b>€${((nS*p.p)+(p.vPen*p.pen)).toFixed(2)}</b></span></div>`;
         });
-        document.getElementById('m-netto').innerText = `€ ${incasso.toFixed(2)}`;
-        document.getElementById('count-pas').innerText = pTot;
-        document.getElementById('count-pen').innerText = fTot;
-        document.getElementById('report-items').innerHTML = rHtml || '<p style="font-size:0.8rem;color:#aaa;text-align:center;padding:20px;">Nessuna vendita registrata</p>';
-        localStorage.setItem('barDataV10', JSON.stringify(prodotti));
+        document.getElementById('m-netto').innerText = `€ ${inc.toFixed(2)}`;
+        document.getElementById('count-pas').innerText = pT; document.getElementById('count-pen').innerText = fT;
+        document.getElementById('report-items').innerHTML = rH || '<p style="text-align:center;color:#aaa;">Nessuna vendita oggi</p>';
+        localStorage.setItem(DB_VERSION, JSON.stringify(prodotti));
     }
 
     function condividiWhatsApp() {
-        let msg = `💰 *REPORT NAV BAR*\n💵 *INCASSO:* ${document.getElementById('m-netto').innerText}\n👥 Std: ${document.getElementById('count-pas').innerText} | Pen: ${document.getElementById('count-pen').innerText}\n\n*DETTAGLIO:*\n`;
-        prodotti.forEach(p => { 
-            if(p.vPas > 0) {
-                let nStd = p.vPas - p.vPen;
-                msg += `▪️ ${p.n}: ${p.vPas} (S:${nStd}, P:${p.vPen}) - €${((nStd*p.p)+(p.vPen*p.pen)).toFixed(2)}\n`; 
-            }
-        });
-        const el = document.createElement('textarea'); el.value = msg; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+        let m = `💰 *REPORT BAR*\n💵 *INCASSO:* ${document.getElementById('m-netto').innerText}\n👥 S: ${document.getElementById('count-pas').innerText} | P: ${document.getElementById('count-pen').innerText}\n\n`;
+        prodotti.forEach(p => { if(p.vPas > 0) m += `▪️ ${p.n}: ${p.vPas} (S:${p.vPas-p.vPen},P:${p.vPen})\n`; });
+        const el = document.createElement('textarea'); el.value = m; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
         alert("Report copiato negli appunti!");
     }
 
     function chiudiGiornata() {
-        if(!confirm("Azzerare le vendite? La merce in bar diventerà l'inizio di domani. Il deposito rimarrà invariato.")) return;
+        if(!confirm("Confermi la chiusura? La merce rimasta (Bar + Deposito + Carico) diventerà il nuovo 'Fisico' di domani.")) return;
         prodotti.forEach(p => { 
-            // La giacenza bar diventa il nuovo 'In Bar'
-            p.q = (p.q + p.c) - (p.vPas + p.o); 
-            p.c = 0; p.vPas = 0; p.vPen = 0; p.o = 0;
-            // Il deposito non si azzera mai a meno di vendite dirette (qui gestito come magazzino)
+            // 1. Calcolo quanto resta effettivamente al BAR (Scorta + Carico - Venduti - Omaggi)
+            let rimanenzaBar = (p.q + p.c) - (p.vPas + p.o);
+            p.q = Math.max(0, rimanenzaBar);
+            
+            // 2. Il deposito resta quello che era (non viene influenzato dalle vendite bar)
+            // 3. Il NUOVO FISICO è la somma di ciò che resta al bar + deposito
+            p.fis = p.q + p.dep;
+
+            // 4. Azzeramento campi giornalieri (il carico è ora 'assorbito' nel fisico)
+            p.c = 0; p.vPas = 0; p.vPen = 0; p.o = 0; 
         });
-        localStorage.setItem('barDataV10', JSON.stringify(prodotti));
-        init();
-        openTab('tab-vendite');
+        localStorage.setItem(DB_VERSION, JSON.stringify(prodotti));
+        init(); openTab('tab-vendite');
     }
     window.onload = init;
 </script>
