@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NAV Bar Manager PRO</title>
+    <title>NAV Bar Manager PRO - Full List</title>
     <style>
         :root {
             --primary: #2c3e50; --accent: #e67e22; --success: #27ae60;
@@ -11,7 +11,8 @@
         }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--primary); user-select: none; overflow-x: hidden; }
         
-        .tabs { display: flex; background: var(--primary); position: sticky; top: 0; z-index: 100; overflow-x: auto; }
+        .tabs { display: flex; background: var(--primary); position: sticky; top: 0; z-index: 100; overflow-x: auto; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
         .tab-btn { flex: 1; padding: 15px 5px; color: white; border: none; background: none; font-weight: bold; font-size: 0.6rem; text-transform: uppercase; opacity: 0.6; min-width: 80px; }
         .tab-btn.active { opacity: 1; border-bottom: 4px solid var(--accent); }
         
@@ -27,7 +28,7 @@
         
         .product-card { background: white; margin-bottom: 10px; border-radius: 12px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid var(--accent); }
         .prod-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .prod-name { font-weight: bold; font-size: 0.95rem; }
+        .prod-name { font-weight: bold; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
         
         .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .field { display: flex; flex-direction: column; gap: 4px; }
@@ -38,23 +39,22 @@
             border: 1px solid #ddd; overflow: hidden; height: 45px;
         }
         .step-btn {
-            width: 40px; height: 100%; border: none; background: #e0e0e0;
-            font-size: 1.4rem; font-weight: bold; color: var(--primary);
+            width: 35px; height: 100%; border: none; background: #e0e0e0;
+            font-size: 1.2rem; font-weight: bold; color: var(--primary);
             cursor: pointer; touch-action: manipulation;
         }
         .step-btn:active { background: #ccc; }
         
         .numpad-trigger { 
             flex: 1; height: 100%; display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; font-weight: bold; color: var(--primary); 
+            font-size: 1.1rem; font-weight: bold; color: var(--primary); 
             background: transparent; border: none; outline: none;
         }
 
         .info-row { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; display: flex; justify-content: space-between; font-size: 0.7rem; color: #7f8c8d; }
         
-        /* Prezzi nel listino */
         .price-edit-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #fdfdfd; padding: 10px; border-radius: 8px; border: 1px solid #eee; margin-top: 5px; }
-        .price-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-weight: bold; }
+        .price-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-weight: bold; box-sizing: border-box; }
 
         #numpad-overlay { 
             position: fixed; bottom: 0; left: 0; width: 100%; background: #d1d4d9; 
@@ -65,8 +65,8 @@
         .numpad-header b { font-size: 1.6rem; color: var(--primary); }
         .numpad-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .num-btn { 
-            background: white; border: none; padding: 20px 0; border-radius: 12px; 
-            font-size: 1.4rem; font-weight: bold; box-shadow: 0 3px 0 #abb1b8;
+            background: white; border: none; padding: 18px 0; border-radius: 12px; 
+            font-size: 1.3rem; font-weight: bold; box-shadow: 0 3px 0 #abb1b8;
         }
         .num-btn:active { transform: translateY(2px); box-shadow: none; }
         .num-btn.math { background: #f39c12; color: white; }
@@ -98,8 +98,8 @@
             <span>Incasso Netto</span>
             <b id="m-netto">€ 0.00</b>
         </div>
-        <div class="stat"><span>Pieno</span><b id="count-pas">0</b></div>
-        <div class="stat"><span>Sconto SC</span><b id="count-pen" style="color:var(--pend)">0</b></div>
+        <div class="stat"><span>Pass.</span><b id="count-pas">0</b></div>
+        <div class="stat"><span>Pend.</span><b id="count-pen" style="color:var(--pend)">0</b></div>
     </div>
 
     <input type="text" id="search" class="search-bar" placeholder="Cerca prodotto..." onkeyup="filterProducts()">
@@ -109,9 +109,9 @@
     <div id="tab-prezzi" class="tab-content"></div>
     <div id="tab-report" class="tab-content">
         <div style="background:white; padding:15px; border-radius:12px;">
-            <h3 style="margin:0 0 10px 0">Riepilogo Odierno</h3>
+            <h3 style="margin:0 0 10px 0">Riepilogo Sessione</h3>
             <div id="report-items"></div>
-            <button class="btn btn-danger" style="width:100%; margin-top:20px" onclick="chiudiGiornata()">CHIUDI GIORNATA</button>
+            <button class="btn btn-danger" style="width:100%; margin-top:20px" onclick="chiudiGiornata()">CHIUDI SESSIONE E AZZERA</button>
         </div>
     </div>
 </div>
@@ -141,10 +141,10 @@
 </div>
 
 <div class="bottom-actions">
-    <button class="btn btn-wa" onclick="condividiWhatsApp()">📲 COPIA REPORT</button>
+    <button class="btn btn-wa" onclick="condividiWhatsApp()">📲 COPIA REPORT WHATSAPP</button>
     <div style="display:flex; gap:8px;">
-        <button class="btn btn-neutral" onclick="openTab('tab-vendite')">VENDITE</button>
-        <button class="btn btn-success" onclick="openTab('tab-report')">VAI AI TOTALI</button>
+        <button class="btn btn-neutral" onclick="openTab('tab-vendite')">TORNA VENDITE</button>
+        <button class="btn btn-success" onclick="openTab('tab-report')">REPORT</button>
     </div>
 </div>
 
@@ -154,22 +154,46 @@
     let firstVal = null;
     let isResetting = false;
 
-    const DB_KEY = 'barData_v44'; // Versione aggiornata
+    const DB_KEY = 'barData_full_v2';
+    
+    // Lista completa derivata dal database fornito
     const defaultData = [
-        {id:'acq', n:"Acqua", i:"💧", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:358},
-        {id:'ara', n:"Arachidi", i:"🥜", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:45},
-        {id:'bp', n:"Borse P", i:"👜", p:6, pen:5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:428},
-        {id:'bg', n:"Borse G", i:"👜", p:10, pen:10, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:41},
-        {id:'bue', n:"Bueno/Snack", i:"🍫", p:3, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:108},
-        {id:'cap', n:"Cappelli", i:"🧢", p:5, pen:5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:117},
-        {id:'cia', n:"Cialde", i:"☕", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:490},
-        {id:'fon', n:"Patatine", i:"🍟", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:209},
-        {id:'ltn', n:"Lattine", i:"🥤", p:2.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:552},
-        {id:'per', n:"Peroni", i:"🍺", p:4.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:261},
-        {id:'pec', n:"Peroni Capri", i:"🍋", p:7.5, pen:5.5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:105},
-        {id:'pri', n:"Pringles", i:"🥔", p:3.5, pen:2, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:150},
-        {id:'spr', n:"Spritz", i:"🍹", p:8, pen:5, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:101},
-        {id:'suc', n:"Succo", i:"🧃", p:3.5, pen:2, q:0, c:0, vPas:0, vPen:0, o:0, dep:0, fis:46}
+        {id:'acq', n:"Acqua", i:"💧", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, fis:358},
+        {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, fis:29},
+        {id:'bp', n:"Borse Piccole", i:"👜", p:6, pen:5, q:0, c:0, vPas:0, vPen:0, fis:200},
+        {id:'bm', n:"Borse Medie", i:"👜", p:7, pen:7, q:0, c:0, vPas:0, vPen:0, fis:0},
+        {id:'bg', n:"Borse Grandi", i:"👜", p:10, pen:10, q:0, c:0, vPas:0, vPen:0, fis:20},
+        {id:'bue', n:"Bueno/B-Ready/Biscuits", i:"🍫", p:3, pen:1, q:0, c:0, vPas:0, vPen:0, fis:48},
+        {id:'cap', n:"Cappelli", i:"🧢", p:5, pen:5, q:0, c:0, vPas:0, vPen:0, fis:54},
+        {id:'car', n:"Caramelle / Gomme", i:"🍬", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, fis:77},
+        {id:'cia', n:"Cialde", i:"☕", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, fis:354},
+        {id:'dec', n:"Deca", i:"☕", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, fis:10},
+        {id:'die', n:"Dietor", i:"🍬", p:0, pen:0, q:0, c:0, vPas:0, vPen:0, fis:40},
+        {id:'fit', n:"Fitness / Cereal Yo", i:"🌾", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, fis:18},
+        {id:'fon', n:"Fonzies / Patatine", i:"🍟", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, fis:134},
+        {id:'gin', n:"Ginseng", i:"☕", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, fis:11},
+        {id:'imp', n:"Impermeabili", i:"🧥", p:3.5, pen:1, q:0, c:0, vPas:0, vPen:0, fis:30},
+        {id:'lat', n:"Latte", i:"🥛", p:0.5, pen:0.5, q:0, c:0, vPas:0, vPen:0, fis:3},
+        {id:'ltn', n:"Lattine", i:"🥤", p:2.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, fis:319},
+        {id:'mag', n:"Maglie", i:"👕", p:5, pen:5, q:0, c:0, vPas:0, vPen:0, fis:50},
+        {id:'mik', n:"Mikado", i:"🥖", p:3, pen:1, q:0, c:0, vPas:0, vPen:0, fis:22},
+        {id:'muf', n:"Muffin", i:"🧁", p:3, pen:1, q:0, c:0, vPas:0, vPen:0, fis:23},
+        {id:'nik', n:"Nik Nok", i:"🥜", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, fis:43},
+        {id:'orz', n:"Orzo", i:"☕", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, fis:0},
+        {id:'pav', n:"Pavesini", i:"🍪", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, fis:20},
+        {id:'per', n:"Peroni", i:"🍺", p:4.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, fis:154},
+        {id:'pec', n:"Peroni Capri", i:"🍋", p:7.5, pen:5.5, q:0, c:0, vPas:0, vPen:0, fis:61},
+        {id:'pri', n:"Pringles", i:"🥔", p:3.5, pen:2, q:0, c:0, vPas:0, vPen:0, fis:90},
+        {id:'vin', n:"Prosecco / Vino", i:"🍷", p:6, pen:3, q:0, c:0, vPas:0, vPen:0, fis:85},
+        {id:'red', n:"Red Bull / Gatorade", i:"⚡", p:4.5, pen:2.5, q:0, c:0, vPas:0, vPen:0, fis:32},
+        {id:'rin', n:"Ringo / Oreo / Baiocchi", i:"🍪", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, fis:94},
+        {id:'rit', n:"Ritz / Cipster", i:"🍪", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, fis:17},
+        {id:'spr', n:"Spritz", i:"🍹", p:8, pen:5, q:0, c:0, vPas:0, vPen:0, fis:60},
+        {id:'suc', n:"Succo", i:"🧃", p:3.5, pen:2, q:0, c:0, vPas:0, vPen:0, fis:23},
+        {id:'the', n:"The Camomilla", i:"🍵", p:2.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, fis:45},
+        {id:'tuc', n:"Tuc", i:"🍪", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, fis:16},
+        {id:'twi', n:"Twix/KitKat/M&M...", i:"🍫", p:2.5, pen:1.5, q:0, c:0, vPas:0, vPen:0, fis:62},
+        {id:'tu', n:"TU", i:"⚓", p:0, pen:0, q:0, c:0, vPas:0, vPen:0, fis:0}
     ];
 
     let prodotti = JSON.parse(localStorage.getItem(DB_KEY)) || defaultData;
@@ -180,6 +204,7 @@
         document.getElementById(id).classList.add('active');
         const map = {'tab-vendite':'btn-vendite', 'tab-magazzino':'btn-magazzino', 'tab-report':'btn-report', 'tab-prezzi':'btn-prezzi'};
         if(map[id]) document.getElementById(map[id]).classList.add('active');
+        window.scrollTo(0,0);
     }
 
     function step(fieldId, delta) {
@@ -190,23 +215,17 @@
         if(field === 'vPas') p.vPas = Math.max(0, p.vPas + delta);
         else if(field === 'vPen') p.vPen = Math.max(0, p.vPen + delta);
         else if(field === 'fis') p.fis = Math.max(0, p.fis + delta);
+        else if(field === 'c') p.c = Math.max(0, p.c + delta);
         else if(field === 'q') {
             if(delta > 0) { if(p.fis > 0) { p.q++; p.fis--; } } 
             else { if(p.q > 0) { p.q--; p.fis++; } }
-        }
-        else if(field === 'dep') {
-            if(delta > 0) { if(p.fis > 0) { p.dep++; p.fis--; } } 
-            else { if(p.dep > 0) { p.dep--; p.fis++; } }
         }
         update();
     }
 
     function changePrice(pId, type, val) {
         const p = prodotti.find(x => x.id === pId);
-        if(p) {
-            p[type] = parseFloat(val) || 0;
-            update();
-        }
+        if(p) { p[type] = parseFloat(val) || 0; update(); }
     }
 
     function openNumpad(id, title) {
@@ -240,17 +259,11 @@
             }
             const [field, pId] = currentInputId.split('-');
             const p = prodotti.find(x => x.id === pId);
-            
-            if(field === 'q' || field === 'dep') {
-                let diff = val - p[field];
-                if(diff > 0 && p.fis >= diff) {
-                    p[field] = val; p.fis -= diff;
-                } else if(diff < 0) {
-                    p[field] = val; p.fis += Math.abs(diff);
-                }
-            } else {
-                p[field] = val;
-            }
+            if(field === 'q') {
+                let diff = val - p.q;
+                if(diff > 0 && p.fis >= diff) { p.q = val; p.fis -= diff; } 
+                else if(diff < 0) { p.q = val; p.fis += Math.abs(diff); }
+            } else { p[field] = val; }
             update();
         }
         document.getElementById('numpad-overlay').style.display = 'none';
@@ -263,62 +276,59 @@
         vL.innerHTML = ''; mL.innerHTML = ''; pL.innerHTML = '';
         
         prodotti.forEach(p => {
-            // Scheda Vendite
             vL.innerHTML += `<div class="product-card" data-name="${p.n}">
-                <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span> <span style="font-size:0.7rem; color:#888">€${p.p} / €${p.pen}</span></div>
+                <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span> <span style="font-size:0.65rem; color:#888">€${p.p} / €${p.pen}</span></div>
                 <div class="input-group">
-                    <div class="field"><label>PIENO</label>
+                    <div class="field"><label>PASSEGGERI</label>
                         <div class="stepper-container">
                             <button class="step-btn" onclick="step('vPas-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('vPas-${p.id}', 'Pieno ${p.n}')"><span id="txt-vPas-${p.id}">${p.vPas}</span></div>
+                            <div class="numpad-trigger" onclick="openNumpad('vPas-${p.id}', '${p.n} Pass.')"><span id="txt-vPas-${p.id}">${p.vPas}</span></div>
                             <button class="step-btn" onclick="step('vPas-${p.id}', 1)">+</button>
                         </div>
                     </div>
-                    <div class="field"><label>SC</label>
+                    <div class="field"><label>PENDOLARI</label>
                         <div class="stepper-container" style="background:#e8f4fd; border-color:var(--pend)">
                             <button class="step-btn" onclick="step('vPen-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('vPen-${p.id}', 'Sconto ${p.n}')"><span id="txt-vPen-${p.id}" style="color:var(--pend)">${p.vPen}</span></div>
+                            <div class="numpad-trigger" onclick="openNumpad('vPen-${p.id}', '${p.n} Pend.')"><span id="txt-vPen-${p.id}" style="color:var(--pend)">${p.vPen}</span></div>
                             <button class="step-btn" onclick="step('vPen-${p.id}', 1)">+</button>
                         </div>
                     </div>
                 </div></div>`;
             
-            // Scheda Magazzino
             mL.innerHTML += `<div class="product-card" style="border-left-color:var(--pend)" data-name="${p.n}">
                 <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                    <div class="field" style="grid-column: span 2;"><label>FISICO DISPONIBILE (IN MAGAZZINO)</label>
+                    <div class="field" style="grid-column: span 2;"><label>STOCK MAGAZZINO (FISICO)</label>
                         <div class="stepper-container" style="background:#2c3e50; border-color:#1a252f">
                             <button class="step-btn" style="background:#34495e; color:white" onclick="step('fis-${p.id}', -1)">–</button>
                             <div class="numpad-trigger" onclick="openNumpad('fis-${p.id}', 'Stock ${p.n}')"><span id="txt-fis-${p.id}" style="color:#f1c40f">${p.fis}</span></div>
                             <button class="step-btn" style="background:#34495e; color:white" onclick="step('fis-${p.id}', 1)">+</button>
                         </div>
                     </div>
-                    <div class="field"><label>BAR</label>
+                    <div class="field"><label>DISPONIBILE BAR</label>
                         <div class="stepper-container">
                             <button class="step-btn" onclick="step('q-${p.id}', -1)">–</button>
                             <div class="numpad-trigger" onclick="openNumpad('q-${p.id}', 'Bar ${p.n}')"><span id="txt-q-${p.id}">${p.q}</span></div>
                             <button class="step-btn" onclick="step('q-${p.id}', 1)">+</button>
                         </div>
                     </div>
-                    <div class="field"><label>DEPOSITO</label>
+                    <div class="field"><label>CARICO DDT</label>
                         <div class="stepper-container">
-                            <button class="step-btn" onclick="step('dep-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('dep-${p.id}', 'Dep ${p.n}')"><span id="txt-dep-${p.id}">${p.dep}</span></div>
-                            <button class="step-btn" onclick="step('dep-${p.id}', 1)">+</button>
+                            <button class="step-btn" onclick="step('c-${p.id}', -1)">–</button>
+                            <div class="numpad-trigger" onclick="openNumpad('c-${p.id}', 'DDT ${p.n}')"><span id="txt-c-${p.id}">${p.c}</span></div>
+                            <button class="step-btn" onclick="step('c-${p.id}', 1)">+</button>
                         </div>
                     </div>
                 </div>
-                <div class="info-row"><span>Stock Reale: <b>${p.fis + p.q + p.dep}</b></span><span>DDT: <b onclick="openNumpad('c-${p.id}', 'Carico')">${p.c}</b></span></div></div>`;
+                <div class="info-row"><span>Totale Reale (Stock+Bar): <b>${p.fis + p.q}</b></span></div></div>`;
 
-            // Scheda Listino Prezzi
             pL.innerHTML += `<div class="product-card" style="border-left-color:var(--warning)" data-name="${p.n}">
                 <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
                 <div class="price-edit-row">
-                    <div class="field"><label>PREZZO PIENO (€)</label>
+                    <div class="field"><label>PREZZO PASS. (€)</label>
                         <input type="number" step="0.1" class="price-input" value="${p.p}" onchange="changePrice('${p.id}', 'p', this.value)">
                     </div>
-                    <div class="field"><label>SCONTO SC (€)</label>
+                    <div class="field"><label>PREZZO PEND. (€)</label>
                         <input type="number" step="0.1" class="price-input" value="${p.pen}" onchange="changePrice('${p.id}', 'pen', this.value)">
                     </div>
                 </div>
@@ -330,28 +340,25 @@
     function update() {
         let inc = 0, pT = 0, fT = 0, rH = '';
         prodotti.forEach(p => {
-            if(document.getElementById(`txt-vPas-${p.id}`)) document.getElementById(`txt-vPas-${p.id}`).innerText = p.vPas; 
-            if(document.getElementById(`txt-vPen-${p.id}`)) document.getElementById(`txt-vPen-${p.id}`).innerText = p.vPen;
-            if(document.getElementById(`txt-q-${p.id}`)) document.getElementById(`txt-q-${p.id}`).innerText = p.q;
-            if(document.getElementById(`txt-dep-${p.id}`)) document.getElementById(`txt-dep-${p.id}`).innerText = p.dep;
-            if(document.getElementById(`txt-fis-${p.id}`)) document.getElementById(`txt-fis-${p.id}`).innerText = p.fis;
+            const ids = [`txt-vPas-${p.id}`, `txt-vPen-${p.id}`, `txt-q-${p.id}`, `txt-fis-${p.id}`, `txt-c-${p.id}`];
+            ids.forEach(id => { 
+                const el = document.getElementById(id); 
+                if(el) el.innerText = p[id.split('-')[1]]; 
+            });
             
-            let incProdotto = (p.vPas * p.p) + (p.vPen * p.pen);
-            inc += incProdotto;
-            pT += p.vPas; fT += p.vPen;
-
-            let totVenduti = p.vPas + p.vPen;
-            if(totVenduti > 0) {
-                rH += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
-                    <span>${p.n} <b>(${totVenduti})</b> <br><small style="color:#888">Pieni: ${p.vPas} | SC: ${p.vPen}</small></span>
-                    <span>€${incProdotto.toFixed(2)}</span>
+            let incP = (p.vPas * p.p) + (p.vPen * p.pen);
+            inc += incP; pT += p.vPas; fT += p.vPen;
+            if((p.vPas + p.vPen) > 0) {
+                rH += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; font-size:0.8rem">
+                    <span>${p.n} <b>(${p.vPas + p.vPen})</b><br><small style="color:#888">Pass: ${p.vPas} | Pend: ${p.vPen}</small></span>
+                    <span style="font-weight:bold">€${incP.toFixed(2)}</span>
                 </div>`;
             }
         });
         document.getElementById('m-netto').innerText = `€ ${inc.toFixed(2)}`;
         document.getElementById('count-pas').innerText = pT; 
         document.getElementById('count-pen').innerText = fT;
-        document.getElementById('report-items').innerHTML = rH || '<p style="text-align:center;color:#999">Nessuna vendita</p>';
+        document.getElementById('report-items').innerHTML = rH || '<p style="text-align:center;color:#999;font-size:0.8rem">Nessuna vendita registrata</p>';
         localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
     }
 
@@ -361,28 +368,23 @@
     }
 
     function condividiWhatsApp() {
-        let m = `📊 *REPORT BAR*\n💰 INCASSO: ${document.getElementById('m-netto').innerText}\n👥 PIENI: ${document.getElementById('count-pas').innerText} | SC: ${document.getElementById('count-pen').innerText}\n\n`;
+        let m = `📊 *REPORT NAV BAR*\n💰 *INCASSO:* ${document.getElementById('m-netto').innerText}\n👥 Pass: ${document.getElementById('count-pas').innerText} | Pend: ${document.getElementById('count-pen').innerText}\n\n`;
         prodotti.forEach(p => { 
             let tot = p.vPas + p.vPen;
-            if(tot > 0) m += `• ${p.n}: ${tot} (Pieno:${p.vPas}, SC:${p.vPen})\n`; 
+            if(tot > 0) m += `• ${p.n}: ${tot} (Pass:${p.vPas}, Pend:${p.vPen})\n`; 
         });
         const el = document.createElement('textarea'); el.value = m; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-        alert("Report copiato!");
+        alert("Report copiato negli appunti!");
     }
 
     function chiudiGiornata() {
-        if(!confirm("Azzerare le vendite e aggiornare lo stock?")) return;
+        if(!confirm("Azzerare vendite e scaricare lo stock?")) return;
         prodotti.forEach(p => { 
             let venduti = p.vPas + p.vPen;
-            let rimanente = venduti;
-            
-            let sB = Math.min(p.q, rimanente); p.q -= sB; rimanente -= sB;
-            let sD = Math.min(p.dep, rimanente); p.dep -= sD; rimanente -= sD;
-            p.fis = Math.max(0, p.fis - rimanente);
-            p.fis += p.c;
-            p.c = 0; p.vPas = 0; p.vPen = 0; 
+            p.q = Math.max(0, p.q - venduti);
+            p.fis += p.c; p.c = 0; p.vPas = 0; p.vPen = 0; 
         });
-        update(); init();
+        update(); init(); openTab('tab-vendite');
     }
     
     window.onload = init;
