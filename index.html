@@ -154,9 +154,8 @@
     let firstVal = null;
     let isResetting = false;
 
-    const DB_KEY = 'barData_full_v2';
+    const DB_KEY = 'barData_full_v3';
     
-    // Lista completa derivata dal database fornito
     const defaultData = [
         {id:'acq', n:"Acqua", i:"💧", p:2, pen:1, q:0, c:0, vPas:0, vPen:0, fis:358},
         {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1, q:0, c:0, vPas:0, vPen:0, fis:29},
@@ -212,20 +211,32 @@
         const p = prodotti.find(x => x.id === id);
         if(!p) return;
 
-        if(field === 'vPas') p.vPas = Math.max(0, p.vPas + delta);
-        else if(field === 'vPen') p.vPen = Math.max(0, p.vPen + delta);
+        if(field === 'vPas' || field === 'vPen') {
+            if(delta > 0) {
+                // Nuova logica: se vendo e il bar è vuoto, sottrai dal fisico
+                if(p.q > 0) { p.q--; } 
+                else if(p.fis > 0) { p.fis--; }
+                p[field]++;
+            } else {
+                if(p[field] > 0) {
+                    p[field]--;
+                    // Quando tolgo una vendita, restituisco al bar
+                    p.q++;
+                }
+            }
+        }
         else if(field === 'fis') p.fis = Math.max(0, p.fis + delta);
-        else if(field === 'c') p.c = Math.max(0, p.c + delta);
+        else if(field === 'c') {
+            const vecchioC = p.c;
+            p.c = Math.max(0, p.c + delta);
+            const diff = p.c - vecchioC;
+            p.fis = Math.max(0, p.fis + diff);
+        }
         else if(field === 'q') {
             if(delta > 0) { if(p.fis > 0) { p.q++; p.fis--; } } 
             else { if(p.q > 0) { p.q--; p.fis++; } }
         }
         update();
-    }
-
-    function changePrice(pId, type, val) {
-        const p = prodotti.find(x => x.id === pId);
-        if(p) { p[type] = parseFloat(val) || 0; update(); }
     }
 
     function openNumpad(id, title) {
@@ -259,11 +270,30 @@
             }
             const [field, pId] = currentInputId.split('-');
             const p = prodotti.find(x => x.id === pId);
-            if(field === 'q') {
+            
+            if(field === 'vPas' || field === 'vPen') {
+                let diff = val - p[field];
+                if(diff > 0) {
+                    // Sottrazione combinata Bar + Fisico
+                    for(let i=0; i<diff; i++) {
+                        if(p.q > 0) p.q--; else if(p.fis > 0) p.fis--;
+                    }
+                } else if(diff < 0) {
+                    // Restituzione al bar
+                    p.q += Math.abs(diff);
+                }
+                p[field] = val;
+            } else if(field === 'q') {
                 let diff = val - p.q;
                 if(diff > 0 && p.fis >= diff) { p.q = val; p.fis -= diff; } 
                 else if(diff < 0) { p.q = val; p.fis += Math.abs(diff); }
-            } else { p[field] = val; }
+            } else if(field === 'c') {
+                let diff = val - p.c;
+                p.c = val;
+                p.fis = Math.max(0, p.fis + diff);
+            } else { 
+                p[field] = val; 
+            }
             update();
         }
         document.getElementById('numpad-overlay').style.display = 'none';
@@ -312,7 +342,7 @@
                             <button class="step-btn" onclick="step('q-${p.id}', 1)">+</button>
                         </div>
                     </div>
-                    <div class="field"><label>CARICO DDT</label>
+                    <div class="field"><label>CARICO DDT (+FISICO)</label>
                         <div class="stepper-container">
                             <button class="step-btn" onclick="step('c-${p.id}', -1)">–</button>
                             <div class="numpad-trigger" onclick="openNumpad('c-${p.id}', 'DDT ${p.n}')"><span id="txt-c-${p.id}">${p.c}</span></div>
@@ -378,13 +408,17 @@
     }
 
     function chiudiGiornata() {
-        if(!confirm("Azzerare vendite e scaricare lo stock?")) return;
+        if(!confirm("Confermi chiusura sessione? Le vendite verranno azzerate e il magazzino aggiornato.")) return;
         prodotti.forEach(p => { 
-            let venduti = p.vPas + p.vPen;
-            p.q = Math.max(0, p.q - venduti);
-            p.fis += p.c; p.c = 0; p.vPas = 0; p.vPen = 0; 
+            // In questa versione, la sottrazione fisica avviene in tempo reale durante la vendita.
+            // Qui azzeriamo solo i contatori temporanei della sessione.
+            p.vPas = 0; 
+            p.vPen = 0; 
+            p.c = 0; 
         });
-        update(); init(); openTab('tab-vendite');
+        update(); 
+        init(); 
+        openTab('tab-vendite');
     }
     
     window.onload = init;
