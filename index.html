@@ -1,126 +1,765 @@
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NAV Bar Manager PRO - Magazzino Aggiornato</title>
+    <title>NAV Bar Manager PRO - Vesuvio Jet</title>
     <style>
         :root {
-            --primary: #2c3e50; --accent: #e67e22; --success: #27ae60;
-            --danger: #e74c3c; --warning: #f39c12; --pend: #2980b9; --bg: #f8f9fa;
+            --primary: #2c3e50;
+            --primary-light: #34495e;
+            --accent: #e67e22;
+            --accent-hover: #d35400;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --pend: #2980b9;
+            --bg: #f5f6fa;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --transition: all 0.2s ease;
         }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--primary); user-select: none; overflow-x: hidden; }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --border-color: #334155;
+            --input-bg: #0f172a;
+            --primary: #38bdf8;
+            --primary-light: #0284c7;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -1px rgba(0,0,0,0.2);
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); 
+            margin: 0; 
+            padding: 0; 
+            color: var(--text-color); 
+            user-select: none; 
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
         
-        .tabs { display: flex; background: var(--primary); position: sticky; top: 0; z-index: 100; overflow-x: auto; scrollbar-width: none; }
+        .app-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .app-logo {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .theme-toggle {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .tabs { 
+            display: flex; 
+            background: var(--card-bg); 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            overflow-x: auto; 
+            scrollbar-width: none; 
+            border-bottom: 2px solid var(--border-color);
+        }
         .tabs::-webkit-scrollbar { display: none; }
-        .tab-btn { flex: 1; padding: 15px 5px; color: white; border: none; background: none; font-weight: bold; font-size: 0.6rem; text-transform: uppercase; opacity: 0.6; min-width: 80px; }
-        .tab-btn.active { opacity: 1; border-bottom: 4px solid var(--accent); }
+        .tab-btn { 
+            flex: 1; 
+            padding: 14px 10px; 
+            color: var(--text-color); 
+            border: none; 
+            background: none; 
+            font-weight: 700; 
+            font-size: 0.65rem; 
+            text-transform: uppercase; 
+            opacity: 0.6; 
+            min-width: 90px; 
+            text-align: center; 
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .tab-btn.active { 
+            opacity: 1; 
+            color: var(--accent);
+            border-bottom: 4px solid var(--accent); 
+        }
         
-        .content { padding: 10px; padding-bottom: 220px; }
+        .content { padding: 12px; padding-bottom: 230px; max-width: 600px; margin: 0 auto; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
-        .mini-dash { background: white; padding: 15px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        /* Dashboard */
+        .mini-dash { 
+            background: var(--card-bg); 
+            padding: 16px; 
+            border-radius: 16px; 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            margin-bottom: 16px; 
+            box-shadow: var(--shadow); 
+            border: 1px solid var(--border-color);
+        }
         .stat { text-align: center; }
-        .stat span { font-size: 0.65rem; color: #7f8c8d; display: block; text-transform: uppercase; }
-        .stat b { font-size: 1rem; }
-        .stat.highlight b { color: var(--success); font-size: 1.3rem; }
+        .stat span { font-size: 0.65rem; color: #7f8c8d; display: block; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; }
+        .stat b { font-size: 1.1rem; color: var(--text-color); }
+        .stat.highlight b { color: var(--success); font-size: 1.5rem; }
         
-        .product-card { background: white; margin-bottom: 10px; border-radius: 12px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid var(--accent); }
-        .prod-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .prod-name { font-weight: bold; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
+        /* Product Cards */
+        .product-card { 
+            background: var(--card-bg); 
+            margin-bottom: 12px; 
+            border-radius: 16px; 
+            padding: 14px; 
+            box-shadow: var(--shadow); 
+            border-left: 5px solid var(--accent); 
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        .prod-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .prod-name { font-weight: bold; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 65%; }
         
-        .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .field { display: flex; flex-direction: column; gap: 4px; }
-        .field label { font-size: 0.55rem; font-weight: bold; color: #95a5a6; text-transform: uppercase; text-align: center; }
+        .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .field { display: flex; flex-direction: column; gap: 6px; }
+        .field label { font-size: 0.6rem; font-weight: 800; color: #8a99ad; text-transform: uppercase; text-align: center; }
         
         .stepper-container {
-            display: flex; align-items: center; background: #f1f2f6; border-radius: 8px; 
-            border: 1px solid #ddd; overflow: hidden; height: 45px;
+            display: flex; align-items: center; background: var(--input-bg); border-radius: 10px; 
+            border: 1px solid var(--border-color); overflow: hidden; height: 46px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
         .step-btn {
-            width: 35px; height: 100%; border: none; background: #e0e0e0;
-            font-size: 1.2rem; font-weight: bold; color: var(--primary);
+            width: 40px; height: 100%; border: none; background: rgba(0,0,0,0.03);
+            font-size: 1.3rem; font-weight: bold; color: var(--text-color);
             cursor: pointer; touch-action: manipulation;
+            transition: background 0.1s;
         }
-        .step-btn:active { background: #ccc; }
+        .step-btn:active { background: rgba(0,0,0,0.1); }
         
         .numpad-trigger { 
             flex: 1; height: 100%; display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; font-weight: bold; color: var(--primary); 
-            background: transparent; border: none; outline: none;
+            font-size: 1.15rem; font-weight: bold; color: var(--text-color); 
+            background: transparent; border: none; outline: none; cursor: pointer;
         }
 
-        .info-row { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; display: flex; justify-content: space-between; font-size: 0.7rem; color: #7f8c8d; }
+        .info-row { 
+            margin-top: 10px; 
+            padding-top: 8px; 
+            border-top: 1px dashed var(--border-color); 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 0.7rem; 
+            color: #7f8c8d; 
+        }
         
+        /* Keyboard Overlay */
         #numpad-overlay { 
             position: fixed; bottom: 0; left: 0; width: 100%; background: #d1d4d9; 
-            z-index: 1000; display: none; padding: 12px; box-sizing: border-box;
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.3); border-radius: 24px 24px 0 0;
+            z-index: 2500; display: none; padding: 16px; box-sizing: border-box;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.25); border-radius: 28px 28px 0 0;
+            transition: transform 0.2s ease;
         }
-        .numpad-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: white; padding: 12px; border-radius: 12px; }
-        .numpad-header b { font-size: 1.6rem; color: var(--primary); }
+        body[data-theme="dark"] #numpad-overlay {
+            background: #1e293b;
+        }
+        .numpad-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 12px; 
+            background: var(--card-bg); 
+            padding: 14px; 
+            border-radius: 16px; 
+            border: 1px solid var(--border-color);
+        }
+        .numpad-header b { font-size: 1.6rem; color: var(--text-color); }
         .numpad-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .num-btn { 
-            background: white; border: none; padding: 18px 0; border-radius: 12px; 
-            font-size: 1.3rem; font-weight: bold; box-shadow: 0 3px 0 #abb1b8;
+            background: var(--card-bg); border: none; padding: 16px 0; border-radius: 14px; 
+            font-size: 1.4rem; font-weight: bold; color: var(--text-color);
+            box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: transform 0.05s, box-shadow 0.05s;
         }
-        .num-btn:active { transform: translateY(2px); box-shadow: none; }
-        .num-btn.math { background: #f39c12; color: white; }
+        .num-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.1); }
+        .num-btn.math { background: var(--warning); color: white; }
         .num-btn.close { background: var(--success); color: white; grid-column: span 2; }
         .num-btn.clear { background: var(--danger); color: white; }
+        .num-btn.dot { background: #95a5a6; color: white; }
 
-        .bottom-actions { position: fixed; bottom: 0; width: 100%; background: white; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 200; }
-        .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; color: white; font-size: 0.85rem; text-align: center; }
+        /* Actions Fixed */
+        .bottom-actions { 
+            position: fixed; 
+            bottom: 0; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%; 
+            max-width: 600px;
+            background: var(--card-bg); 
+            padding: 12px 16px; 
+            box-sizing: border-box; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08); 
+            z-index: 200; 
+            border-top: 1px solid var(--border-color);
+            border-radius: 16px 16px 0 0;
+        }
+        .btn { 
+            flex: 1; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            color: white; 
+            font-size: 0.9rem; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: var(--transition);
+        }
+        .btn:active { transform: scale(0.98); }
         .btn-success { background: var(--success); }
-        .btn-neutral { background: var(--primary); }
+        .btn-neutral { background: var(--primary-light); }
         .btn-danger { background: var(--danger); }
-        .btn-wa { background: #25D366; color: white; }
+        .btn-wa { background: #25D366; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; }
         
-        .search-bar { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; margin-bottom: 10px; font-size: 1rem; }
-        .price-input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-weight: bold; box-sizing: border-box; }
-        .price-edit-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #fdfdfd; padding: 10px; border-radius: 8px; border: 1px solid #eee; margin-top: 5px; }
+        .search-container { position: relative; margin-bottom: 12px; }
+        .search-bar { 
+            width: 100%; 
+            padding: 14px 14px 14px 40px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border-color); 
+            box-sizing: border-box; 
+            font-size: 1rem; 
+            background: var(--card-bg);
+            color: var(--text-color);
+            outline: none;
+            transition: var(--transition);
+        }
+        .search-bar:focus { border-color: var(--accent); }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #7f8c8d; }
+        
+        .price-input { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            text-align: center; 
+            font-weight: bold; 
+            box-sizing: border-box; 
+            background: var(--input-bg);
+            color: var(--text-color);
+        }
+        .price-edit-row { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            background: var(--input-bg); 
+            padding: 12px; 
+            border-radius: 10px; 
+            border: 1px solid var(--border-color); 
+            margin-top: 8px; 
+        }
+        
+        .badge { padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.72rem; }
+        .badge-danger { background: #fde8e8; color: var(--danger); }
+        body[data-theme="dark"] .badge-danger { background: #7f1d1d; color: #fca5a5; }
+        .badge-success { background: #eafaf1; color: var(--success); }
+        body[data-theme="dark"] .badge-success { background: #14532d; color: #86efac; }
+        .badge-neutral { background: var(--input-bg); color: #7f8c8d; }
+        
+        .inv-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 8px 0; 
+            font-size: 0.78rem; 
+            border-bottom: 1px dashed var(--border-color); 
+        }
+        
+        /* Notes Box */
+        .notes-container {
+            background: #fffde7; 
+            border: 1px dashed #f39c12; 
+            border-radius: 12px; 
+            padding: 12px; 
+            margin-bottom: 15px; 
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            transition: var(--transition);
+        }
+        body[data-theme="dark"] .notes-container {
+            background: #2d261e;
+            border-color: var(--accent);
+            color: #f1f5f9;
+        }
+        .notes-edit-btn {
+            float: right;
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .notes-input-area {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 8px;
+            padding: 6px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            margin-top: 6px;
+            display: none;
+            box-sizing: border-box;
+        }
+        
+        /* Register & Inventory Dashboards */
+        .registro-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: var(--card-bg); 
+            border-radius: 10px; 
+            overflow: hidden; 
+            font-size: 0.78rem; 
+            margin-top: 10px; 
+            box-shadow: var(--shadow); 
+        }
+        .registro-table th, .registro-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .registro-table th { background: var(--primary-light); color: white; font-weight: bold; font-size: 0.7rem; text-transform: uppercase; }
+        .registro-table tr:last-child td { border-bottom: none; }
+        
+        .registro-dash { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        .reg-card { 
+            background: var(--card-bg); 
+            padding: 12px 6px; 
+            border-radius: 12px; 
+            text-align: center; 
+            box-shadow: var(--shadow); 
+            border: 1px solid var(--border-color);
+        }
+        .reg-card span { font-size: 0.58rem; color: #7f8c8d; display: block; text-transform: uppercase; margin-bottom: 4px; font-weight: bold; }
+        .reg-card b { font-size: 0.9rem; }
+
+        /* Modals and Toasts */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            backdrop-filter: blur(4px);
+        }
+        .modal-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            animation: modalScale 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalScale {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-title { font-size: 1.1rem; font-weight: bold; color: var(--text-color); margin-bottom: 12px; }
+        .modal-body { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 20px; line-height: 1.4; }
+        .modal-buttons { display: flex; gap: 10px; justify-content: center; }
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+        .modal-btn-ok { background: var(--accent); color: white; }
+        .modal-btn-cancel { background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); }
+        .modal-btn-confirm { background: var(--danger); color: white; }
+
+        .toast-box {
+            position: fixed;
+            top: 20px; left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--primary-light);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 3500;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toast-box.show { transform: translateX(-50%) translateY(0); }
+
+        /* Stili per importazione AI */
+        .ai-import-preview {
+            max-height: 250px;
+            overflow-y: auto;
+            margin: 15px 0;
+            text-align: left;
+            background: var(--input-bg);
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px dashed var(--border-color);
+        }
+        .ai-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+        .ai-item-row:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
 
+<!-- Header con Logo e Dark Mode Toggle -->
+<div class="app-header">
+    <div class="app-logo">
+        🛳️ <span>Vesuvio Jet</span> <small style="font-size:0.65rem; color:#7f8c8d;">PRO BAR MANAGER</small>
+    </div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambia Tema">🌓</button>
+</div>
+
+<!-- Tabs principali di navigazione -->
 <div class="tabs">
     <button class="tab-btn active" id="btn-vendite" onclick="openTab('tab-vendite')">💰 VENDITE</button>
-    <button class="tab-btn" id="btn-magazzino" onclick="openTab('tab-magazzino')">📦 STOCK</button>
+    <button class="tab-btn" id="btn-magazzino" onclick="openTab('tab-magazzino')">📦 STOCK / CARICO</button>
     <button class="tab-btn" id="btn-prezzi" onclick="openTab('tab-prezzi')">🏷️ LISTINO</button>
-    <button class="tab-btn" id="btn-report" onclick="openTab('tab-report')">📊 REPORT</button>
+    <button class="tab-btn" id="btn-report" onclick="openTab('tab-report')">📊 INVENTARIO FISICO</button>
+    <button class="tab-btn" id="btn-registro" onclick="openTab('tab-registro')">📁 REGISTRO CASSA</button>
 </div>
 
 <div class="content">
+    <!-- Statistiche Dashboard in evidenza -->
     <div class="mini-dash">
         <div class="stat highlight" style="grid-column: span 2;">
-            <span>Incasso Netto</span>
+            <span>Incasso di Oggi (Turno Corrente)</span>
             <b id="m-netto">€ 0.00</b>
         </div>
-        <div class="stat"><span>Pass.</span><b id="count-pas">0</b></div>
-        <div class="stat"><span>Pend.</span><b id="count-pen" style="color:var(--pend)">0</b></div>
+        <div class="stat"><span>Pass. Oggi</span><b id="count-pas">0</b></div>
+        <div class="stat"><span>Pend. Oggi</span><b id="count-pen" style="color:var(--pend)">0</b></div>
     </div>
 
-    <input type="text" id="search" class="search-bar" placeholder="Cerca prodotto..." onkeyup="filterProducts()">
+    <!-- Note Aggiuntive Mezzo Modificabili -->
+    <div class="notes-container" id="notesBox">
+        <button class="notes-edit-btn" onclick="toggleEditNotes()">MODIFICA ✏️</button>
+        📌 <b style="color: var(--accent);">NOTE AGGIUNTIVE MEZZO:</b> 
+        <span id="notesLabelText">Ginseng M • Deca 10</span>
+        <textarea id="notesInput" class="notes-input-area" rows="2" placeholder="Scrivi note mezzo qui..."></textarea>
+    </div>
 
+    <!-- Barra di Ricerca Prodotto -->
+    <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" class="search-bar" placeholder="Cerca prodotto...">
+    </div>
+
+    <!-- SCHEDA: VENDITE -->
     <div id="tab-vendite" class="tab-content active"></div>
+    
+    <!-- SCHEDA: STOCK / CARICO -->
     <div id="tab-magazzino" class="tab-content"></div>
+    
+    <!-- SCHEDA: LISTINO PREZZI -->
     <div id="tab-prezzi" class="tab-content"></div>
+    
+    <!-- SCHEDA: INVENTARIO & CASSA GIORNALIERA -->
     <div id="tab-report" class="tab-content">
-        <div style="background:white; padding:15px; border-radius:12px;">
-            <h3 style="margin:0 0 10px 0">Riepilogo Sessione</h3>
+        <!-- QUADRATURA CASSA REALE -->
+        <div style="background:var(--card-bg); padding:16px; border-radius:16px; margin-bottom: 16px; box-shadow: var(--shadow); border: 1px solid var(--border-color);">
+            <h3 style="margin:0 0 12px 0; font-size:1.1rem; border-bottom:2px solid var(--border-color); padding-bottom:6px; color: var(--accent);">💰 QUADRATURA CASSA SU INVENTARIO</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                <div class="field">
+                    <label>Valore Merce Consumata (Teorico)</label>
+                    <div style="background:var(--input-bg); height:46px; display:flex; align-items:center; justify-content:center; font-weight:bold; border-radius:10px; border:1px solid var(--border-color); color: var(--primary);" id="cassa-teorica">€ 0.00</div>
+                </div>
+                <div class="field">
+                    <label style="color:var(--accent)">Soldi Incassati Realmente</label>
+                    <div class="stepper-container" style="border-color:var(--accent); background:rgba(230, 126, 34, 0.05)">
+                        <div class="numpad-trigger" onclick="openNumpad('cassa-reale-global', 'Incasso Reale €', true)"><span id="txt-cassa-reale" style="color:var(--accent); font-size:1.25rem;">0.00</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- BADGE PERDITA / PLUS RISPETTO AI PEZZI CONSUMATI -->
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:14px; border-radius:12px; margin-bottom: 12px;" id="box-discrepanza-cassa">
+                <span id="label-discrepanza-cassa" style="font-weight: bold; font-size: 0.9rem;">Stato Cassa:</span>
+                <b id="val-discrepanza-cassa" style="font-size:1.25rem;">€ 0.00</b>
+            </div>
+            
+            <button class="btn btn-success" style="width:100%; font-size:1rem; padding:14px;" onclick="richiediChiusuraCassaGiornaliera()">💾 CHIUDI CASSA E SALVA NEL REGISTRO</button>
+            <p style="text-align:center; font-size:0.7rem; color:#7f8c8d; margin-top:6px; margin-bottom:0;">
+                Archivia l'incasso e calcola la quadratura rispetto alle merci mancanti. Le giacenze fisiche attese continueranno ad accumularsi per l'inventario generale.
+            </p>
+        </div>
+
+        <!-- VERIFICA INVENTARIO FISICO -->
+        <div style="background:var(--card-bg); padding:16px; border-radius:16px; box-shadow: var(--shadow); border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom:2px solid var(--border-color); padding-bottom:6px; margin-bottom:12px;">
+                <h3 style="margin:0; font-size:1.1rem; color: var(--accent);">📋 INVENTARIO FISICO DI PERIODO</h3>
+                <span class="badge badge-neutral" style="font-size:0.6rem;">CICLO ATTIVO</span>
+            </div>
+            
+            <!-- CRUSCOTTO VALORE ECONOMICO DELLE DISCREPANZE -->
+            <div style="background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div class="stat" style="border-right: 1px solid var(--border-color);">
+                    <span>Valore Merci Attese</span>
+                    <b id="valore-inventario-atteso">€ 0.00</b>
+                </div>
+                <div class="stat">
+                    <span>Valore Merci Reali (Fisico)</span>
+                    <b id="valore-inventario-reale">€ 0.00</b>
+                </div>
+                <div class="stat highlight" style="grid-column: span 2; padding-top: 8px; border-top: 1px dashed var(--border-color); text-align: center;">
+                    <span id="label-diff-economica">Valore Merce Consumata (Teorico)</span>
+                    <b id="valore-differenza-economica">€ 0.00</b>
+                </div>
+            </div>
+
+            <p style="font-size:0.75rem; color:#7f8c8d; margin-bottom:15px; line-height:1.4;">
+                Qui puoi confrontare la <b>Giacenza Iniziale</b> di inizio periodo + i <b>Carichi</b> con il totale di <b>tutte le vendite accumulate</b> finora. Inserisci il conteggio fisico reale di bordo per rilevare eventuali ammanchi complessivi in pezzi e valore economico.
+            </p>
+            
             <div id="report-items"></div>
-            <button class="btn btn-danger" style="width:100%; margin-top:20px" onclick="chiudiGiornata()">CHIUDI SESSIONE E AZZERA</button>
+            
+            <!-- PULSANTI OPERATIVI INVENTARIO -->
+            <div style="background: var(--input-bg); padding: 12px; border: 1px dashed var(--border-color); border-radius: 12px; margin-top: 20px; text-align: center;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.85rem; color: var(--accent);">📄 SCARICA IL REQUISITO DI CONTEGGIO</h4>
+                <p style="font-size:0.7rem; color:#7f8c8d; margin: 0 0 10px 0;">
+                    Se ti hanno chiesto di contare il fisico, scarica questo foglio completo incolonnato per inviarlo o consegnarlo al controllo di bordo.
+                </p>
+                <button class="btn btn-neutral" style="width:100%; font-size:0.85rem; padding:12px; background:var(--pend); box-shadow: 0 4px 6px rgba(41, 128, 185, 0.2);" onclick="scaricaReportInventarioText()">📥 SCARICA FOGLIO INVENTARIO (.TXT)</button>
+            </div>
+
+            <button class="btn btn-danger" style="width:100%; margin-top:20px; font-size:1rem; padding:16px; box-shadow:0 4px 6px rgba(231, 76, 60, 0.2);" onclick="richiediConsolidamentoInventario()">🔒 CONSOLIDA INVENTARIO E RIPARTI</button>
+            <p style="text-align:center; font-size:0.7rem; color:#7f8c8d; margin-top:6px; margin-bottom:0;">
+                <b>Attenzione:</b> Questa operazione imposta il conteggio fisico inserito sopra como la NUOVA Giacenza Iniziale del prossimo periodo, azzerando le vendite e i carichi accumulati finora.
+            </p>
+        </div>
+    </div>
+    
+    <!-- SCHEDA: REGISTRO GENERALE E STORICO ACCUMULATO -->
+    <div id="tab-registro" class="tab-content">
+        <!-- CRUSCOTTO ACCUMULATORI RIORGANIZZATO PER MOSTRARE STORICO + TURNO ATTIVO -->
+        <h4 style="margin: 0 0 8px 0; font-size:0.8rem; text-transform:uppercase; color: #7f8c8d;">📈 RIEPILOGO GENERALE CASSA</h4>
+        <div class="registro-dash">
+            <div class="reg-card" style="border-bottom: 4px solid var(--primary-light);">
+                <span>Totale Teorico</span>
+                <b id="tot-teorico-accumulato" style="color: var(--text-color);">€ 0.00</b>
+                <small id="tot-teorico-dettagli" style="display:block; font-size:0.55rem; color:#888; margin-top:2px;">(Storico: €0 + Turno: €0)</small>
+            </div>
+            <div class="reg-card" style="border-bottom: 4px solid var(--success);">
+                <span>Totale Reale</span>
+                <b id="tot-reale-accumulato" style="color: var(--success);">€ 0.00</b>
+                <small id="tot-reale-dettagli" style="display:block; font-size:0.55rem; color:#888; margin-top:2px;">(Storico: €0 + Turno: €0)</small>
+            </div>
+            <div class="reg-card" style="border-bottom: 4px solid var(--danger);" id="card-diff-accumulata">
+                <span>Differenza Tot.</span>
+                <b id="tot-differenza-accumulata">€ 0.00</b>
+                <small id="tot-diff-dettagli" style="display:block; font-size:0.55rem; color:#888; margin-top:2px;">(Storico: €0 + Turno: €0)</small>
+            </div>
+        </div>
+        
+        <!-- TABELLA DI REGISTRO -->
+        <div style="background:var(--card-bg); padding:14px; border-radius:16px; box-shadow: var(--shadow); border: 1px solid var(--border-color); margin-bottom: 16px;">
+            <h3 style="margin:0 0 10px 0; font-size:1rem;">📋 CRONOLOGIA CHIUSURE DI CASSA</h3>
+            
+            <div style="overflow-x: auto;">
+                <table class="registro-table">
+                    <thead>
+                        <tr>
+                            <th>Data/Ora</th>
+                            <th>Teorico</th>
+                            <th>Reale</th>
+                            <th>Diff. Cassa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="registro-rows">
+                        <!-- Righe popolate via JS -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button class="btn btn-neutral" style="font-size: 0.8rem;" onclick="esportaCSV()">📥 ESPORTA CSV</button>
+                <button class="btn btn-danger" style="font-size: 0.8rem; background: #c0392b;" onclick="richiediAzzeraRegistro()">🗑️ AZZERA REGISTRO</button>
+            </div>
+        </div>
+
+        <!-- NUOVO BLOCCO: CARICA E SCARICA BACKUP JSON -->
+        <div style="background:var(--card-bg); padding:16px; border-radius:16px; box-shadow: var(--shadow); border: 1px solid var(--border-color);">
+            <h3 style="margin:0 0 4px 0; font-size:1rem; color: var(--accent); display: flex; align-items: center; gap: 6px;">
+                💾 GESTIONE BACKUP COMPLETO (JSON)
+            </h3>
+            <p style="font-size:0.75rem; color:#7f8c8d; margin-bottom:12px; line-height:1.4;">
+                Consente di salvare o trasferire tutto il lavoro (compreso lo storico delle casse, listino e giacenze) in un file portabile. Utile per il passaggio di consegne al collega.
+            </p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button class="btn btn-neutral" style="font-size: 0.8rem; background: #8e44ad; padding: 12px;" onclick="scaricaJSONBackup()">📤 SCARICA BACKUP</button>
+                <button class="btn btn-neutral" style="font-size: 0.8rem; background: #2980b9; padding: 12px;" onclick="triggerCaricaJSON()">📥 CARICA BACKUP</button>
+            </div>
+            <input type="file" id="importJsonInput" style="display:none" accept=".json" onchange="completaCaricaJSON(event)">
         </div>
     </div>
 </div>
 
-<div id="numpad-overlay">
-    <div class="numpad-header">
-        <span id="numpad-title" style="padding-left:10px; color:#7f8c8d">Valore</span>
-        <b id="numpad-display" style="padding-right:15px">0</b>
+<!-- MODALE DEDICATO: INSERIMENTO CARICO DDT - SPLITTATO BAR E DEPOSITO -->
+<div class="modal-overlay" id="ddtModal">
+    <div class="modal-card">
+        <div class="modal-title" style="color: var(--accent);">➕ Registra Carico DDT</div>
+        <div class="modal-body" style="text-align: left;">
+            <p id="ddtModalProdName" style="font-weight: bold; margin-bottom: 12px; font-size: 1rem; text-align: center; background: var(--input-bg); padding: 8px; border-radius: 8px;"></p>
+            
+            <div class="field" style="margin-bottom: 14px;">
+                <label style="text-align: left; margin-bottom: 4px;">Numero DDT o Fattura</label>
+                <input type="text" id="ddtModalNum" class="price-input" placeholder="Es. DDT-1025" style="text-align: left; padding: 10px;">
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+                <div class="field">
+                    <label style="text-align: center; margin-bottom: 4px; color: var(--accent);">☕ Quantità al BAR</label>
+                    <div class="stepper-container" style="border-color: var(--accent); background: rgba(230, 126, 34, 0.03);">
+                        <div class="numpad-trigger" onclick="openNumpad('ddt-qta-bar', 'Quantità al Bar')">
+                            <span id="txt-ddt-qta-bar-display" style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label style="text-align: center; margin-bottom: 4px; color: var(--primary-light);">🚚 Quantità DEPOSITO</label>
+                    <div class="stepper-container" style="border-color: var(--primary-light); background: var(--input-bg);">
+                        <div class="numpad-trigger" onclick="openNumpad('ddt-qta-dep', 'Quantità Deposito')">
+                            <span id="txt-ddt-qta-dep-display" style="font-size: 1.2rem; font-weight: bold; color: var(--primary-light);">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: var(--input-bg); border-radius: 8px; padding: 10px; text-align: center; border: 1px dashed var(--border-color); font-weight: bold;">
+                Totale Carico DDT: <span id="txt-ddt-tot-display" style="color: var(--success); font-size: 1.1rem;">0</span> pz
+            </div>
+        </div>
+        <div class="modal-buttons" style="margin-top: 15px;">
+            <button class="modal-btn modal-btn-cancel" onclick="closeDdtModal()">Annulla</button>
+            <button class="modal-btn modal-btn-ok" onclick="salvaNuovoDdt()">Registra Carico</button>
+        </div>
     </div>
-    <div class="numpad-grid">
+</div>
+
+<!-- MODALE DEDICATO: IMPORTAZIONE DDT TRAMITE FOTO CON INTEGRAZIONE AI (GEMINI) -->
+<div class="modal-overlay" id="aiDdtModal">
+    <div class="modal-card" style="max-width: 500px;">
+        <div class="modal-title" style="color: var(--success); display: flex; align-items: center; justify-content: center; gap: 8px;">
+            📸 Importa DDT da Foto
+        </div>
+        <div class="modal-body" style="text-align: left;">
+            <p style="font-size:0.8rem; line-height:1.4; color:#7f8c8d;">
+                Scatta o carica la foto del documento di trasporto merci. L'intelligenza artificiale estrarrà le righe di testo (es. <b>3X24 COCA</b>) e le assocerà automaticamente al listino.
+            </p>
+            
+            <div class="field" style="margin-bottom: 14px;">
+                <label style="text-align: left; margin-bottom: 4px;">Numero DDT rilevato o digitato</label>
+                <input type="text" id="aiDdtNum" class="price-input" placeholder="Es. TRASFERIMENTO-01" style="text-align: left; padding: 10px;">
+            </div>
+
+            <div style="margin-bottom: 14px; text-align: center;">
+                <input type="file" id="aiFileInput" accept="image/*" style="display: none;" onchange="handleAiFileSelect(event)">
+                <button class="btn btn-neutral" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--accent);" onclick="document.getElementById('aiFileInput').click()">
+                    📷 SELEZIONA O SCATTA FOTO
+                </button>
+                <div id="aiFileNameDisplay" style="font-size: 0.72rem; color: var(--success); margin-top: 6px; font-weight: bold;"></div>
+            </div>
+
+            <div id="aiLoadingIndicator" style="display: none; text-align: center; padding: 20px; background: var(--input-bg); border-radius: 12px; margin-top: 10px;">
+                <span style="font-size: 1.4rem;">⚙️</span>
+                <p style="font-weight: bold; margin: 8px 0 2px 0; color: var(--accent);">Rilevamento prodotti in corso...</p>
+                <span style="font-size: 0.7rem; color: #888;">L'intelligenza artificiale di Gemini sta decifrando la foto.</span>
+            </div>
+
+            <!-- Anteprima di associazione dei prodotti trovati -->
+            <div id="aiImportPreviewBox" style="display: none;">
+                <h4 style="margin: 0 0 6px 0; font-size: 0.8rem; text-transform: uppercase; color: var(--accent);">Articoli decifrati ed associati:</h4>
+                <div class="ai-import-preview" id="aiImportPreviewList">
+                    <!-- Popolato dinamicamente -->
+                </div>
+                <p style="font-size:0.65rem; color:#7f8c8d; text-align:center;">
+                    Puoi modificare le quantità o lo smistamento di ciascun prodotto prima di cliccare su conferma.
+                </p>
+            </div>
+        </div>
+        <div class="modal-buttons" style="margin-top: 15px;">
+            <button class="modal-btn modal-btn-cancel" onclick="closeAiDdtModal()">Chiudi</button>
+            <button class="modal-btn modal-btn-ok" id="aiConfirmBtn" style="background: var(--success); display: none;" onclick="salvaCarichiDdtImportati()">Importa Carichi</button>
+        </div>
+    </div>
+</div>
+
+<!-- KEYBOARD NUMPAD CUSTOM OVERLAY -->
+<div id="numpad-overlay">
+    <div class="numpad-header" style="flex-direction: column; align-items: stretch; gap: 4px; border: 1px solid var(--border-color); border-radius: 16px; padding: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #7f8c8d; font-weight: bold;">
+            <span id="numpad-title">Valore</span>
+            <span id="numpad-expression" style="color: var(--accent); font-size: 0.9rem; letter-spacing: 0.5px;"></span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+            <!-- Bottone scorciatoia rapida per cartoni e colli interi, visibili solo per le quantità -->
+            <div style="display: flex; gap: 6px;" id="numpad-shortcuts">
+                <button class="btn" style="padding: 6px 10px; font-size: 0.72rem; background: var(--primary-light); color: white; border-radius: 8px; font-weight: bold;" onclick="addShortcutVal(6)">+6</button>
+                <button class="btn" style="padding: 6px 10px; font-size: 0.72rem; background: var(--primary-light); color: white; border-radius: 8px; font-weight: bold;" onclick="addShortcutVal(12)">+12</button>
+                <button class="btn" style="padding: 6px 10px; font-size: 0.72rem; background: var(--primary-light); color: white; border-radius: 8px; font-weight: bold;" onclick="addShortcutVal(24)">+24</button>
+            </div>
+            <b id="numpad-display" style="font-size: 1.9rem; color: var(--text-color); font-weight: 800; letter-spacing: -0.5px;">0</b>
+        </div>
+    </div>
+    <div class="numpad-grid" style="margin-top: 12px;">
         <button class="num-btn" onclick="pressNum(1)">1</button>
         <button class="num-btn" onclick="pressNum(2)">2</button>
         <button class="num-btn" onclick="pressNum(3)">3</button>
@@ -133,18 +772,38 @@
         <button class="num-btn" onclick="pressNum(8)">8</button>
         <button class="num-btn" onclick="pressNum(9)">9</button>
         <button class="num-btn clear" onclick="pressClear()">C</button>
+        <button class="num-btn dot" onclick="pressDot()">.</button>
         <button class="num-btn" onclick="pressNum(0)">0</button>
         <button class="num-btn" onclick="pressDelete()">⌫</button>
         <button class="num-btn close" onclick="closeNumpad()">OK</button>
     </div>
 </div>
 
+<!-- FLOATING BOTTOM ACTIONS -->
 <div class="bottom-actions">
-    <button class="btn btn-wa" onclick="condividiWhatsApp()">📲 COPIA REPORT WHATSAPP</button>
+    <button class="btn btn-wa" onclick="condividiWhatsApp()">
+        <span>📲</span> COPIA REPORT GENERALE WHATSAPP
+    </button>
     <div style="display:flex; gap:8px;">
         <button class="btn btn-neutral" onclick="openTab('tab-vendite')">TORNA VENDITE</button>
-        <button class="btn btn-success" onclick="openTab('tab-report')">REPORT</button>
+        <button class="btn btn-success" onclick="openTab('tab-report')">INVENTARIO & CASSA</button>
     </div>
+</div>
+
+<!-- CUSTOM ALERTS / CONFIRMS / MODALS -->
+<div class="modal-overlay" id="customModal">
+    <div class="modal-card">
+        <div class="modal-title" id="customModalTitle">Attenzione</div>
+        <div class="modal-body" id="customModalBody">Messaggio del modale</div>
+        <div class="modal-buttons" id="customModalButtons">
+            <!-- Populated via JS -->
+        </div>
+    </div>
+</div>
+
+<!-- TOAST NOTIFICATION POPUP -->
+<div class="toast-box" id="toastNotification">
+    <span id="toastIcon">✨</span> <span id="toastMessage">Operazione riuscita!</span>
 </div>
 
 <script>
@@ -152,57 +811,577 @@
     let currentOp = null;
     let firstVal = null;
     let isResetting = false;
-
-    // Chiave DB aggiornata per i nuovi dati di magazzino
-    const DB_KEY = 'barData_v6_final_stock';
+    let decimalMode = false;
+    let activeDdtProductId = null; // ID del prodotto durante l'aggiunta DDT
     
-    // fis: Magazzino Fisico, q: Disponibile Bar
+    let numpadExpression = "";
+    let numpadCurrentVal = "0";
+    
+    // Contatori temporanei separati per la gestione DDT splittata
+    let tempDdtBar = 0;
+    let tempDdtDep = 0;
+
+    // Struttura dati per DDT rilevato da AI
+    let ddtRilevatoProdotti = [];
+
+    // Database Keys
+    const DB_KEY = 'barData_v11_vesuvio_jet';
+    const HIST_KEY = 'barData_v11_history_logs';
+    const NOTES_KEY = 'barData_v11_notes_mezzo';
+    const THEME_KEY = 'barData_v11_theme';
+    
+    // I dati reali estratti interamente dalle FOTO REALI caricate
     const defaultData = [
-        {id:'acq', n:"Acqua", i:"💧", p:2, pen:1, q:75, c:0, vPas:0, vPen:0, fis:120}, // 5x24
-        {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1, q:26, c:0, vPas:0, vPen:0, fis:0},
-        {id:'bp', n:"Borse Piccole", i:"👜", p:6, pen:5, q:28, c:0, vPas:0, vPen:0, fis:120}, // 30x4
-        {id:'bg', n:"Borse Grandi", i:"👜", p:10, pen:10, q:16, c:0, vPas:0, vPen:0, fis:0},
-        {id:'bue', n:"Bueno/B-Ready/Biscuits", i:"🍫", p:3, pen:1, q:37, c:0, vPas:0, vPen:0, fis:0},
-        {id:'cap', n:"Cappelli", i:"🧢", p:5, pen:5, q:45, c:0, vPas:0, vPen:0, fis:0},
-        {id:'car', n:"Caramelle / Gomme", i:"🍬", p:2.5, pen:1, q:68, c:0, vPas:0, vPen:0, fis:0},
-        {id:'cia', n:"Cialde", i:"☕", p:2, pen:1, q:278, c:0, vPas:0, vPen:0, fis:150}, // Caffè 150
-        {id:'kin', n:"Kinder Cards", i:"🃏", p:2.5, pen:1.5, q:6, c:0, vPas:0, vPen:0, fis:0},
-        {id:'die', n:"Dietor", i:"🍬", p:0, pen:0, q:40, c:0, vPas:0, vPen:0, fis:0},
-        {id:'fit', n:"Fitness / Cereal Yo", i:"🌾", p:2.5, pen:1, q:11, c:0, vPas:0, vPen:0, fis:0},
-        {id:'fon', n:"Fonzies / Patatine", i:"🍟", p:2.5, pen:1, q:46, c:0, vPas:0, vPen:0, fis:50}, // 50
-        {id:'imp', n:"Impermeabili", i:"🧥", p:3.5, pen:1, q:21, c:0, vPas:0, vPen:0, fis:0},
-        {id:'lat', n:"Latte", i:"🥛", p:0.5, pen:0.5, q:3, c:0, vPas:0, vPen:0, fis:0},
-        {id:'ltn', n:"Lattine", i:"🥤", p:2.5, pen:1.5, q:191, c:0, vPas:0, vPen:0, fis:102}, // 3x34
-        {id:'mag', n:"Maglie", i:"👕", p:5, pen:5, q:45, c:0, vPas:0, vPen:0, fis:0},
-        {id:'mik', n:"Mikado", i:"🥖", p:3, pen:1, q:18, c:0, vPas:0, vPen:0, fis:0},
-        {id:'muf', n:"Muffin", i:"🧁", p:3, pen:1, q:17, c:0, vPas:0, vPen:0, fis:0},
-        {id:'nik', n:"Nik Nok", i:"🥜", p:2.5, pen:1, q:39, c:0, vPas:0, vPen:0, fis:0},
-        {id:'pav', n:"Pavesini", i:"🍪", p:2.5, pen:1, q:20, c:0, vPas:0, vPen:0, fis:0},
-        {id:'per', n:"Peroni", i:"🍺", p:4.5, pen:1.5, q:53, c:0, vPas:0, vPen:0, fis:0},
-        {id:'pec', n:"Peroni Capri", i:"🍋", p:7.5, pen:5.5, q:31, c:0, vPas:0, vPen:0, fis:24}, // 24
-        {id:'pri', n:"Pringles", i:"🥔", p:3.5, pen:2, q:73, c:0, vPas:0, vPen:0, fis:0},
-        {id:'vin', n:"Prosecco / Vino", i:"🍷", p:6, pen:3, q:63, c:0, vPas:0, vPen:0, fis:0},
-        {id:'red', n:"Red Bull / Gatorade", i:"⚡", p:4.5, pen:2.5, q:47, c:0, vPas:0, vPen:0, fis:0},
-        {id:'rin', n:"Ringo / Oreo / Baiocchi", i:"🍪", p:2.5, pen:1, q:78, c:0, vPas:0, vPen:0, fis:0},
-        {id:'rit', n:"Ritz / Cipster", i:"🍪", p:2.5, pen:1, q:14, c:0, vPas:0, vPen:0, fis:0},
-        {id:'spr', n:"Spritz", i:"🍹", p:8, pen:5, q:16, c:0, vPas:0, vPen:0, fis:25}, // 25
-        {id:'suc', n:"Succo", i:"🧃", p:3.5, pen:2, q:13, c:0, vPas:0, vPen:0, fis:0},
-        {id:'the', n:"The Camomilla", i:"🍵", p:2.5, pen:1.5, q:42, c:0, vPas:0, vPen:0, fis:0},
-        {id:'tuc', n:"Tuc", i:"🍪", p:2.5, pen:1, q:11, c:0, vPas:0, vPen:0, fis:0},
-        {id:'twi', n:"Twix/KitKat/M&M...", i:"🍫", p:2.5, pen:1.5, q:33, c:0, vPas:0, vPen:0, fis:0}
+        {id:'acq', n:"Acqua", i:"💧", p:2.0, pen:1.0, inizio:219, q:123, c:120, ddts:[{numero:"294", qta:120, bar:0, dep:120}], vPas:0, vPen:0, accPas:0, accPen:0, fis:120, fisicoIn:243}, 
+        {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1.0, inizio:26, q:23, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:23}, 
+        {id:'bp', n:"Borse Piccole", i:"👜", p:6.0, pen:6.0, inizio:148, q:8, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:120, fisicoIn:128}, 
+        {id:'bg', n:"Borse Grandi", i:"👜", p:10.0, pen:10.0, inizio:16, q:15, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:15},
+        {id:'bue', n:"Bueno/B-Ready/Biscuits", i:"🍫", p:3.0, pen:1.0, inizio:30, q:32, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:32}, 
+        {id:'cap', n:"Cappelli", i:"🧢", p:5.0, pen:5.0, inizio:45, q:85, c:50, ddts:[{numero:"294", qta:50, bar:50, dep:0}], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:85},
+        {id:'car', n:"Caramelle / Gomme", i:"🍬", p:2.5, pen:1.0, inizio:68, q:59, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:59}, 
+        {id:'cia', n:"Cialde", i:"☕", p:2.0, pen:1.0, inizio:278, q:92, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:150, fisicoIn:242}, 
+        {id:'die', n:"Dietor", i:"🍬", p:0.0, pen:0.0, inizio:40, q:40, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:40},
+        {id:'fit', n:"Fitness / Cereal Yo", i:"🌾", p:2.5, pen:1.0, inizio:11, q:7, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:7},
+        {id:'fon', n:"Fonzies / Patatine", i:"🍟", p:2.5, pen:1.0, inizio:96, q:81, c:72, ddts:[{numero:"294", qta:72, bar:0, dep:72}], vPas:0, vPen:0, accPas:0, accPen:0, fis:50, fisicoIn:131}, 
+        {id:'imp', n:"Impermeabili", i:"🧥", p:3.5, pen:3.25, inizio:21, q:21, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:21},
+        {id:'kin', n:"Kinder Cards", i:"🃏", p:2.5, pen:1.5, inizio:6, q:5, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:5},
+        {id:'lat', n:"Latte", i:"🥛", p:0.5, pen:0.5, inizio:3, q:3, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:3},
+        {id:'ltn', n:"Lattine", i:"🥤", p:3.5, pen:1.5, inizio:263, q:145, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:72, fisicoIn:217}, 
+        {id:'mag', n:"Maglie", i:"👕", p:5.0, pen:5.0, inizio:45, q:42, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:42},
+        {id:'mik', n:"Mikado", i:"🥖", p:3.0, pen:1.5, inizio:18, q:14, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:14},
+        {id:'muf', n:"Muffin", i:"🧁", p:3.0, pen:1.0, inizio:17, q:13, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:13}, 
+        {id:'nik', n:"Nik Nok", i:"🥜", p:2.5, pen:1.0, inizio:39, q:39, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:39}, 
+        {id:'pav', n:"Pavesini", i:"🍪", p:2.5, pen:1.0, inizio:20, q:19, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:19}, 
+        {id:'per', n:"Peroni", i:"🍺", p:4.5, pen:1.5, inizio:77, q:101, c:120, ddts:[{numero:"294", qta:120, bar:0, dep:120}], vPas:0, vPen:0, accPas:0, accPen:0, fis:24, fisicoIn:125}, 
+        {id:'pec', n:"Peroni Capri", i:"🍋", p:7.5, pen:7.5, inizio:55, q:31, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:31}, 
+        {id:'pri', n:"Pringles", i:"🥔", p:3.5, pen:2.0, inizio:73, q:57, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:57}, 
+        {id:'vin', n:"Prosecco / Vino", i:"🍷", p:6.0, pen:3.0, inizio:63, q:49, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:49}, 
+        {id:'red', n:"Red Bull / Gatorade", i:"⚡", p:4.5, pen:2.5, inizio:37, q:42, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:42}, 
+        {id:'rin', n:"Ringo / Oreo / Baiocchi", i:"🍪", p:2.5, pen:1.0, inizio:78, q:72, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:72}, 
+        {id:'rit', n:"Ritz / Cipster", i:"🍪", p:4.5, pen:2.5, inizio:14, q:11, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:11},
+        {id:'spr', n:"Spritz", i:"🍹", p:8.0, pen:8.0, inizio:40, q:25, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:25}, 
+        {id:'suc', n:"Succo", i:"🧃", p:3.5, pen:1.0, inizio:13, q:13, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:13},
+        {id:'the', n:"The Camomilla", i:"🍵", p:2.5, pen:1.5, inizio:42, q:42, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:42},
+        {id:'tuc', n:"Tuc", i:"🍪", p:4.0, pen:2.0, inizio:11, q:8, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:8}, 
+        {id:'twi', n:"Twix/KitKat/M&M...", i:"🍫", p:2.5, pen:1.0, inizio:33, q:23, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:23}
     ];
 
-    let prodotti = JSON.parse(localStorage.getItem(DB_KEY)) || defaultData;
+    // Funzione helper di migrazione automatica dati (per non perdere la cronologia)
+    function migraVecchiDati() {
+        const versioniPrecedenti = ['v10', 'v9'];
+        let prodottiMigrati = null;
+        let storicoMigrato = null;
+        let noteMigrate = null;
+
+        for (let v of versioniPrecedenti) {
+            let pData = localStorage.getItem(`barData_${v}_vesuvio_jet`);
+            let hData = localStorage.getItem(`barData_${v}_history_logs`);
+            let nData = localStorage.getItem(`barData_${v}_notes_mezzo`);
+            
+            if (pData && !prodottiMigrati) prodottiMigrati = JSON.parse(pData);
+            if (hData && !storicoMigrato) storicoMigrato = JSON.parse(hData);
+            if (nData && !noteMigrate) noteMigrate = nData;
+        }
+
+        if (prodottiMigrati && !localStorage.getItem(DB_KEY)) {
+            localStorage.setItem(DB_KEY, JSON.stringify(prodottiMigrati));
+        }
+        if (storicoMigrato && !localStorage.getItem(HIST_KEY)) {
+            localStorage.setItem(HIST_KEY, JSON.stringify(storicoMigrato));
+        }
+        if (noteMigrate && !localStorage.getItem(NOTES_KEY)) {
+            localStorage.setItem(NOTES_KEY, noteMigrate);
+        }
+    }
+
+    migraVecchiDati();
+
+    // Carica i dati salvati dal browser se presenti, altrimenti usa quelli base.
+    let prodotti = JSON.parse(localStorage.getItem(DB_KEY));
+
+    if (!prodotti) {
+        prodotti = JSON.parse(JSON.stringify(defaultData));
+    } else {
+        // Sincronizziamo eventuali nuovi prodotti inseriti nel listino di default,
+        // senza azzerare o alterare le vendite, le giacenze attuali o i prezzi configurati!
+        defaultData.forEach(d => {
+            let p = prodotti.find(x => x.id === d.id);
+            if (!p) {
+                prodotti.push(JSON.parse(JSON.stringify(d)));
+            }
+        });
+    }
+
+    let cassaRealeGlobal = parseFloat(localStorage.getItem('cassa_reale_global')) || 0.00;
+    let storicoChiusure = JSON.parse(localStorage.getItem(HIST_KEY)) || [];
+    let noteMezzo = localStorage.getItem(NOTES_KEY) || "Ginseng M • Deca 10";
+
+    // Salvataggio iniziale di sicurezza
+    localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
+
+    function safeFloat(val) {
+        if (val === undefined || val === null) return 0;
+        if (typeof val === 'number') return isNaN(val) ? 0 : val;
+        let clean = String(val).replace(/[^0-9.-]/g, '').replace(',', '.');
+        let parsed = parseFloat(clean);
+        return isNaN(parsed) ? 0 : parsed;
+    }
+
+    // Cambia Tema (Dark/Light)
+    function toggleTheme() {
+        const currentTheme = document.body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.body.setAttribute('data-theme', newTheme);
+        localStorage.setItem(THEME_KEY, newTheme);
+        showToast(newTheme === 'dark' ? '🌙 Tema scuro attivato' : '☀️ Tema chiaro attivato');
+    }
+
+    function initTheme() {
+        const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+    }
+
+    // Modal Custom
+    function showModalAlert(title, message) {
+        document.getElementById('customModalTitle').innerText = title;
+        document.getElementById('customModalBody').innerText = message;
+        
+        const container = document.getElementById('customModalButtons');
+        container.innerHTML = `<button class="modal-btn modal-btn-ok" onclick="closeCustomModal()">Ho Capito</button>`;
+        
+        document.getElementById('customModal').style.display = 'flex';
+    }
+
+    function showModalConfirm(title, message, onConfirm) {
+        document.getElementById('customModalTitle').innerText = title;
+        document.getElementById('customModalBody').innerText = message;
+        
+        const container = document.getElementById('customModalButtons');
+        container.innerHTML = `
+            <button class="modal-btn modal-btn-cancel" onclick="closeCustomModal()">Annulla</button>
+            <button class="modal-btn modal-btn-confirm" id="modalConfirmTrigger">Conferma</button>
+        `;
+        
+        document.getElementById('modalConfirmTrigger').onclick = function() {
+            closeCustomModal();
+            onConfirm();
+        };
+        
+        document.getElementById('customModal').style.display = 'flex';
+    }
+
+    function closeCustomModal() {
+        document.getElementById('customModal').style.display = 'none';
+    }
+
+    // Toast Notifications
+    function showToast(message, icon = "✨") {
+        const toast = document.getElementById('toastNotification');
+        document.getElementById('toastIcon').innerText = icon;
+        document.getElementById('toastMessage').innerText = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2200);
+    }
+
+    // Note Mezzo
+    function toggleEditNotes() {
+        const btn = document.querySelector('.notes-edit-btn');
+        const txt = document.getElementById('notesLabelText');
+        const input = document.getElementById('notesInput');
+        
+        if (input.style.display === 'none' || input.style.display === '') {
+            input.value = noteMezzo;
+            txt.style.display = 'none';
+            input.style.display = 'block';
+            input.focus();
+            btn.innerText = 'SALVA ✔️';
+        } else {
+            noteMezzo = input.value.trim() || 'Nessuna nota';
+            localStorage.setItem(NOTES_KEY, noteMezzo);
+            txt.innerText = noteMezzo;
+            txt.style.display = 'inline';
+            input.style.display = 'none';
+            btn.innerText = 'MODIFICA ✏️';
+            showToast("Note aggiornate con successo", "📌");
+        }
+    }
 
     function openTab(id) {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        const map = {'tab-vendite':'btn-vendite', 'tab-magazzino':'btn-magazzino', 'tab-report':'btn-report', 'tab-prezzi':'btn-prezzi'};
+        
+        const map = {
+            'tab-vendite':'btn-vendite', 
+            'tab-magazzino':'btn-magazzino', 
+            'tab-report':'btn-report', 
+            'tab-prezzi':'btn-prezzi',
+            'tab-registro':'btn-registro'
+        };
         if(map[id]) document.getElementById(map[id]).classList.add('active');
-        window.scrollTo(0,0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // GESTIONE DEI NUOVI CARICHI DDT (MODALE CON DOPPIO CAMPO)
+    function apriDdtModal(productId) {
+        activeDdtProductId = productId;
+        const p = prodotti.find(x => x.id === productId);
+        if(!p) return;
+        
+        document.getElementById('ddtModalProdName').innerText = `${p.i} ${p.n}`;
+        document.getElementById('ddtModalNum').value = '';
+        
+        // Resetta contatori temporanei per la distribuzione
+        tempDdtBar = 0;
+        tempDdtDep = 0;
+        
+        aggiornaDdtTotale();
+        document.getElementById('ddtModal').style.display = 'flex';
+    }
+
+    function aggiornaDdtTotale() {
+        document.getElementById('txt-ddt-qta-bar-display').innerText = tempDdtBar;
+        document.getElementById('txt-ddt-qta-dep-display').innerText = tempDdtDep;
+        document.getElementById('txt-ddt-tot-display').innerText = tempDdtBar + tempDdtDep;
+    }
+
+    function closeDdtModal() {
+        document.getElementById('ddtModal').style.display = 'none';
+        activeDdtProductId = null;
+    }
+
+    function salvaNuovoDdt() {
+        const ddtNum = document.getElementById('ddtModalNum').value.trim();
+        const ddtQtaTot = tempDdtBar + tempDdtDep;
+
+        if(!ddtNum) {
+            showToast("Inserisci un numero DDT valido!", "⚠️");
+            return;
+        }
+        if(ddtQtaTot <= 0) {
+            showToast("La quantità totale deve essere maggiore di 0!", "⚠️");
+            return;
+        }
+
+        const p = prodotti.find(x => x.id === activeDdtProductId);
+        if(p) {
+            if(!p.ddts) p.ddts = [];
+            
+            // Registra nel dettaglio DDT quanto va al Bar e quanto a Deposito
+            p.ddts.push({ 
+                numero: ddtNum, 
+                qta: ddtQtaTot,
+                bar: tempDdtBar,
+                dep: tempDdtDep
+            });
+            
+            p.c += ddtQtaTot;        // Il carico totale accumulato sale
+            p.q += tempDdtBar;       // Va direttamente dietro al Bar (Pronto)
+            p.fis += tempDdtDep;     // Va giù in Deposito/Magazzino
+            p.fisicoIn += ddtQtaTot; // Allinea il conto fisico finale per evitare finti ammanchi
+
+            localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
+            showToast(`DDT ${ddtNum} registrato: Bar +${tempDdtBar} | Magazzino +${tempDdtDep}`, "📦");
+            closeDdtModal();
+            init(); 
+        }
+    }
+
+    function ddtIndex(productId, index) {
+        const p = prodotti.find(x => x.id === productId);
+        if(p && p.ddts && p.ddts[index]) {
+            const ddt = p.ddts[index];
+            const barScarico = ddt.bar !== undefined ? ddt.bar : 0;
+            const depScarico = ddt.dep !== undefined ? ddt.dep : ddt.qta; // Fallback se vecchio dato
+            
+            showModalConfirm(
+                "Elimina Carico DDT", 
+                `Vuoi rimuovere definitivamente il DDT N. ${ddt.numero}?\n\nQuesto rimuoverà:\n- ${barScarico} pz dal Bar\n- ${depScarico} pz dal Deposito`, 
+                function() {
+                    p.c = Math.max(0, p.c - ddt.qta);
+                    p.q = Math.max(0, p.q - barScarico);
+                    p.fis = Math.max(0, p.fis - depScarico);
+                    p.fisicoIn = Math.max(0, p.fisicoIn - ddt.qta); // Allinea il conto fisico
+                    p.ddts.splice(index, 1); 
+                    
+                    localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
+                    showToast("DDT rimosso e carichi riallineati", "🗑️");
+                    init();
+                }
+            );
+        }
+    }
+
+    // MODULI IMPORTAZIONE AI DDT TRAMITE VISIONE GEMINI
+    function openAiDdtModal() {
+        document.getElementById('aiDdtNum').value = 'DDT-' + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('aiFileNameDisplay').innerText = '';
+        document.getElementById('aiFileInput').value = '';
+        document.getElementById('aiLoadingIndicator').style.display = 'none';
+        document.getElementById('aiImportPreviewBox').style.display = 'none';
+        document.getElementById('aiConfirmBtn').style.display = 'none';
+        ddtRilevatoProdotti = [];
+        
+        document.getElementById('aiDdtModal').style.display = 'flex';
+    }
+
+    function closeAiDdtModal() {
+        document.getElementById('aiDdtModal').style.display = 'none';
+    }
+
+    // Rileva se il file immagine viene caricato ed esegue la lettura AI
+    function handleAiFileSelect(event) {
+        const file = event.target.files[0];
+        if(!file) return;
+
+        document.getElementById('aiFileNameDisplay').innerText = `📄 Caricato: ${file.name}`;
+        document.getElementById('aiLoadingIndicator').style.display = 'block';
+        document.getElementById('aiImportPreviewBox').style.display = 'none';
+        document.getElementById('aiConfirmBtn').style.display = 'none';
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64Data = e.target.result.split(',')[1];
+            inviaImmagineAdAi(base64Data);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Chiamata API Gemini per decifrare il DDT ed associarlo ai prodotti
+    async function inviaImmagineAdAi(base64Image) {
+        const apiKey = ""; // Gestita dall'ambiente di esecuzione
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+        // Elenco prodotti censiti per aiutare l'associazione corretta delle chiavi
+        const elencoProdottiMap = prodotti.map(p => ({id: p.id, n: p.n}));
+
+        const systemPrompt = `Sei l'assistente del bar manager del Vesuvio Jet. Analizza l'immagine del DDT (Documento Trasporto/Trasferimento Merci) caricata.
+Estrai le merci e calcola la quantità totale moltiplicando eventuali colli (es: "3X24 NAT" corrisponde a un totale di 72 acqua naturale, "5X2 B-READY" corrisponde a 10 B-Ready, "3+3" o "5+5" sono somme, "50" o "3" sono numeri secchi).
+Associa i beni trovati ESCLUSIVAMENTE a uno dei prodotti nel listino fornito.
+
+Listino Prodotti disponibili:
+${JSON.stringify(elencoProdottiMap, null, 2)}
+
+Regole di associazione molto importanti basate sul listino:
+- "NAT", "FRIZZ", "ACQUETTA" o "ACQUA 2L" associane il totale a id "acq" (Acqua).
+- "PERONI" o "2 CESTINI" (Peroni) a id "per" (Peroni).
+- "BIRRA CAPRI" a id "pec" (Peroni Capri).
+- "PROSECCO" o "VINO B" a id "vin" (Prosecco / Vino).
+- "SPRITZ" a id "spr" (Spritz).
+- "COCA", "ZERO", "FANTA", "LEMON" o "LATTINE" a id "ltn" (Lattine).
+- "THE" a id "the" (The Camomilla).
+- "LATTE" a id "lat" (Latte).
+- "PATA", "FONZIES", "PATATINE" a id "fon" (Fonzies / Patatine).
+- "BUENO" a id "bue" (Bueno/B-Ready/Biscuits) OPPURE a id "twi" se sono merendine generiche.
+- "B-READY", "BISCUITS" a id "bue".
+- "KIT KAT", "TWIX", "M&M'S", "MARS" a id "twi" (Twix/KitKat/M&M...).
+- "RINGO", "OREO", "BAIOCCHI" a id "rin" (Ringo / Oreo / Baiocchi).
+- "MIKADO" a id "mik" (Mikado).
+- "CAPP.CAPRI MIX" o "CAPPELLI" a id "cap" (Cappelli).
+- "BORSE CAPRI" o "ROTOLINI" o "CARTELLINI BORSE" o "Borse Piccole" a id "bp" (Borse Piccole).
+- "GOMMA", "SKITTLES", "MENTOS", "FRUIT JOYS", "FRUITELLA", "MOROSITAS", "CARAMELLE" a id "car" (Caramelle / Gomme).
+
+Genera l'output rigorosamente in formato JSON strutturato con questa forma:
+{
+  "carichi": [
+    { "id": "acq", "quantita": 72 },
+    { "id": "per", "quantita": 96 }
+  ]
+}
+Restituisci solo ed esclusivamente il JSON pulito.`;
+
+        const payload = {
+            contents: [{
+                role: "user",
+                parts: [
+                    { text: "Estrai i prodotti da questo DDT e associa gli id come indicato." },
+                    { inlineData: { mimeType: "image/png", data: base64Image } }
+                ]
+            }],
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            generationConfig: { responseMimeType: "application/json" }
+        };
+
+        let tentativi = 5;
+        let delay = 1000;
+
+        for (let i = 0; i < tentativi; i++) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error("Chiamata fallita");
+
+                const result = await response.json();
+                const textOutput = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                const parsedOutput = JSON.parse(textOutput);
+
+                if (parsedOutput && parsedOutput.carichi) {
+                    mostraAnteprimaDdtImportato(parsedOutput.carichi);
+                    return;
+                }
+            } catch (err) {
+                if (i === tentativi - 1) {
+                    document.getElementById('aiLoadingIndicator').style.display = 'none';
+                    showModalAlert("Errore di Lettura AI", "Impossibile elaborare l'immagine del DDT. Riprova con un'immagine più chiara o carica i prodotti a mano.");
+                    return;
+                }
+                await new Promise(r => setTimeout(r, delay));
+                delay *= 2;
+            }
+        }
+    }
+
+    // Mostra l'anteprima interattiva dei carichi rilevati da Gemini
+    function mostraAnteprimaDdtImportato(carichi) {
+        document.getElementById('aiLoadingIndicator').style.display = 'none';
+        const previewList = document.getElementById('aiImportPreviewList');
+        previewList.innerHTML = '';
+        ddtRilevatoProdotti = [];
+
+        carichi.forEach(carico => {
+            const p = prodotti.find(x => x.id === carico.id);
+            if (p && carico.quantita > 0) {
+                // Impostiamo di base tutto a Deposito, l'utente potrà smistare dal modale
+                const item = {
+                    id: p.id,
+                    n: p.n,
+                    i: p.i,
+                    totale: carico.quantita,
+                    bar: 0,
+                    dep: carico.quantita
+                };
+                ddtRilevatoProdotti.push(item);
+            }
+        });
+
+        if (ddtRilevatoProdotti.length === 0) {
+            previewList.innerHTML = `<p style="color:var(--danger); text-align:center; font-weight:bold;">Nessun prodotto compatibile rilevato. Riprova.</p>`;
+            document.getElementById('aiImportPreviewBox').style.display = 'block';
+            return;
+        }
+
+        renderAiPreviewRows();
+
+        document.getElementById('aiImportPreviewBox').style.display = 'block';
+        document.getElementById('aiConfirmBtn').style.display = 'block';
+    }
+
+    // Renderizza le righe editabili del DDT rilevato nell'anteprima
+    function renderAiPreviewRows() {
+        const previewList = document.getElementById('aiImportPreviewList');
+        previewList.innerHTML = '';
+
+        ddtRilevatoProdotti.forEach((item, index) => {
+            previewList.innerHTML += `
+                <div class="ai-item-row">
+                    <div style="flex:1;">
+                        <b>${item.i} ${item.n}</b><br>
+                        <small style="color:var(--success)">Rilevati: ${item.totale} pz</small>
+                    </div>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <div class="field" style="width:70px;">
+                            <label style="font-size:0.5rem; text-align:center;">BAR</label>
+                            <input type="number" class="price-input" style="padding:6px; font-size:0.8rem;" value="${item.bar}" onchange="aggiornaRipartoAiItem(${index}, 'bar', this.value)">
+                        </div>
+                        <div class="field" style="width:70px;">
+                            <label style="font-size:0.5rem; text-align:center;">DEP.</label>
+                            <input type="number" class="price-input" style="padding:6px; font-size:0.8rem;" value="${item.dep}" onchange="aggiornaRipartoAiItem(${index}, 'dep', this.value)">
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // Aggiorna il riparto tra Bar e Deposito degli articoli rilevati
+    function aggiornaRipartoAiItem(index, type, val) {
+        const item = ddtRilevatoProdotti[index];
+        if(!item) return;
+
+        let parsedVal = parseInt(val) || 0;
+        if (type === 'bar') {
+            item.bar = parsedVal;
+            item.dep = Math.max(0, item.totale - item.bar);
+        } else {
+            item.dep = parsedVal;
+            item.bar = Math.max(0, item.totale - item.dep);
+        }
+        renderAiPreviewRows();
+    }
+
+    // Salva definitivamente tutti i carichi importati dall'AI
+    function salvaCarichiDdtImportati() {
+        const ddtNum = document.getElementById('aiDdtNum').value.trim();
+        if(!ddtNum) {
+            showToast("Inserisci un numero DDT valido!", "⚠️");
+            return;
+        }
+
+        let contatoreCaricati = 0;
+        ddtRilevatoProdotti.forEach(item => {
+            const p = prodotti.find(x => x.id === item.id);
+            if (p && (item.bar + item.dep) > 0) {
+                if(!p.ddts) p.ddts = [];
+                
+                const qtaTotale = item.bar + item.dep;
+                p.ddts.push({
+                    numero: ddtNum,
+                    qta: qtaTotale,
+                    bar: item.bar,
+                    dep: item.dep
+                });
+
+                p.c += qtaTotale;
+                p.q += item.bar;
+                p.fis += item.dep;
+                p.fisicoIn += qtaTotale; // Sincronizza conto fisico per azzerare gli ammanchi
+                contatoreCaricati++;
+            }
+        });
+
+        if (contatoreCaricati > 0) {
+            localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
+            showToast(`Importati correttamente ${contatoreCaricati} articoli da DDT`, "📦");
+            closeAiDdtModal();
+            init();
+        } else {
+            showToast("Nessun carico valido inserito", "⚠️");
+        }
+    }
+
+    // FUNZIONE DI RIPRISTINO/ALLINEAMENTO GIACENZE COMPLETO ALLE FOTO
+    function ripristinaStockFoto() {
+        showModalConfirm(
+            "Riallinea Giacenze alle Foto 📸",
+            "Vuoi reimpostare tutte le giacenze attuali (Bar e Deposito) ai valori di default fotografati negli screenshot?\nQuesto correggerà eventuali disallineamenti di magazzino.",
+            function() {
+                prodotti = JSON.parse(JSON.stringify(defaultData));
+                localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
+                showToast("Magazzino riallineato con le foto!", "📸");
+                init();
+            }
+        );
+    }
+
+    // GESTIONE DELLA SOTTO-RILEVAZIONE DEI PENDOLARI DIRETTAMENTE DALLA RIGHE INVENTARIO FISICO
+    function stepInventarioPendolari(id, delta) {
+        const p = prodotti.find(x => x.id === id);
+        if(!p) return;
+        
+        let pezziMancanti = (p.inizio + p.c) - p.fisicoIn;
+        if(pezziMancanti < 0) pezziMancanti = 0;
+
+        p.vPen = Math.max(0, Math.min(pezziMancanti, p.vPen + delta));
+        update();
+    }
+
+    // LOGICA MOVIMENTO FLUSSO VENDITE E TRAVASI
     function step(fieldId, delta) {
         const [field, id] = fieldId.split('-');
         const p = prodotti.find(x => x.id === id);
@@ -210,78 +1389,212 @@
 
         if(field === 'vPas' || field === 'vPen') {
             if(delta > 0) {
-                if(p.q > 0) { p.q--; } 
-                else { p.fis--; } 
+                if(p.q > 0) { p.q--; } else if(p.fis > 0) { p.fis--; }
                 p[field]++;
+                p.fisicoIn = Math.max(0, p.fisicoIn - 1); // La vendita toglie fisicamente un pezzo dal conto complessivo
             } else {
-                if(p[field] > 0) { p[field]--; p.q++; }
+                if(p[field] > 0) { 
+                    p[field]--; 
+                    p.q++; 
+                    p.fisicoIn++; // Lo storno restituisce fisicamente il pezzo
+                }
             }
         }
-        else if(field === 'fis') p.fis += delta;
-        else if(field === 'c') {
-            const vecchioC = p.c;
-            p.c = Math.max(0, p.c + delta);
-            const diff = p.c - vecchioC;
-            p.fis += diff;
-        }
         else if(field === 'q') {
-            if(delta > 0) { p.q++; p.fis--; } 
-            else { p.q--; p.fis++; }
+            if (delta > 0) {
+                if (p.fis > 0) {
+                    p.q++;
+                    p.fis--; 
+                } else {
+                    showToast(`Deposito vuoto per ${p.n}!`, "⚠️");
+                }
+            } else {
+                if (p.q > 0) {
+                    p.q--;
+                    p.fis++; 
+                }
+            }
         }
+        else if(field === 'fis') {
+            p.fis = Math.max(0, p.fis + delta);
+            p.fisicoIn = Math.max(0, p.fisicoIn + delta); // La modifica manuale del deposito corregge in proporzione il totale
+        }
+        else if(field === 'fisicoIn') {
+            p.fisicoIn = Math.max(0, p.fisicoIn + delta);
+        }
+        
         update();
     }
 
-    function openNumpad(id, title) {
+    // LOGICA TASTIERINO PRO CON FORMULE E SCORCIATOIE
+    function openNumpad(id, title, isDecimal = false) {
         currentInputId = id;
-        currentOp = null; firstVal = null; isResetting = false;
-        const [field, pId] = id.split('-');
-        const p = prodotti.find(x => x.id === pId);
+        decimalMode = isDecimal;
+        numpadExpression = "";
+        isResetting = false;
+        
+        let startVal = "0";
+        if (id === 'cassa-reale-global') {
+            startVal = cassaRealeGlobal.toFixed(2);
+        } else if (id === 'ddt-qta-bar') {
+            startVal = String(tempDdtBar);
+        } else if (id === 'ddt-qta-dep') {
+            startVal = String(tempDdtDep);
+        } else if (id.startsWith('invPend-')) {
+            const pId = id.split('-')[1];
+            const p = prodotti.find(x => x.id === pId);
+            startVal = String(p.vPen || 0);
+        } else {
+            const [field, pId] = id.split('-');
+            const p = prodotti.find(x => x.id === pId);
+            startVal = String(p[field] !== undefined ? p[field] : 0);
+        }
+        
+        numpadCurrentVal = startVal;
         document.getElementById('numpad-title').innerText = title;
-        document.getElementById('numpad-display').innerText = p[field] || 0;
+        document.getElementById('numpad-expression').innerText = "";
+        document.getElementById('numpad-display').innerText = startVal;
+        
+        const shortcuts = document.getElementById('numpad-shortcuts');
+        if (id === 'cassa-reale-global') {
+            shortcuts.style.visibility = 'hidden';
+        } else {
+            shortcuts.style.visibility = 'visible';
+        }
+        
         document.getElementById('numpad-overlay').style.display = 'block';
     }
 
     function pressNum(n) {
-        const d = document.getElementById('numpad-display');
-        d.innerText = (d.innerText === "0" || isResetting) ? n : d.innerText + n;
+        if (numpadCurrentVal === "0" || isResetting) {
+            numpadCurrentVal = String(n);
+        } else {
+            numpadCurrentVal += String(n);
+        }
         isResetting = false;
+        document.getElementById('numpad-display').innerText = numpadCurrentVal;
     }
-    function pressOp(op) { firstVal = parseInt(document.getElementById('numpad-display').innerText); currentOp = op; isResetting = true; }
-    function pressClear() { document.getElementById('numpad-display').innerText = "0"; }
-    function pressDelete() { 
-        let d = document.getElementById('numpad-display');
-        d.innerText = d.innerText.length > 1 ? d.innerText.slice(0, -1) : "0";
+    
+    function pressDot() {
+        if (!numpadCurrentVal.includes('.')) {
+            numpadCurrentVal += '.';
+            document.getElementById('numpad-display').innerText = numpadCurrentVal;
+        }
+    }
+
+    function pressOp(op) {
+        let val = parseFloat(numpadCurrentVal) || 0;
+        if (numpadExpression === "") {
+            numpadExpression = val + " " + (op === 'x' ? '×' : op);
+        } else {
+            let result = evalExpression(numpadExpression + " " + val);
+            numpadExpression = result + " " + (op === 'x' ? '×' : op);
+            numpadCurrentVal = String(result);
+            document.getElementById('numpad-display').innerText = numpadCurrentVal;
+        }
+        document.getElementById('numpad-expression').innerText = numpadExpression;
+        isResetting = true;
+    }
+    
+    function addShortcutVal(num) {
+        let current = parseFloat(numpadCurrentVal) || 0;
+        numpadCurrentVal = String(current + num);
+        document.getElementById('numpad-display').innerText = numpadCurrentVal;
+        showToast(`Aggiunti +${num} pezzi al calcolo`, "📦");
+    }
+    
+    function evalExpression(expr) {
+        let clean = expr.replace(/×/g, '*').replace(/x/g, '*');
+        try {
+            let res = Function('"use strict";return (' + clean + ')')();
+            return Number(res.toFixed(4));
+        } catch(e) {
+            return 0;
+        }
+    }
+    
+    function pressClear() {
+        numpadCurrentVal = "0";
+        numpadExpression = "";
+        document.getElementById('numpad-display').innerText = "0";
+        document.getElementById('numpad-expression').innerText = "";
+    }
+    
+    function pressDelete() {
+        if (numpadCurrentVal.length > 1) {
+            numpadCurrentVal = numpadCurrentVal.slice(0, -1);
+        } else {
+            numpadCurrentVal = "0";
+        }
+        document.getElementById('numpad-display').innerText = numpadCurrentVal;
     }
 
     function closeNumpad() {
         if (currentInputId) {
-            let val = parseInt(document.getElementById('numpad-display').innerText) || 0;
-            if (currentOp && firstVal !== null) {
-                if (currentOp === '+') val = firstVal + val;
-                if (currentOp === 'x') val = firstVal * val;
+            let finalVal = parseFloat(numpadCurrentVal) || 0;
+            if (numpadExpression !== "") {
+                finalVal = evalExpression(numpadExpression + " " + finalVal);
             }
-            const [field, pId] = currentInputId.split('-');
-            const p = prodotti.find(x => x.id === pId);
             
-            if(field === 'vPas' || field === 'vPen') {
-                let diff = val - p[field];
-                if(diff > 0) {
-                    for(let i=0; i<diff; i++) {
-                        if(p.q > 0) p.q--; else p.fis--;
+            if(currentInputId === 'cassa-reale-global') {
+                cassaRealeGlobal = finalVal;
+                localStorage.setItem('cassa_reale_global', cassaRealeGlobal.toFixed(2));
+            } else if (currentInputId === 'ddt-qta-bar') {
+                tempDdtBar = Math.round(finalVal);
+                aggiornaDdtTotale();
+            } else if (currentInputId === 'ddt-qta-dep') {
+                tempDdtDep = Math.round(finalVal);
+                aggiornaDdtTotale();
+            } else if (currentInputId.startsWith('invPend-')) {
+                const pId = currentInputId.split('-')[1];
+                const p = prodotti.find(x => x.id === pId);
+                let pezziMancanti = (p.inizio + p.c) - p.fisicoIn;
+                if(pezziMancanti < 0) pezziMancanti = 0;
+                let val = Math.max(0, Math.min(pezziMancanti, Math.round(finalVal)));
+                p.vPen = val;
+            } else {
+                const [field, pId] = currentInputId.split('-');
+                const p = prodotti.find(x => x.id === pId);
+                let val = decimalMode ? finalVal : Math.round(finalVal);
+                
+                if(field === 'vPas' || field === 'vPen') {
+                    let diff = val - p[field];
+                    if(diff > 0) {
+                        for(let i=0; i<diff; i++) {
+                            if(p.q > 0) p.q--; else if(p.fis > 0) p.fis--;
+                        }
+                        p.fisicoIn = Math.max(0, p.fisicoIn - diff); // Sincronizza con decremento di vendita
+                    } else if(diff < 0) {
+                        p.q += Math.abs(diff);
+                        p.fisicoIn += Math.abs(diff); // Ripristina
                     }
-                } else if(diff < 0) {
-                    p.q += Math.abs(diff);
+                    p[field] = val;
                 }
-                p[field] = val;
-            } else if(field === 'q') {
-                let diff = val - p.q;
-                p.q = val; p.fis -= diff;
-            } else if(field === 'c') {
-                let diff = val - p.c;
-                p.c = val;
-                p.fis += diff;
-            } else { 
-                p[field] = val; 
+                else if(field === 'q') {
+                    let diffBar = val - p.q;
+                    if(diffBar > 0) {
+                        if(p.fis >= diffBar) {
+                            p.q = val;
+                            p.fis -= diffBar;
+                        } else {
+                            let maxTrasferibile = p.fis;
+                            p.q += maxTrasferibile;
+                            p.fis = 0;
+                            showToast(`Deposito insufficiente! Trasferiti solo ${maxTrasferibile} pz`, "⚠️");
+                        }
+                    } else {
+                        p.q = val;
+                        p.fis += Math.abs(diffBar);
+                    }
+                }
+                else if(field === 'fis') {
+                    let diffFis = val - p.fis;
+                    p.fis = val;
+                    p.fisicoIn = Math.max(0, p.fisicoIn + diffFis); // Sincronizza l'inventario col cambio manuale del deposito
+                }
+                else {
+                    p[field] = val;
+                }
             }
             update();
         }
@@ -294,14 +1607,37 @@
     }
 
     function init() {
+        initTheme();
+        document.getElementById('notesLabelText').innerText = noteMezzo;
+
         const vL = document.getElementById('tab-vendite'), 
               mL = document.getElementById('tab-magazzino'),
               pL = document.getElementById('tab-prezzi');
         vL.innerHTML = ''; mL.innerHTML = ''; pL.innerHTML = '';
+
+        // Intestazione fissa con pulsante di sincronizzazione rapida alle foto nel tab Magazzino
+        mL.innerHTML = `
+            <div style="background: var(--card-bg); padding: 14px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--border-color); box-shadow: var(--shadow); text-align: center; display: flex; flex-direction: column; gap: 8px;">
+                <button class="btn" style="width: 100%; font-size: 0.95rem; background: var(--success); padding: 12px 14px; border-radius: 10px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="openAiDdtModal()">
+                    📸 IMPORTA DDT DA FOTO
+                </button>
+                <div style="border-top: 1px dashed var(--border-color); padding-top: 8px; margin-top: 4px;">
+                    <p style="font-size: 0.72rem; color: #7f8c8d; margin: 0 0 6px 0; line-height: 1.3;">
+                        Oppure reimposta tutte le giacenze (Bar e Deposito) ai valori predefiniti delle foto screenshot caricati in precedenza.
+                    </p>
+                    <button class="btn" style="width: 100%; font-size: 0.8rem; background: var(--primary-light); padding: 8px 14px; border-radius: 8px;" onclick="ripristinaStockFoto()">
+                        🔄 RESETTA GIACENZE ALLE FOTO INIZIALI
+                    </button>
+                </div>
+            </div>
+        `;
         
         prodotti.forEach(p => {
             vL.innerHTML += `<div class="product-card" data-name="${p.n}">
-                <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span> <span style="font-size:0.65rem; color:#888">€${p.p} / €${p.pen}</span></div>
+                <div class="prod-header">
+                    <span class="prod-name">${p.i} ${p.n}</span> 
+                    <span style="font-size:0.7rem; font-weight:bold; color:var(--text-color); opacity:0.8;">Pas €${p.p.toFixed(2)} / Pen €${p.pen.toFixed(2)}</span>
+                </div>
                 <div class="input-group">
                     <div class="field"><label>PASSEGGERI</label>
                         <div class="stepper-container">
@@ -311,40 +1647,61 @@
                         </div>
                     </div>
                     <div class="field"><label>PENDOLARI</label>
-                        <div class="stepper-container" style="background:#e8f4fd; border-color:var(--pend)">
+                        <div class="stepper-container" style="background:rgba(41, 128, 185, 0.05); border-color:var(--pend)">
                             <button class="step-btn" onclick="step('vPen-${p.id}', -1)">–</button>
                             <div class="numpad-trigger" onclick="openNumpad('vPen-${p.id}', '${p.n} Pend.')"><span id="txt-vPen-${p.id}" style="color:var(--pend)">${p.vPen}</span></div>
                             <button class="step-btn" onclick="step('vPen-${p.id}', 1)">+</button>
                         </div>
                     </div>
                 </div></div>`;
+
+            let ddtListHtml = '';
+            if (p.ddts && p.ddts.length > 0) {
+                ddtListHtml = `<div style="margin-top: 10px; font-size: 0.72rem; background: var(--input-bg); border-radius: 10px; padding: 10px; border: 1px solid var(--border-color);">
+                    <div style="font-weight: 800; margin-bottom: 6px; color: var(--accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Storico DDT Caricati:</div>`;
+                p.ddts.forEach((d, index) => {
+                    let detBar = d.bar !== undefined ? d.bar : 0;
+                    let detDep = d.dep !== undefined ? d.dep : d.qta;
+                    ddtListHtml += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; border-bottom: 1px dashed var(--border-color); padding-bottom: 3px;">
+                        <span>📄 N. <b>${d.numero}</b>: <b style="color: var(--success);">+${d.qta} tot</b> <span style="font-size:0.65rem; color:#888;">(Bar: ${detBar} | Dep: ${detDep})</span></span>
+                        <button onclick="ddtIndex('${p.id}', ${index})" style="background: none; border: none; color: var(--danger); font-weight: bold; cursor: pointer; padding: 2px 8px; font-size: 0.8rem;">✕</button>
+                    </div>`;
+                });
+                ddtListHtml += `</div>`;
+            } else {
+                ddtListHtml = `<div style="margin-top: 10px; font-size: 0.7rem; color: #7f8c8d; font-style: italic; text-align: center;">Nessun DDT caricato per questo ciclo.</div>`;
+            }
             
             mL.innerHTML += `<div class="product-card" style="border-left-color:var(--pend)" data-name="${p.n}">
-                <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
+                <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span> <span style="font-size:0.7rem; color:#888">Inizio Periodo: <b>${p.inizio}</b></span></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                    <div class="field" style="grid-column: span 2;"><label>STOCK MAGAZZINO (FISICO)</label>
-                        <div class="stepper-container" style="background:#2c3e50; border-color:#1a252f">
-                            <button class="step-btn" style="background:#34495e; color:white" onclick="step('fis-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('fis-${p.id}', 'Stock ${p.n}')"><span id="txt-fis-${p.id}" style="color:#f1c40f">${p.fis}</span></div>
-                            <button class="step-btn" style="background:#34495e; color:white" onclick="step('fis-${p.id}', 1)">+</button>
-                        </div>
-                    </div>
                     <div class="field"><label>DISPONIBILE BAR</label>
-                        <div class="stepper-container">
+                        <div class="stepper-container" style="border-color: var(--accent); background: rgba(230, 126, 34, 0.03);">
                             <button class="step-btn" onclick="step('q-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('q-${p.id}', 'Bar ${p.n}')"><span id="txt-q-${p.id}">${p.q}</span></div>
+                            <div class="numpad-trigger" onclick="openNumpad('q-${p.id}', 'Bar ${p.n}')"><span id="txt-q-${p.id}" style="color:var(--accent);">${p.q}</span></div>
                             <button class="step-btn" onclick="step('q-${p.id}', 1)">+</button>
                         </div>
                     </div>
-                    <div class="field"><label>CARICO DDT (+FISICO)</label>
-                        <div class="stepper-container">
-                            <button class="step-btn" onclick="step('c-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('c-${p.id}', 'DDT ${p.n}')"><span id="txt-c-${p.id}">${p.c}</span></div>
-                            <button class="step-btn" onclick="step('c-${p.id}', 1)">+</button>
+                    <div class="field"><label>STOCK DEPOSITO</label>
+                        <div class="stepper-container" style="background:var(--primary-light); border-color:var(--primary)">
+                            <button class="step-btn" style="background:rgba(255,255,255,0.1); color:white" onclick="step('fis-${p.id}', -1)">–</button>
+                            <div class="numpad-trigger" onclick="openNumpad('fis-${p.id}', 'Deposito ${p.n}')"><span id="txt-fis-${p.id}" style="color:#f1c40f">${p.fis}</span></div>
+                            <button class="step-btn" style="background:rgba(255,255,255,0.1); color:white" onclick="step('fis-${p.id}', 1)">+</button>
                         </div>
                     </div>
+                    <div class="field" style="grid-column: span 2;"><label style="color:var(--warning); font-weight: bold;">FATTURE / ACQUISTI DDT (SMISTA AL CARICO)</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <div style="flex: 1; background: rgba(243, 156, 18, 0.05); border: 1px solid var(--warning); height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.15rem; color: var(--warning);">
+                                Totale DDT: <span id="txt-c-${p.id}" style="margin-left: 6px;">${p.c}</span> pz
+                            </div>
+                            <button class="btn" style="flex: 1; height: 46px; background: var(--warning); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; padding: 0 10px; border-radius: 10px;" onclick="apriDdtModal('${p.id}')">
+                                ➕ REGISTRA DDT
+                            </button>
+                        </div>
+                        ${ddtListHtml}
+                    </div>
                 </div>
-                <div class="info-row"><span>Totale Reale (Stock+Bar): <b>${p.fis + p.q}</b></span></div></div>`;
+                <div class="info-row"><span>Giacenza Totale (Bar + Dep): <b>${p.fis + p.q}</b></span> <span>Inizio Ciclo: ${p.inizio}</span></div></div>`;
 
             pL.innerHTML += `<div class="product-card" style="border-left-color:var(--warning)" data-name="${p.n}">
                 <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
@@ -358,62 +1715,579 @@
                 </div>
             </div>`;
         });
+        
+        document.getElementById('search').onkeyup = function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('.product-card').forEach(c => c.style.display = c.getAttribute('data-name').toLowerCase().includes(q) ? 'block' : 'none');
+        };
+
+        renderRegistro();
         update();
     }
 
     function update() {
-        let inc = 0, pT = 0, fT = 0, rH = '';
+        let incTeoricoOggi = 0, pT = 0, fT = 0;
+        let invHTML = '';
+        
+        let valoreAttesoTotale = 0;
+        let valoreFisicoTotale = 0;
+        let valoreTeoricoInCassaTotale = 0; // Il Teorico REALE in cassa detratto lo sconto dei pendolari
+        
         prodotti.forEach(p => {
-            const ids = [`txt-vPas-${p.id}`, `txt-vPen-${p.id}`, `txt-q-${p.id}`, `txt-fis-${p.id}`, `txt-c-${p.id}`];
-            ids.forEach(id => { 
-                const el = document.getElementById(id); 
-                if(el) el.innerText = p[id.split('-')[1]]; 
+            // Calcola quanti pezzi mancano in totale (Inizio + DDT - Fisico Corrente)
+            let pezziMancanti = (p.inizio + p.c) - p.fisicoIn;
+            if (pezziMancanti < 0) pezziMancanti = 0;
+
+            // Riduce automaticamente i pendolari se superano il consumo totale
+            if (p.vPen > pezziMancanti) {
+                p.vPen = pezziMancanti;
+            }
+            // I restanti mancanti sono passeggeri standard a prezzo pieno
+            p.vPas = Math.max(0, pezziMancanti - p.vPen);
+
+            // Popola i contatori visivi
+            ['txt-vPas-', 'txt-vPen-', 'txt-q-', 'txt-fis-', 'txt-c-'].forEach(pref => {
+                const el = document.getElementById(pref + p.id);
+                if(el) el.innerText = p[pref.split('-')[1]];
             });
             
-            let incP = (p.vPas * p.p) + (p.vPen * p.pen);
-            inc += incP; pT += p.vPas; fT += p.vPen;
-            if((p.vPas + p.vPen) > 0) {
-                rH += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; font-size:0.8rem">
-                    <span>${p.n} <b>(${p.vPas + p.vPen})</b><br><small style="color:#888">Pass: ${p.vPas} | Pend: ${p.vPen}</small></span>
-                    <span style="font-weight:bold">€${incP.toFixed(2)}</span>
-                </div>`;
+            // Calcola il valore teorico reale dell'incasso dovuto (suddiviso per fasce prezzo)
+            let incProdottoTeorico = (p.vPas * p.p) + (p.vPen * p.pen);
+            valoreTeoricoInCassaTotale += incProdottoTeorico; 
+            
+            pT += p.vPas; 
+            fT += p.vPen;
+            
+            // Calcolo valori base di inventario economico
+            let valoreInizialeECarichi = (p.inizio + p.c) * p.p;
+            let valoreVendutoStoricoELive = (p.vPas * p.p) + (p.vPen * p.pen);
+            
+            let valoreMerceAttesaEconomico = valoreInizialeECarichi - valoreVendutoStoricoELive;
+            if(valoreMerceAttesaEconomico < 0) valoreMerceAttesaEconomico = 0;
+            
+            let valoreMerceFisicaRealeEconomico = p.fisicoIn * p.p;
+            let impattoEconomicoDiscrepanza = valoreMerceFisicaRealeEconomico - valoreMerceAttesaEconomico;
+            
+            valoreAttesoTotale += valoreMerceAttesaEconomico;
+            valoreFisicoTotale += valoreMerceFisicaRealeEconomico;
+            
+            let badgeDiff = '';
+            if(pezziMancanti > 0) {
+                badgeDiff = `<span class="badge badge-danger" style="background:#fff5f5; color:var(--danger)">CONSUMATI: ${pezziMancanti} pz</span>`;
+            } else {
+                badgeDiff = `<span class="badge badge-neutral">INTATTO</span>`;
             }
+
+            let reportDdtsLabel = '';
+            if (p.ddts && p.ddts.length > 0) {
+                reportDdtsLabel = `<div style="font-size: 0.65rem; color: var(--warning); margin-top: 4px;">DDT registrati: ${p.ddts.map(d => `#${d.numero} (+${d.qta})`).join(', ')}</div>`;
+            }
+
+            // CREAZIONE CARD INVENTARIO FISICO CON SEZIONE "PENDOLARI" SE CI SONO MANCANTI
+            invHTML += `<div style="background:var(--card-bg); padding:14px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:10px; box-shadow:var(--shadow);">
+                <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; margin-bottom:8px;">
+                    <div style="font-size: 0.95rem;">${p.i} ${p.n}</div>
+                    <div>${badgeDiff}</div>
+                </div>
+                <div class="inv-row"><span>Giacenza Iniziale + DDT:</span> <b>${p.inizio + p.c} pz</b> <small style="color:#888">(Inizio: ${p.inizio} | Carico DDT: +${p.c})</small></div>
+                ${reportDdtsLabel}
+                
+                <!-- STEP 1: CONTO FISICO EFFETTIVO RIMASTO -->
+                <div class="inv-row" style="margin-top:6px; padding: 6px 0; border-top: 1px dashed var(--border-color); align-items: center;">
+                    <span style="color:var(--text-color); font-weight:bold;">1. CONTO FISICO EFFETTIVO:</span>
+                    <div class="stepper-container" style="width:130px; height:34px; background:var(--card-bg); border-color:#95a5a6;">
+                        <button class="step-btn" style="width:28px;" onclick="step('fisicoIn-${p.id}', -1)">-</button>
+                        <div class="numpad-trigger" style="font-size:0.95rem;" onclick="openNumpad('fisicoIn-${p.id}', 'Fisico ${p.n}')"><span id="txticoIn-${p.id}" style="font-weight:bold;">${p.fisicoIn}</span></div>
+                        <button class="step-btn" style="width:28px;" onclick="step('fisicoIn-${p.id}', 1)">+</button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: RIPARTO MERCE CONSUMATA (PASSEGGERI / PENDOLARI) -->
+                ${pezziMancanti > 0 ? `
+                <div style="margin-top: 8px; padding: 10px; background: var(--input-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="display:flex; justify-content:space-between; font-size: 0.72rem; color:#7f8c8d; margin-bottom: 6px;">
+                        <span>Pezzi Mancanti / Consumati:</span>
+                        <b style="color:var(--danger)">${pezziMancanti} pz</b>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.78rem; margin-bottom: 6px;">
+                        <span style="color:var(--success); font-weight:600;">2. Venduti a Passeggeri (Prezzo pieno):</span>
+                        <b style="font-size: 0.85rem;">${p.vPas} pz</b>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.78rem;">
+                        <span style="color:var(--pend); font-weight:600;">3. Di cui a Pendolari (Prezzo scontato):</span>
+                        <div class="stepper-container" style="width:110px; height:30px; background:var(--card-bg); border-color:var(--pend)">
+                            <button class="step-btn" style="width:24px; font-size: 1rem;" onclick="stepInventarioPendolari('${p.id}', -1)">-</button>
+                            <div class="numpad-trigger" style="font-size:0.85rem;" onclick="openNumpad('invPend-${p.id}', 'Pendolari ${p.n}')">
+                                <span id="txt-inv-pend-${p.id}" style="color:var(--pend); font-weight:bold;">${p.vPen}</span>
+                            </div>
+                            <button class="step-btn" style="width:24px; font-size: 1rem;" onclick="stepInventarioPendolari('${p.id}', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+            </div>`;
         });
-        document.getElementById('m-netto').innerText = `€ ${inc.toFixed(2)}`;
+        
+        document.getElementById('valore-inventario-atteso').innerText = `€ ${valoreAttesoTotale.toFixed(2)}`;
+        document.getElementById('valore-inventario-reale').innerText = `€ ${valoreFisicoTotale.toFixed(2)}`;
+        
+        const valDiffEl = document.getElementById('valore-differenza-economica');
+        const labelDiffEl = document.getElementById('label-diff-economica');
+        
+        valDiffEl.innerText = `€ ${valoreTeoricoInCassaTotale.toFixed(2)}`;
+        valDiffEl.style.color = 'var(--accent)';
+        labelDiffEl.innerText = "Valore Merce Consumata (Teorico Corretto)";
+
+        document.getElementById('m-netto').innerText = `€ ${valoreTeoricoInCassaTotale.toFixed(2)}`;
         document.getElementById('count-pas').innerText = pT; 
         document.getElementById('count-pen').innerText = fT;
-        document.getElementById('report-items').innerHTML = rH || '<p style="text-align:center;color:#999;font-size:0.8rem">Nessuna vendita registrata</p>';
+        
+        // Assegniamo il "Teorico da Incassare" basandoci sulla reale suddivisione passeggeri/pendolari
+        document.getElementById('cassa-teorica').innerText = `€ ${valoreTeoricoInCassaTotale.toFixed(2)}`;
+        document.getElementById('txt-cassa-reale').innerText = cassaRealeGlobal.toFixed(2);
+        
+        // GESTIONE QUADRATURA CASSA RISPETTO AI SOLDI INCASSATI VS MERCE CONSUMATA SUDDIVISA
+        let diffCassa = cassaRealeGlobal - valoreTeoricoInCassaTotale;
+        const diffCassaEl = document.getElementById('val-discrepanza-cassa');
+        const boxCassa = document.getElementById('box-discrepanza-cassa');
+        const labelCassaEl = document.getElementById('label-discrepanza-cassa');
+        
+        if (diffCassa < -0.01) { // Tolleranza centesimi
+            boxCassa.style.background = 'rgba(231, 76, 60, 0.15)'; 
+            diffCassaEl.style.color = 'var(--danger)';
+            labelCassaEl.innerHTML = `⚠️ <span class="badge badge-danger" style="font-size:0.8rem; padding: 4px 10px;">PERDITA CASSA</span>`;
+            diffCassaEl.innerText = `- € ${Math.abs(diffCassa).toFixed(2)}`;
+        } else if (diffCassa > 0.01) {
+            boxCassa.style.background = 'rgba(39, 174, 96, 0.15)'; 
+            diffCassaEl.style.color = 'var(--success)';
+            labelCassaEl.innerHTML = `🎉 <span class="badge badge-success" style="font-size:0.8rem; padding: 4px 10px;">PLUS CASSA (ESUBERO)</span>`;
+            diffCassaEl.innerText = `+ € ${Math.abs(diffCassa).toFixed(2)}`;
+        } else {
+            boxCassa.style.background = 'var(--input-bg)'; 
+            diffCassaEl.style.color = '#7f8c8d';
+            labelCassaEl.innerHTML = `⚖️ Bilancio Cassa:`;
+            diffCassaEl.innerText = `€ 0.00 (Pareggio)`;
+        }
+        
+        document.getElementById('report-items').innerHTML = invHTML || '<p style="text-align:center;color:#999;">Nessun prodotto censito</p>';
         localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
+
+        renderRegistro();
     }
 
-    function filterProducts() {
-        const q = document.getElementById('search').value.toLowerCase();
-        document.querySelectorAll('.product-card').forEach(c => c.style.display = c.getAttribute('data-name').toLowerCase().includes(q) ? 'block' : 'none');
+    function renderRegistro() {
+        const container = document.getElementById('registro-rows');
+        
+        let sumTeoricoStorico = 0;
+        let sumRealeStorico = 0;
+        let sumDifferenzaStorico = 0;
+        
+        // Il teorico è la merce consumata suddivisa passeggeri/pendolari
+        let valoreTeoricoInCassaTotale = 0;
+        prodotti.forEach(p => {
+            let pezziMancanti = (p.inizio + p.c) - p.fisicoIn;
+            if (pezziMancanti < 0) pezziMancanti = 0;
+            let tempPen = Math.min(pezziMancanti, p.vPen);
+            let tempPas = Math.max(0, pezziMancanti - tempPen);
+            valoreTeoricoInCassaTotale += (tempPas * p.p) + (tempPen * p.pen);
+        });
+        
+        let diffCassaOggi = cassaRealeGlobal - valoreTeoricoInCassaTotale;
+
+        let html = '';
+
+        html += `<tr style="background: rgba(230, 126, 34, 0.08); font-style: italic;">
+            <td><b>🔴 Turno in Corso</b><br><small style="color:#7f8c8d;">Live (Non archiviato)</small></td>
+            <td>€ ${valoreTeoricoInCassaTotale.toFixed(2)}</td>
+            <td style="font-weight:bold;">€ ${cassaRealeGlobal.toFixed(2)}</td>
+            <td style="${diffCassaOggi < -0.01 ? 'color: var(--danger);' : (diffCassaOggi > 0.01 ? 'color: var(--success);' : 'color:#7f8c8d;')} font-weight: bold;">
+                € ${diffCassaOggi >= 0 ? '+' : ''}${diffCassaOggi.toFixed(2)}
+            </td>
+        </tr>`;
+
+        if(storicoChiusure && storicoChiusure.length) {
+            storicoChiusure.slice().reverse().forEach((log) => {
+                let t = safeFloat(log.teorico);
+                let r = safeFloat(log.reale);
+                let d = safeFloat(log.diffCassa);
+                
+                sumTeoricoStorico += t;
+                sumRealeStorico += r;
+                sumDifferenzaStorico += d;
+                
+                let classDiff = d < -0.01 ? 'color: var(--danger); font-weight: bold;' : (d > 0.01 ? 'color: var(--success); font-weight: bold;' : 'color:#7f8c8d;');
+                
+                let dataStr = log.data ? String(log.data) : 'N/D';
+                let dataGiorno = dataStr;
+                let dataOra = '';
+                if (dataStr.includes(',')) {
+                    let parti = dataStr.split(',');
+                    dataGiorno = parti[0] || 'N/D';
+                    dataOra = parti[1] || '';
+                } else if (dataStr.includes(' - ')) {
+                    let parti = dataStr.split(' - ');
+                    dataGiorno = parti[0] || 'N/D';
+                    dataOra = parti[1] || '';
+                } else if (dataStr.includes(' ')) {
+                    let parti = dataStr.split(' ');
+                    dataGiorno = parti[0] || 'N/D';
+                    dataOra = parti.slice(1).join(' ') || '';
+                }
+                
+                html += `<tr>
+                    <td><b>${dataGiorno}</b><br><small style="color:#888;">${dataOra}</small></td>
+                    <td>€ ${t.toFixed(2)}</td>
+                    <td style="font-weight:bold;">€ ${r.toFixed(2)}</td>
+                    <td style="${classDiff}">€ ${d >= 0 ? '+' : ''}${d.toFixed(2)}</td>
+                </tr>`;
+            });
+        }
+        
+        container.innerHTML = html;
+        
+        let granTeorico = sumTeoricoStorico + valoreTeoricoInCassaTotale;
+        let granReale = sumRealeStorico + cassaRealeGlobal;
+        let granDifferenza = sumDifferenzaStorico + diffCassaOggi;
+
+        document.getElementById('tot-teorico-accumulato').innerText = `€ ${granTeorico.toFixed(2)}`;
+        document.getElementById('tot-reale-accumulato').innerText = `€ ${granReale.toFixed(2)}`;
+        
+        const diffEl = document.getElementById('tot-differenza-accumulata');
+        const cardDiff = document.getElementById('card-diff-accumulata');
+        
+        diffEl.innerText = `${granDifferenza >= 0 ? '+' : ''}€ ${granDifferenza.toFixed(2)}`;
+        
+        if(granDifferenza < -0.01) {
+            diffEl.style.color = 'var(--danger)';
+            cardDiff.style.borderBottomColor = 'var(--danger)';
+        } else if (granDifferenza > 0.01) {
+            diffEl.style.color = 'var(--success)';
+            cardDiff.style.borderBottomColor = 'var(--success)';
+        } else {
+            diffEl.style.color = '#7f8c8d';
+            cardDiff.style.borderBottomColor = '#7f8c8d';
+        }
+
+        document.getElementById('tot-teorico-dettagli').innerText = `(Storico: €${sumTeoricoStorico.toFixed(2)} + Oggi: €${valoreTeoricoInCassaTotale.toFixed(2)})`;
+        document.getElementById('tot-reale-dettagli').innerText = `(Storico: €${sumRealeStorico.toFixed(2)} + Oggi: €${cassaRealeGlobal.toFixed(2)})`;
+        document.getElementById('tot-diff-dettagli').innerText = `(Storico: ${sumDifferenzaStorico >= 0 ? '+' : ''}€${sumDifferenzaStorico.toFixed(2)} + Oggi: ${diffCassaOggi >= 0 ? '+' : ''}€${diffCassaOggi.toFixed(2)})`;
+    }
+
+    function richiediChiusuraCassaGiornaliera() {
+        let valoreTeoricoInCassaTotale = 0;
+        prodotti.forEach(p => {
+            let pezziMancanti = (p.inizio + p.c) - p.fisicoIn;
+            if (pezziMancanti < 0) pezziMancanti = 0;
+            let tempPen = Math.min(pezziMancanti, p.vPen);
+            let tempPas = Math.max(0, pezziMancanti - tempPen);
+            valoreTeoricoInCassaTotale += (tempPas * p.p) + (tempPen * p.pen);
+        });
+
+        const msg = `Vuoi salvare la cassa del periodo corrente nel registro storico?\n\nValore Merce Venduta da Inventario: €${valoreTeoricoInCassaTotale.toFixed(2)}\nSoldi Contati in Cassa: €${cassaRealeGlobal.toFixed(2)}\n\nDiscrepanza: €${(cassaRealeGlobal - valoreTeoricoInCassaTotale).toFixed(2)}`;
+        
+        showModalConfirm("Archiviazione Quadratura Cassa", msg, function() {
+            completaChiusuraCassa(valoreTeoricoInCassaTotale);
+        });
+    }
+
+    function completaChiusuraCassa(incTeorico) {
+        const nuovoLog = {
+            data: new Date().toLocaleString('it-IT'),
+            teorico: incTeorico.toFixed(2),
+            reale: cassaRealeGlobal.toFixed(2),
+            diffCassa: (cassaRealeGlobal - incTeorico).toFixed(2),
+            noteMerce: "Archiviazione quadratura cassa da inventario di periodo."
+        };
+        storicoChiusure.push(nuovoLog);
+        localStorage.setItem(HIST_KEY, JSON.stringify(storicoChiusure));
+        
+        prodotti.forEach(p => {
+            p.accPas += p.vPas;
+            p.accPen += p.vPen;
+            p.vPas = 0;
+            p.vPen = 0;
+        });
+        
+        cassaRealeGlobal = 0.00;
+        localStorage.setItem('cassa_reale_global', '0.00');
+        localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
+        
+        showToast("Quadratura cassa salvata e archiviata!", "💰");
+        init();
+        renderRegistro();
+        openTab('tab-registro');
+    }
+
+    function AIC_Core() {}
+
+    function richiediConsolidamentoInventario() {
+        let noteM = [];
+        
+        prodotti.forEach(p => {
+            let venditeTotaliPas = p.accPas + p.vPas;
+            let venditeTotaliPen = p.accPen + p.vPen;
+            let attesoPezzi = p.inizio + p.c - (venditeTotaliPas + venditeTotaliPen);
+            let diff = p.fisicoIn - attesoPezzi;
+            if (diff !== 0) {
+                noteM.push(`${p.n}: ${diff > 0 ? '+' : ''}${diff}`);
+            }
+        });
+
+        const resoconto = noteM.length ? `Rilevamento discrepanze:\n${noteM.join('\n')}` : "Nessuna discrepanza riscontrata!";
+        const msg = `Vuoi CONSOLIDARE l'inventario del ciclo attuale?\n\n${resoconto}\n\nQuesta azione applicherà la giacenza fisica corrente como 'Iniziale' per il nuovo periodo e azzererà tutti i carichi e le vendite accumulate finora.`;
+        
+        showModalConfirm("Consolida Inventario Generale", msg, function() {
+            completaConsolidamento();
+        });
+    }
+
+    function completaConsolidamento() {
+        prodotti.forEach(p => {
+            p.inizio = p.fisicoIn;
+            p.c = 0;
+            p.ddts = []; 
+            p.accPas = 0;
+            p.accPen = 0;
+            p.vPas = 0;
+            p.vPen = 0;
+            p.q = p.fisicoIn > p.fis ? p.fisicoIn - p.fis : 0;
+        });
+        
+        localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
+        showToast("Inventario consolidato! Nuovo ciclo avviato.", "🔒");
+        init();
+    }
+
+    function richiediAzzeraRegistro() {
+        showModalConfirm(
+            "⚠️ Azzeramento Registro", 
+            "Attenzione! Questa azione cancellerà permanentemente tutto lo storico accumulato degli incassi reali e teorici. Continuare?", 
+            function() {
+                storicoChiusure = [];
+                localStorage.setItem(HIST_KEY, JSON.stringify(storicoChiusure));
+                renderRegistro();
+                showToast("Registro cassa azzerato.", "🗑️");
+            }
+        );
+    }
+
+    function scaricaReportInventarioText() {
+        let dataCorrente = new Date().toLocaleString('it-IT');
+        let report = `=================================================================================\n`;
+        report += `                     VESUVIO JET - FOGLIO INVENTARIO FISICO                      \n`;
+        report += `=================================================================================\n`;
+        report += `Data Estrazione : ${dataCorrente}\n`;
+        report += `Note Mezzo      : ${noteMezzo}\n`;
+        report += `---------------------------------------------------------------------------------\n\n`;
+
+        let valoreAttesoTotale = 0;
+        let valoreFisicoTotale = 0;
+        let valoreDifferenzaTotale = 0;
+
+        report += `Dettagli dei Prodotti a Bordo:\n`;
+        report += `---------------------------------------------------------------------------------\n`;
+        report += `PRODOTTO                | INIZIO | CARICO | VENDUTO | ATTESO | EFFETTIVO | DIFFERENZA\n`;
+        report += `---------------------------------------------------------------------------------\n`;
+
+        prodotti.forEach(p => {
+            let venditeTotaliCicloPas = p.accPas + p.vPas;
+            let venditeTotaliCicloPen = p.accPen + p.vPen;
+            let venditeTotaliCicloPezzi = venditeTotaliCicloPas + venditeTotaliCicloPen;
+            
+            let merceAttesaPezzi = p.inizio + p.c - venditeTotaliCicloPezzi;
+            if(merceAttesaPezzi < 0) merceAttesaPezzi = 0;
+            let merceFisicaRealePezzi = p.fisicoIn;
+            let differenzaPezzi = merceFisicaRealePezzi - merceAttesaPezzi;
+
+            let valoreMerceAttesaEconomico = ((p.inizio + p.c) * p.p) - ((venditeTotaliCicloPas * p.p) + (venditeTotaliCicloPen * p.pen));
+            if(valoreMerceAttesaEconomico < 0) valoreMerceAttesaEconomico = 0;
+            
+            let valoreMerceFisicaRealeEconomico = merceFisicaRealePezzi * p.p;
+            let impattoEconomicoDiscrepanza = valoreMerceFisicaRealeEconomico - valoreMerceAttesaEconomico;
+
+            valoreAttesoTotale += valoreMerceAttesaEconomico;
+            valoreFisicoTotale += valoreMerceFisicaRealeEconomico;
+            valoreDifferenzaTotale += impattoEconomicoDiscrepanza;
+
+            let nomeAllineato = (p.i + " " + p.n).substring(0, 23).padEnd(23, ' ');
+            let inizAllineato = String(p.inizio).padStart(6, ' ');
+            let cariAllineato = String(p.c).padStart(6, ' ');
+            let vendAllineato = String(venditeTotaliCicloPezzi).padStart(7, ' ');
+            let teorAllineato = String(merceAttesaPezzi).padStart(6, ' ');
+            let fisAllineato = String(merceFisicaRealePezzi).padStart(9, ' ');
+            let diffAllineato = (differenzaPezzi >= 0 ? `+${differenzaPezzi}` : String(differenzaPezzi)).padStart(10, ' ');
+
+            report += `${nomeAllineato} | ${inizAllineato} | ${cariAllineato} | ${vendAllineato} | ${teorAllineato} | ${fisAllineato} | ${diffAllineato} (${impattoEconomicoDiscrepanza >= 0 ? '+' : ''}${impattoEconomicoDiscrepanza.toFixed(2)} €)\n`;
+            
+            if(p.ddts && p.ddts.length > 0) {
+                let ddtLine = p.ddts.map(d => `DDT N. ${d.numero} (+${d.qta})`).join(' | ');
+                report += `   [Carichi: ${ddtLine}]\n`;
+            }
+        });
+
+        report += `---------------------------------------------------------------------------------\n\n`;
+        report += `=================================================================================\n`;
+        report += `                               RESOCONTO ECONOMICO                               \n`;
+        report += `=================================================================================\n`;
+        report += `Valore Totale Merci Attese (Teorico) : € ${valoreAttesoTotale.toFixed(2)}\n`;
+        report += `Valore Totale Merci Reali Contate    : € ${valoreFisicoTotale.toFixed(2)}\n`;
+        report += `Discrepanza Economica Totale         : € ${valoreDifferenzaTotale.toFixed(2)} (${valoreDifferenzaTotale >= 0 ? "Esubero / Plus" : "Ammanco / Perdita"})\n`;
+        report += `=================================================================================\n\n`;
+        report += `Firme di Bordo:\n\n`;
+        report += `Responsabile Bar: ________________________\n\n`;
+        report += `Comandante: ______________________________\n`;
+
+        const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement("a");
+        link.setAttribute("href", URL.createObjectURL(blob));
+        link.setAttribute("download", `inventario_vesuvio_jet_${new Date().toISOString().slice(0,10)}.txt`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast("Inventario TXT scaricato!", "📄");
+    }
+
+    function scaricaJSONBackup() {
+        const backupData = {
+            versione: "v11_vesuvio_jet",
+            dataEsportazione: new Date().toLocaleString('it-IT'),
+            prodotti: prodotti,
+            cassaRealeGlobal: cassaRealeGlobal,
+            storicoChiusure: storicoChiusure,
+            noteMezzo: noteMezzo
+        };
+
+        const strData = JSON.stringify(backupData, null, 2);
+        const blob = new Blob([strData], { type: 'application/json;charset=utf-8' });
+        const link = document.createElement("a");
+        link.setAttribute("href", URL.createObjectURL(blob));
+        link.setAttribute("download", `backup_vesuvio_jet_${new Date().toISOString().slice(0,10)}.json`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast("Backup JSON salvato!", "📤");
+    }
+
+    function triggerCaricaJSON() {
+        document.getElementById('importJsonInput').click();
+    }
+
+    function completaCaricaJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importato = JSON.parse(e.target.result);
+                
+                if (!importato.prodotti || !Array.isArray(importato.prodotti)) {
+                    showModalAlert("Errore Backup", "Il file selezionato non è un formato di backup valido.");
+                    return;
+                }
+
+                const dataBackup = importato.dataEsportazione || "Sconosciuta";
+                const numRighe = importato.storicoChiusure ? importato.storicoChiusure.length : 0;
+
+                showModalConfirm(
+                    "Conferma Ripristino Backup", 
+                    `Vuoi caricare questo backup creato il: ${dataBackup}?\n\nAttenzione: questa operazione sovrascriverà all'istante tutte le giacenze attuali e lo storico con ben ${numRighe} chiusure registrate nel file.`, 
+                    function() {
+                        prodotti = importato.prodotti;
+                        
+                        prodotti.forEach(p => {
+                            if(!p.ddts || !Array.isArray(p.ddts)) p.ddts = [];
+                        });
+
+                        storicoChiusure = importato.storicoChiusure || [];
+                        cassaRealeGlobal = parseFloat(importato.cassaRealeGlobal) || 0.00;
+                        noteMezzo = importato.noteMezzo || "Ginseng M • Deca 10";
+
+                        localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
+                        localStorage.setItem(HIST_KEY, JSON.stringify(storicoChiusure));
+                        localStorage.setItem('cassa_reale_global', cassaRealeGlobal.toFixed(2));
+                        localStorage.setItem(NOTES_KEY, noteMezzo);
+
+                        showToast("Backup ripristinato con successo!", "📥");
+                        init();
+                        renderRegistro();
+                    }
+                );
+            } catch (err) {
+                showModalAlert("Errore Caricamento", "Impossibile leggere il file. Assicurati che sia un backup JSON valido.");
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = ''; 
+    }
+
+    function esportaCSV() {
+        if (!storicoChiusure || !storicoChiusure.length) {
+            showModalAlert("Nessun Dato", "Non ci sono chiusure salvate da esportare.");
+            return;
+        }
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Data;Incasso Teorico;Incasso Reale;Differenza Cassa\n";
+        
+        storicoChiusure.forEach(log => {
+            csvContent += `"${log.data}";"${log.teorico}";"${log.reale}";"${log.diffCassa}"\n`;
+        });
+        
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `registro_cassa_vesuvio_jet.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast("Esportazione completata!", "📥");
     }
 
     function condividiWhatsApp() {
-        let m = `📊 *REPORT NAV BAR*\n💰 *INCASSO:* ${document.getElementById('m-netto').innerText}\n👥 Pass: ${document.getElementById('count-pas').innerText} | Pend: ${document.getElementById('count-pen').innerText}\n\n`;
-        prodotti.forEach(p => { 
-            let tot = p.vPas + p.vPen;
-            if(tot > 0) m += `• ${p.n}: ${tot} (Pass:${p.vPas}, Pend:${p.vPen})\n`; 
+        let incTeoricoOggi = 0;
+        let noteM = [];
+        
+        prodotti.forEach(p => {
+            let venditeTotaliPas = p.accPas + p.vPas;
+            let venditeTotaliPen = p.accPen + p.vPen;
+            let attesoPezzi = p.inizio + p.c - (venditeTotaliPas + venditeTotaliPen);
+            let diff = p.fisicoIn - attesoPezzi;
+            if(diff !== 0) noteM.push(`${p.i} ${p.n}: ${diff > 0 ? 'PLUS +' : 'AMMANCO '}${diff}`);
         });
-        const el = document.createElement('textarea'); el.value = m; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-        alert("Report copiato negli appunti!");
-    }
-
-    function chiudiGiornata() {
-        if(!confirm("Confermi chiusura sessione? Le vendite verranno azzerate.")) return;
-        prodotti.forEach(p => { 
-            p.vPas = 0; 
-            p.vPen = 0; 
-            p.c = 0; 
+        
+        // Calcolo teorico basato sul consumo
+        let valoreTeoricoInCassaTotale = 0;
+        prodotti.forEach(p => {
+            let pezziMancanti = (p.inizio + p.c) - p.fisicoIn;
+            if (pezziMancanti < 0) pezziMancanti = 0;
+            let tempPen = Math.min(pezziMancanti, p.vPen);
+            let tempPas = Math.max(0, pezziMancanti - tempPen);
+            valoreTeoricoInCassaTotale += (tempPas * p.p) + (tempPen * p.pen);
         });
-        update(); 
-        init(); 
-        openTab('tab-vendite');
+        
+        let m = `📊 *REPORT VESUVIO JET BAR MANAGER*\n`;
+        m += `📆 *Data Chiusura:* ${new Date().toLocaleDateString('it-IT')}\n\n`;
+        m += `💰 *Valore Merce Venduta (Consumata):* €${valoreTeoricoInCassaTotale.toFixed(2)}\n`;
+        m += `💵 *Cassa Contata Reale:* €${cassaRealeGlobal.toFixed(2)}\n`;
+        m += `⚖️ *Discrepanza Cassa (Incasso vs Merce):* €${(cassaRealeGlobal - valoreTeoricoInCassaTotale).toFixed(2)} (${cassaRealeGlobal >= valoreTeoricoInCassaTotale ? 'PLUS' : 'PERDITA'})\n\n`;
+        m += `🔍 *STATO INVENTARIO DI PERIODO:*\n`;
+        m += noteM.length ? noteM.map(n => `• ${n}`).join('\n') : `✓ Nessuna discrepanza di stock riscontrata.\n`;
+        m += `\n📌 *NOTE MEZZO:* ${noteMezzo}`;
+        
+        const el = document.createElement('textarea'); 
+        el.value = m; 
+        document.body.appendChild(el); 
+        el.select(); 
+        document.execCommand('copy'); 
+        document.body.removeChild(el);
+        
+        showToast("Report completo copiato negli appunti!", "📋");
     }
     
-    window.onload = init;
+    window.onload = function() {
+        init();
+        renderRegistro();
+    };
 </script>
 </body>
 </html>
