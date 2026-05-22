@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -128,6 +127,18 @@
         .stat span { font-size: 0.65rem; color: #7f8c8d; display: block; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; }
         .stat b { font-size: 1.1rem; color: var(--text-color); }
         .stat.highlight b { color: var(--success); font-size: 1.5rem; }
+        .stat.paga-highlight {
+            grid-column: span 2;
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.1) 0%, rgba(46, 204, 113, 0.15) 100%);
+            border: 1px solid rgba(39, 174, 96, 0.3);
+            border-radius: 12px;
+            padding: 10px;
+            margin-top: 4px;
+        }
+        .stat.paga-highlight b {
+            color: var(--success);
+            font-size: 1.4rem;
+        }
         
         /* Product Cards */
         .product-card { 
@@ -468,17 +479,16 @@
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambia Tema">🌓</button>
 </div>
 
-<!-- Tabs principali di navigazione -->
+<!-- Tabs principali di navigazione (Scheda Listino Rimossa) -->
 <div class="tabs">
     <button class="tab-btn active" id="btn-vendite" onclick="openTab('tab-vendite')">💰 VENDITE</button>
     <button class="tab-btn" id="btn-magazzino" onclick="openTab('tab-magazzino')">📦 STOCK / CARICO</button>
-    <button class="tab-btn" id="btn-prezzi" onclick="openTab('tab-prezzi')">🏷️ LISTINO</button>
     <button class="tab-btn" id="btn-report" onclick="openTab('tab-report')">📊 INVENTARIO FISICO</button>
     <button class="tab-btn" id="btn-registro" onclick="openTab('tab-registro')">📁 REGISTRO CASSA</button>
 </div>
 
 <div class="content">
-    <!-- Statistiche Dashboard in evidenza -->
+    <!-- Statistiche Dashboard in evidenza con Calcolo Paga Giornaliera Corrente -->
     <div class="mini-dash">
         <div class="stat highlight" style="grid-column: span 2;">
             <span>Incasso di Oggi (Turno Corrente)</span>
@@ -486,6 +496,13 @@
         </div>
         <div class="stat"><span>Pass. Oggi</span><b id="count-pas">0</b></div>
         <div class="stat"><span>Pend. Oggi</span><b id="count-pen" style="color:var(--pend)">0</b></div>
+        
+        <!-- NUOVO CONTATORE: LA TUA PAGA LIVE DEL TURNO CORRENTE -->
+        <div class="stat paga-highlight">
+            <span>💶 LA TUA PAGA DI OGGI</span>
+            <b id="paga-live">€ 26.00</b>
+            <small style="display:block; font-size:0.65rem; color:#27ae60; margin-top:2px;" id="paga-live-dettaglio">(Fisso €26.00 + 5% su €0.00)</small>
+        </div>
     </div>
 
     <!-- Note Aggiuntive Mezzo Modificabili -->
@@ -502,14 +519,11 @@
         <input type="text" id="search" class="search-bar" placeholder="Cerca prodotto...">
     </div>
 
-    <!-- SCHEDA: VENDITE -->
+    <!-- SCHEDA: VENDITE (Con opzione per mostrare/nascondere la modifica del listino integrata) -->
     <div id="tab-vendite" class="tab-content active"></div>
     
     <!-- SCHEDA: STOCK / CARICO -->
     <div id="tab-magazzino" class="tab-content"></div>
-    
-    <!-- SCHEDA: LISTINO PREZZI -->
-    <div id="tab-prezzi" class="tab-content"></div>
     
     <!-- SCHEDA: INVENTARIO & CASSA GIORNALIERA -->
     <div id="tab-report" class="tab-content">
@@ -535,10 +549,16 @@
                 <span id="label-discrepanza-cassa" style="font-weight: bold; font-size: 0.9rem;">Stato Cassa:</span>
                 <b id="val-discrepanza-cassa" style="font-size:1.25rem;">€ 0.00</b>
             </div>
+
+            <!-- DETTAGLIO PAGA NEL MODULO CHIUSURA -->
+            <div style="background: rgba(39, 174, 96, 0.05); border: 1px dashed var(--success); border-radius: 12px; padding: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.8rem; font-weight: bold; color: var(--success);">Paga calcolata per questa chiusura:</span>
+                <b id="paga-calcolata-chiusura" style="color: var(--success); font-size: 1.15rem;">€ 26.00</b>
+            </div>
             
             <button class="btn btn-success" style="width:100%; font-size:1rem; padding:14px;" onclick="richiediChiusuraCassaGiornaliera()">💾 CHIUDI CASSA E SALVA NEL REGISTRO</button>
             <p style="text-align:center; font-size:0.7rem; color:#7f8c8d; margin-top:6px; margin-bottom:0;">
-                Archivia l'incasso e calcola la quadratura rispetto alle merci mancanti. Le giacenze fisiche attese continueranno ad accumularsi per l'inventario generale.
+                Archivia l'incasso, calcola la quadratura e salva definitivamente la tua paga giornaliera nel registro storico.
             </p>
         </div>
 
@@ -589,9 +609,9 @@
     
     <!-- SCHEDA: REGISTRO GENERALE E STORICO ACCUMULATO -->
     <div id="tab-registro" class="tab-content">
-        <!-- CRUSCOTTO ACCUMULATORI RIORGANIZZATO PER MOSTRARE STORICO + TURNO ATTIVO -->
-        <h4 style="margin: 0 0 8px 0; font-size:0.8rem; text-transform:uppercase; color: #7f8c8d;">📈 RIEPILOGO GENERALE CASSA</h4>
-        <div class="registro-dash">
+        <!-- CRUSCOTTO ACCUMULATORI RIORGANIZZATO CON DETTAGLIO PAGA -->
+        <h4 style="margin: 0 0 8px 0; font-size:0.8rem; text-transform:uppercase; color: #7f8c8d;">📈 RIEPILOGO GENERALE CASSA & COMPENSI</h4>
+        <div class="registro-dash" style="grid-template-columns: repeat(2, 1fr);">
             <div class="reg-card" style="border-bottom: 4px solid var(--primary-light);">
                 <span>Totale Teorico</span>
                 <b id="tot-teorico-accumulato" style="color: var(--text-color);">€ 0.00</b>
@@ -603,15 +623,21 @@
                 <small id="tot-reale-dettagli" style="display:block; font-size:0.55rem; color:#888; margin-top:2px;">(Storico: €0 + Turno: €0)</small>
             </div>
             <div class="reg-card" style="border-bottom: 4px solid var(--danger);" id="card-diff-accumulata">
-                <span>Differenza Tot.</span>
+                <span>Differenza Cassa Tot.</span>
                 <b id="tot-differenza-accumulata">€ 0.00</b>
                 <small id="tot-diff-dettagli" style="display:block; font-size:0.55rem; color:#888; margin-top:2px;">(Storico: €0 + Turno: €0)</small>
             </div>
+            <!-- COMPENSI ACCUMULATI -->
+            <div class="reg-card" style="border-bottom: 4px solid #25D366; background: rgba(37, 211, 102, 0.04);">
+                <span>PAGHE TOTALI ACCUMULATE</span>
+                <b id="tot-paghe-accumulate" style="color: var(--success); font-weight: 800;">€ 26.00</b>
+                <small id="tot-paghe-dettagli" style="display:block; font-size:0.55rem; color:#444; margin-top:2px;">(Storico: €0 + Corrente: €26)</small>
+            </div>
         </div>
         
-        <!-- TABELLA DI REGISTRO -->
+        <!-- TABELLA DI REGISTRO CON COLONNA "LA TUA PAGA" -->
         <div style="background:var(--card-bg); padding:14px; border-radius:16px; box-shadow: var(--shadow); border: 1px solid var(--border-color); margin-bottom: 16px;">
-            <h3 style="margin:0 0 10px 0; font-size:1rem;">📋 CRONOLOGIA CHIUSURE DI CASSA</h3>
+            <h3 style="margin:0 0 10px 0; font-size:1rem;">📋 CRONOLOGIA CHIUSURE DI CASSA & COMPENSI</h3>
             
             <div style="overflow-x: auto;">
                 <table class="registro-table">
@@ -620,6 +646,7 @@
                             <th>Data/Ora</th>
                             <th>Teorico</th>
                             <th>Reale</th>
+                            <th>Paga (26€+5%)</th>
                             <th>Diff. Cassa</th>
                         </tr>
                     </thead>
@@ -632,6 +659,12 @@
             <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                 <button class="btn btn-neutral" style="font-size: 0.8rem;" onclick="esportaCSV()">📥 ESPORTA CSV</button>
                 <button class="btn btn-danger" style="font-size: 0.8rem; background: #c0392b;" onclick="richiediAzzeraRegistro()">🗑️ AZZERA REGISTRO</button>
+            </div>
+            <!-- AZZERAMENTO TURNO DI SICUREZZA -->
+            <div style="margin-top: 8px;">
+                <button class="btn" style="width:100%; font-size: 0.85rem; background: var(--accent); padding: 12px; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="richiediAzzeraVenditeTurno()">
+                    🔄 AZZERA VENDITE TURNO (CON SALVATAGGIO DI SICUREZZA)
+                </button>
             </div>
         </div>
 
@@ -726,7 +759,7 @@
 
             <!-- Anteprima di associazione dei prodotti trovati -->
             <div id="aiImportPreviewBox" style="display: none;">
-                <h4 style="margin: 0 0 6px 0; font-size: 0.8rem; text-transform: uppercase; color: var(--accent);">Articoli decifrati ed associati:</h4>
+                <h4 style="margin: 0 0 6px 0; font-size: 0.85rem; text-transform: uppercase; color: var(--accent);">Articoli decifrati ed associati:</h4>
                 <div class="ai-import-preview" id="aiImportPreviewList">
                     <!-- Popolato dinamicamente -->
                 </div>
@@ -817,6 +850,9 @@
     let numpadExpression = "";
     let numpadCurrentVal = "0";
     
+    // Stato visibilità listino rapido integrato
+    let globalPriceEditVisible = false;
+
     // Contatori temporanei separati per la gestione DDT splittata
     let tempDdtBar = 0;
     let tempDdtDep = 0;
@@ -826,7 +862,7 @@
 
     // Database Keys
     const DB_KEY = 'barData_v11_vesuvio_jet';
-    const HIST_KEY = 'barData_v11_history_logs';
+    const HIST_KEY = 'barData_v11_history_logs_paga'; // Chiave nuova per tracciare storico paghe
     const NOTES_KEY = 'barData_v11_notes_mezzo';
     const THEME_KEY = 'barData_v11_theme';
     
@@ -866,17 +902,17 @@
         {id:'twi', n:"Twix/KitKat/M&M...", i:"🍫", p:2.5, pen:1.0, inizio:33, q:23, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:23}
     ];
 
-    // Funzione helper di migrazione automatica dati (per non perdere la cronologia)
+    // Migrazione e caricamento storico
     function migraVecchiDati() {
-        const versioniPrecedenti = ['v10', 'v9'];
+        const versioniPrecedenti = ['barData_v11_history_logs', 'v10', 'v9'];
         let prodottiMigrati = null;
         let storicoMigrato = null;
         let noteMigrate = null;
 
         for (let v of versioniPrecedenti) {
-            let pData = localStorage.getItem(`barData_${v}_vesuvio_jet`);
-            let hData = localStorage.getItem(`barData_${v}_history_logs`);
-            let nData = localStorage.getItem(`barData_${v}_notes_mezzo`);
+            let pData = localStorage.getItem(v.includes('barData') ? v : `barData_${v}_vesuvio_jet`);
+            let hData = localStorage.getItem(v.includes('barData') ? v : `barData_${v}_history_logs`);
+            let nData = localStorage.getItem(v.includes('barData') ? v : `barData_${v}_notes_mezzo`);
             
             if (pData && !prodottiMigrati) prodottiMigrati = JSON.parse(pData);
             if (hData && !storicoMigrato) storicoMigrato = JSON.parse(hData);
@@ -896,14 +932,11 @@
 
     migraVecchiDati();
 
-    // Carica i dati salvati dal browser se presenti, altrimenti usa quelli base.
     let prodotti = JSON.parse(localStorage.getItem(DB_KEY));
 
     if (!prodotti) {
         prodotti = JSON.parse(JSON.stringify(defaultData));
     } else {
-        // Sincronizziamo eventuali nuovi prodotti inseriti nel listino di default,
-        // senza azzerare o alterare le vendite, le giacenze attuali o i prezzi configurati!
         defaultData.forEach(d => {
             let p = prodotti.find(x => x.id === d.id);
             if (!p) {
@@ -916,7 +949,6 @@
     let storicoChiusure = JSON.parse(localStorage.getItem(HIST_KEY)) || [];
     let noteMezzo = localStorage.getItem(NOTES_KEY) || "Ginseng M • Deca 10";
 
-    // Salvataggio iniziale di sicurezza
     localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
 
     function safeFloat(val) {
@@ -927,7 +959,6 @@
         return isNaN(parsed) ? 0 : parsed;
     }
 
-    // Cambia Tema (Dark/Light)
     function toggleTheme() {
         const currentTheme = document.body.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -941,7 +972,6 @@
         document.body.setAttribute('data-theme', savedTheme);
     }
 
-    // Modal Custom
     function showModalAlert(title, message) {
         document.getElementById('customModalTitle').innerText = title;
         document.getElementById('customModalBody').innerText = message;
@@ -974,7 +1004,6 @@
         document.getElementById('customModal').style.display = 'none';
     }
 
-    // Toast Notifications
     function showToast(message, icon = "✨") {
         const toast = document.getElementById('toastNotification');
         document.getElementById('toastIcon').innerText = icon;
@@ -985,7 +1014,6 @@
         }, 2200);
     }
 
-    // Note Mezzo
     function toggleEditNotes() {
         const btn = document.querySelector('.notes-edit-btn');
         const txt = document.getElementById('notesLabelText');
@@ -1017,14 +1045,12 @@
             'tab-vendite':'btn-vendite', 
             'tab-magazzino':'btn-magazzino', 
             'tab-report':'btn-report', 
-            'tab-prezzi':'btn-prezzi',
             'tab-registro':'btn-registro'
         };
         if(map[id]) document.getElementById(map[id]).classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // GESTIONE DEI NUOVI CARICHI DDT (MODALE CON DOPPIO CAMPO)
     function apriDdtModal(productId) {
         activeDdtProductId = productId;
         const p = prodotti.find(x => x.id === productId);
@@ -1033,7 +1059,6 @@
         document.getElementById('ddtModalProdName').innerText = `${p.i} ${p.n}`;
         document.getElementById('ddtModalNum').value = '';
         
-        // Resetta contatori temporanei per la distribuzione
         tempDdtBar = 0;
         tempDdtDep = 0;
         
@@ -1068,19 +1093,16 @@
         const p = prodotti.find(x => x.id === activeDdtProductId);
         if(p) {
             if(!p.ddts) p.ddts = [];
-            
-            // Registra nel dettaglio DDT quanto va al Bar e quanto a Deposito
             p.ddts.push({ 
                 numero: ddtNum, 
                 qta: ddtQtaTot,
                 bar: tempDdtBar,
                 dep: tempDdtDep
             });
-            
-            p.c += ddtQtaTot;        // Il carico totale accumulato sale
-            p.q += tempDdtBar;       // Va direttamente dietro al Bar (Pronto)
-            p.fis += tempDdtDep;     // Va giù in Deposito/Magazzino
-            p.fisicoIn += ddtQtaTot; // Allinea il conto fisico finale per evitare finti ammanchi
+            p.c += ddtQtaTot;
+            p.q += tempDdtBar;
+            p.fis += tempDdtDep;
+            p.fisicoIn += ddtQtaTot;
 
             localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
             showToast(`DDT ${ddtNum} registrato: Bar +${tempDdtBar} | Magazzino +${tempDdtDep}`, "📦");
@@ -1094,7 +1116,7 @@
         if(p && p.ddts && p.ddts[index]) {
             const ddt = p.ddts[index];
             const barScarico = ddt.bar !== undefined ? ddt.bar : 0;
-            const depScarico = ddt.dep !== undefined ? ddt.dep : ddt.qta; // Fallback se vecchio dato
+            const depScarico = ddt.dep !== undefined ? ddt.dep : ddt.qta;
             
             showModalConfirm(
                 "Elimina Carico DDT", 
@@ -1103,7 +1125,7 @@
                     p.c = Math.max(0, p.c - ddt.qta);
                     p.q = Math.max(0, p.q - barScarico);
                     p.fis = Math.max(0, p.fis - depScarico);
-                    p.fisicoIn = Math.max(0, p.fisicoIn - ddt.qta); // Allinea il conto fisico
+                    p.fisicoIn = Math.max(0, p.fisicoIn - ddt.qta);
                     p.ddts.splice(index, 1); 
                     
                     localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
@@ -1114,7 +1136,6 @@
         }
     }
 
-    // MODULI IMPORTAZIONE AI DDT TRAMITE VISIONE GEMINI
     function openAiDdtModal() {
         document.getElementById('aiDdtNum').value = 'DDT-' + Math.floor(1000 + Math.random() * 9000);
         document.getElementById('aiFileNameDisplay').innerText = '';
@@ -1131,7 +1152,6 @@
         document.getElementById('aiDdtModal').style.display = 'none';
     }
 
-    // Rileva se il file immagine viene caricato ed esegue la lettura AI
     function handleAiFileSelect(event) {
         const file = event.target.files[0];
         if(!file) return;
@@ -1149,39 +1169,35 @@
         reader.readAsDataURL(file);
     }
 
-    // Chiamata API Gemini per decifrare il DDT ed associarlo ai prodotti
     async function inviaImmagineAdAi(base64Image) {
-        const apiKey = ""; // Gestita dall'ambiente di esecuzione
+        const apiKey = ""; 
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
-        // Elenco prodotti censiti per aiutare l'associazione corretta delle chiavi
         const elencoProdottiMap = prodotti.map(p => ({id: p.id, n: p.n}));
 
-        const systemPrompt = `Sei l'assistente del bar manager del Vesuvio Jet. Analizza l'immagine del DDT (Documento Trasporto/Trasferimento Merci) caricata.
-Estrai le merci e calcola la quantità totale moltiplicando eventuali colli (es: "3X24 NAT" corrisponde a un totale di 72 acqua naturale, "5X2 B-READY" corrisponde a 10 B-Ready, "3+3" o "5+5" sono somme, "50" o "3" sono numeri secchi).
-Associa i beni trovati ESCLUSIVAMENTE a uno dei prodotti nel listino fornito.
+        const systemPrompt = `Sei l'assistente del bar manager del Vesuvio Jet. Analizza l'immagine del DDT caricata.
+Estrai le merci e calcola la quantità totale moltiplicando eventuali colli. Associa i beni trovati ESCLUSIVAMENTE a uno dei prodotti nel listino fornito.
 
 Listino Prodotti disponibili:
 ${JSON.stringify(elencoProdottiMap, null, 2)}
 
 Regole di associazione molto importanti basate sul listino:
-- "NAT", "FRIZZ", "ACQUETTA" o "ACQUA 2L" associane il totale a id "acq" (Acqua).
-- "PERONI" o "2 CESTINI" (Peroni) a id "per" (Peroni).
-- "BIRRA CAPRI" a id "pec" (Peroni Capri).
-- "PROSECCO" o "VINO B" a id "vin" (Prosecco / Vino).
-- "SPRITZ" a id "spr" (Spritz).
-- "COCA", "ZERO", "FANTA", "LEMON" o "LATTINE" a id "ltn" (Lattine).
-- "THE" a id "the" (The Camomilla).
-- "LATTE" a id "lat" (Latte).
-- "PATA", "FONZIES", "PATATINE" a id "fon" (Fonzies / Patatine).
-- "BUENO" a id "bue" (Bueno/B-Ready/Biscuits) OPPURE a id "twi" se sono merendine generiche.
-- "B-READY", "BISCUITS" a id "bue".
-- "KIT KAT", "TWIX", "M&M'S", "MARS" a id "twi" (Twix/KitKat/M&M...).
-- "RINGO", "OREO", "BAIOCCHI" a id "rin" (Ringo / Oreo / Baiocchi).
-- "MIKADO" a id "mik" (Mikado).
-- "CAPP.CAPRI MIX" o "CAPPELLI" a id "cap" (Cappelli).
-- "BORSE CAPRI" o "ROTOLINI" o "CARTELLINI BORSE" o "Borse Piccole" a id "bp" (Borse Piccole).
-- "GOMMA", "SKITTLES", "MENTOS", "FRUIT JOYS", "FRUITELLA", "MOROSITAS", "CARAMELLE" a id "car" (Caramelle / Gomme).
+- "NAT", "FRIZZ", "ACQUETTA" o "ACQUA 2L" -> id "acq"
+- "PERONI" -> id "per"
+- "BIRRA CAPRI" -> id "pec"
+- "PROSECCO", "VINO" -> id "vin"
+- "SPRITZ" -> id "spr"
+- "COCA", "ZERO", "FANTA", "LEMON", "LATTINE" -> id "ltn"
+- "THE" -> id "the"
+- "LATTE" -> id "lat"
+- "PATA", "FONZIES", "PATATINE" -> id "fon"
+- "BUENO", "B-READY" -> id "bue"
+- "KIT KAT", "TWIX", "M&M" -> id "twi"
+- "RINGO", "OREO", "BAIOCCHI" -> id "rin"
+- "MIKADO" -> id "mik"
+- "CAPPELLI" -> id "cap"
+- "BORSE" -> id "bp"
+- "GOMMA", "CARAMELLE" -> id "car"
 
 Genera l'output rigorosamente in formato JSON strutturato con questa forma:
 {
@@ -1228,7 +1244,7 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
             } catch (err) {
                 if (i === tentativi - 1) {
                     document.getElementById('aiLoadingIndicator').style.display = 'none';
-                    showModalAlert("Errore di Lettura AI", "Impossibile elaborare l'immagine del DDT. Riprova con un'immagine più chiara o carica i prodotti a mano.");
+                    showModalAlert("Errore di Lettura AI", "Impossibile elaborare l'immagine del DDT. Riprova o carica manualmente.");
                     return;
                 }
                 await new Promise(r => setTimeout(r, delay));
@@ -1237,7 +1253,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         }
     }
 
-    // Mostra l'anteprima interattiva dei carichi rilevati da Gemini
     function mostraAnteprimaDdtImportato(carichi) {
         document.getElementById('aiLoadingIndicator').style.display = 'none';
         const previewList = document.getElementById('aiImportPreviewList');
@@ -1247,7 +1262,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         carichi.forEach(carico => {
             const p = prodotti.find(x => x.id === carico.id);
             if (p && carico.quantita > 0) {
-                // Impostiamo di base tutto a Deposito, l'utente potrà smistare dal modale
                 const item = {
                     id: p.id,
                     n: p.n,
@@ -1261,18 +1275,16 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         });
 
         if (ddtRilevatoProdotti.length === 0) {
-            previewList.innerHTML = `<p style="color:var(--danger); text-align:center; font-weight:bold;">Nessun prodotto compatibile rilevato. Riprova.</p>`;
+            previewList.innerHTML = `<p style="color:var(--danger); text-align:center; font-weight:bold;">Nessun prodotto rilevato.</p>`;
             document.getElementById('aiImportPreviewBox').style.display = 'block';
             return;
         }
 
         renderAiPreviewRows();
-
         document.getElementById('aiImportPreviewBox').style.display = 'block';
         document.getElementById('aiConfirmBtn').style.display = 'block';
     }
 
-    // Renderizza le righe editabili del DDT rilevato nell'anteprima
     function renderAiPreviewRows() {
         const previewList = document.getElementById('aiImportPreviewList');
         previewList.innerHTML = '';
@@ -1299,7 +1311,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         });
     }
 
-    // Aggiorna il riparto tra Bar e Deposito degli articoli rilevati
     function aggiornaRipartoAiItem(index, type, val) {
         const item = ddtRilevatoProdotti[index];
         if(!item) return;
@@ -1315,7 +1326,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         renderAiPreviewRows();
     }
 
-    // Salva definitivamente tutti i carichi importati dall'AI
     function salvaCarichiDdtImportati() {
         const ddtNum = document.getElementById('aiDdtNum').value.trim();
         if(!ddtNum) {
@@ -1340,7 +1350,7 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
                 p.c += qtaTotale;
                 p.q += item.bar;
                 p.fis += item.dep;
-                p.fisicoIn += qtaTotale; // Sincronizza conto fisico per azzerare gli ammanchi
+                p.fisicoIn += qtaTotale;
                 contatoreCaricati++;
             }
         });
@@ -1355,7 +1365,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         }
     }
 
-    // FUNZIONE DI RIPRISTINO/ALLINEAMENTO GIACENZE COMPLETO ALLE FOTO
     function ripristinaStockFoto() {
         showModalConfirm(
             "Riallinea Giacenze alle Foto 📸",
@@ -1369,19 +1378,22 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         );
     }
 
-    // GESTIONE DELLA SOTTO-RILEVAZIONE DEI PENDOLARI DIRETTAMENTE DALLA RIGHE INVENTARIO FISICO
     function stepInventarioPendolari(id, delta) {
         const p = prodotti.find(x => x.id === id);
         if(!p) return;
         
-        let pezziMancanti = (p.inizio + p.c) - p.fisicoIn;
-        if(pezziMancanti < 0) pezziMancanti = 0;
+        // 1. Calcoliamo la giacenza attesa all'inizio di questo turno
+        let inizioTurno = p.inizio + p.c - (p.accPas + p.accPen);
+        if (inizioTurno < 0) inizioTurno = 0;
 
-        p.vPen = Math.max(0, Math.min(pezziMancanti, p.vPen + delta));
+        // 2. Calcoliamo i pezzi mancanti (consumati) nel turno corrente
+        let pezziMancantiTurno = inizioTurno - p.fisicoIn;
+        if (pezziMancantiTurno < 0) pezziMancantiTurno = 0;
+
+        p.vPen = Math.max(0, Math.min(pezziMancantiTurno, p.vPen + delta));
         update();
     }
 
-    // LOGICA MOVIMENTO FLUSSO VENDITE E TRAVASI
     function step(fieldId, delta) {
         const [field, id] = fieldId.split('-');
         const p = prodotti.find(x => x.id === id);
@@ -1391,12 +1403,12 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
             if(delta > 0) {
                 if(p.q > 0) { p.q--; } else if(p.fis > 0) { p.fis--; }
                 p[field]++;
-                p.fisicoIn = Math.max(0, p.fisicoIn - 1); // La vendita toglie fisicamente un pezzo dal conto complessivo
+                p.fisicoIn = Math.max(0, p.fisicoIn - 1);
             } else {
                 if(p[field] > 0) { 
                     p[field]--; 
                     p.q++; 
-                    p.fisicoIn++; // Lo storno restituisce fisicamente il pezzo
+                    p.fisicoIn++;
                 }
             }
         }
@@ -1417,7 +1429,7 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         }
         else if(field === 'fis') {
             p.fis = Math.max(0, p.fis + delta);
-            p.fisicoIn = Math.max(0, p.fisicoIn + delta); // La modifica manuale del deposito corregge in proporzione il totale
+            p.fisicoIn = Math.max(0, p.fisicoIn + delta);
         }
         else if(field === 'fisicoIn') {
             p.fisicoIn = Math.max(0, p.fisicoIn + delta);
@@ -1426,7 +1438,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         update();
     }
 
-    // LOGICA TASTIERINO PRO CON FORMULE E SCORCIATOIE
     function openNumpad(id, title, isDecimal = false) {
         currentInputId = id;
         decimalMode = isDecimal;
@@ -1548,9 +1559,14 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
             } else if (currentInputId.startsWith('invPend-')) {
                 const pId = currentInputId.split('-')[1];
                 const p = prodotti.find(x => x.id === pId);
-                let pezziMancanti = (p.inizio + p.c) - p.fisicoIn;
-                if(pezziMancanti < 0) pezziMancanti = 0;
-                let val = Math.max(0, Math.min(pezziMancanti, Math.round(finalVal)));
+                
+                let inizioTurno = p.inizio + p.c - (p.accPas + p.accPen);
+                if (inizioTurno < 0) inizioTurno = 0;
+
+                let pezziMancantiTurno = inizioTurno - p.fisicoIn;
+                if(pezziMancantiTurno < 0) pezziMancantiTurno = 0;
+
+                let val = Math.max(0, Math.min(pezziMancantiTurno, Math.round(finalVal)));
                 p.vPen = val;
             } else {
                 const [field, pId] = currentInputId.split('-');
@@ -1563,10 +1579,10 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
                         for(let i=0; i<diff; i++) {
                             if(p.q > 0) p.q--; else if(p.fis > 0) p.fis--;
                         }
-                        p.fisicoIn = Math.max(0, p.fisicoIn - diff); // Sincronizza con decremento di vendita
+                        p.fisicoIn = Math.max(0, p.fisicoIn - diff);
                     } else if(diff < 0) {
                         p.q += Math.abs(diff);
-                        p.fisicoIn += Math.abs(diff); // Ripristina
+                        p.fisicoIn += Math.abs(diff);
                     }
                     p[field] = val;
                 }
@@ -1590,7 +1606,7 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
                 else if(field === 'fis') {
                     let diffFis = val - p.fis;
                     p.fis = val;
-                    p.fisicoIn = Math.max(0, p.fisicoIn + diffFis); // Sincronizza l'inventario col cambio manuale del deposito
+                    p.fisicoIn = Math.max(0, p.fisicoIn + diffFis);
                 }
                 else {
                     p[field] = val;
@@ -1601,9 +1617,54 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         document.getElementById('numpad-overlay').style.display = 'none';
     }
 
+    // Toggle per mostrare o nascondere l'editor prezzi inline nel tab vendite
+    function toggleInlinePriceEdit(id) {
+        const el = document.getElementById(`inline-price-${id}`);
+        if (el) {
+            el.style.display = el.style.display === 'none' ? 'grid' : 'none';
+        }
+    }
+
+    // Abilita o disabilita globalmente la modalità modifica prezzi nel tab vendite
+    function toggleGlobalPriceEdit() {
+        globalPriceEditVisible = !globalPriceEditVisible;
+        const btn = document.getElementById('btn-global-price-edit');
+        if (btn) {
+            if (globalPriceEditVisible) {
+                btn.style.background = 'var(--accent)';
+                btn.style.color = 'white';
+                btn.innerText = '🏷️ MOSTRANDO MODIFICA PREZZI';
+            } else {
+                btn.style.background = 'var(--input-bg)';
+                btn.style.color = 'var(--text-color)';
+                btn.innerText = '🏷️ ABILITA MODIFICA PREZZI';
+            }
+        }
+        prodotti.forEach(p => {
+            const el = document.getElementById(`inline-price-${p.id}`);
+            if (el) {
+                el.style.display = globalPriceEditVisible ? 'grid' : 'none';
+            }
+        });
+    }
+
     function changePrice(pId, type, val) {
         const p = prodotti.find(x => x.id === pId);
-        if(p) { p[type] = parseFloat(val) || 0; update(); }
+        if(p) { 
+            p[type] = parseFloat(val) || 0; 
+            
+            // Sincronizza l'input inline nel tab vendite se esistente
+            const inlineInput = document.getElementById(`inline-input-${type}-${pId}`);
+            if (inlineInput) inlineInput.value = p[type];
+
+            // Sincronizza l'etichetta dei prezzi visibili nell'header della scheda vendite
+            const labelEl = document.getElementById(`label-prezzi-${pId}`);
+            if (labelEl) {
+                labelEl.innerHTML = `Pas €${p.p.toFixed(2)} / Pen €${p.pen.toFixed(2)}`;
+            }
+
+            update(); 
+        }
     }
 
     function init() {
@@ -1611,49 +1672,79 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         document.getElementById('notesLabelText').innerText = noteMezzo;
 
         const vL = document.getElementById('tab-vendite'), 
-              mL = document.getElementById('tab-magazzino'),
-              pL = document.getElementById('tab-prezzi');
-        vL.innerHTML = ''; mL.innerHTML = ''; pL.innerHTML = '';
+              mL = document.getElementById('tab-magazzino');
+        
+        if (vL) vL.innerHTML = ''; 
+        if (mL) mL.innerHTML = ''; 
 
-        // Intestazione fissa con pulsante di sincronizzazione rapida alle foto nel tab Magazzino
-        mL.innerHTML = `
-            <div style="background: var(--card-bg); padding: 14px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--border-color); box-shadow: var(--shadow); text-align: center; display: flex; flex-direction: column; gap: 8px;">
-                <button class="btn" style="width: 100%; font-size: 0.95rem; background: var(--success); padding: 12px 14px; border-radius: 10px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="openAiDdtModal()">
-                    📸 IMPORTA DDT DA FOTO
-                </button>
-                <div style="border-top: 1px dashed var(--border-color); padding-top: 8px; margin-top: 4px;">
-                    <p style="font-size: 0.72rem; color: #7f8c8d; margin: 0 0 6px 0; line-height: 1.3;">
-                        Oppure reimposta tutte le giacenze (Bar e Deposito) ai valori predefiniti delle foto screenshot caricati in precedenza.
-                    </p>
-                    <button class="btn" style="width: 100%; font-size: 0.8rem; background: var(--primary-light); padding: 8px 14px; border-radius: 8px;" onclick="ripristinaStockFoto()">
-                        🔄 RESETTA GIACENZE ALLE FOTO INIZIALI
+        // Intestazione con pulsante di abilitazione rapida listino nel tab Vendite
+        if (vL) {
+            vL.innerHTML = `
+                <div style="background: var(--card-bg); padding: 12px; border-radius: 12px; margin-bottom: 12px; border: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow);">
+                    <span style="font-size: 0.75rem; font-weight: bold; color: var(--accent);">Gestisci listino prezzi direttamente da qui:</span>
+                    <button class="btn" id="btn-global-price-edit" style="padding: 8px 12px; font-size: 0.72rem; border-radius: 8px; font-weight: bold; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); cursor: pointer;" onclick="toggleGlobalPriceEdit()">
+                        🏷️ ABILITA MODIFICA PREZZI
                     </button>
                 </div>
-            </div>
-        `;
+            `;
+        }
+
+        if (mL) {
+            mL.innerHTML = `
+                <div style="background: var(--card-bg); padding: 14px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--border-color); box-shadow: var(--shadow); text-align: center; display: flex; flex-direction: column; gap: 8px;">
+                    <button class="btn" style="width: 100%; font-size: 0.95rem; background: var(--success); padding: 12px 14px; border-radius: 10px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="openAiDdtModal()">
+                        📸 IMPORTA DDT DA FOTO
+                    </button>
+                    <div style="border-top: 1px dashed var(--border-color); padding-top: 8px; margin-top: 4px;">
+                        <p style="font-size: 0.72rem; color: #7f8c8d; margin: 0 0 6px 0; line-height: 1.3;">
+                            Oppure reimposta tutte le giacenze (Bar e Deposito) ai valori predefiniti delle foto screenshot caricati in precedenza.
+                        </p>
+                        <button class="btn" style="width: 100%; font-size: 0.8rem; background: var(--primary-light); padding: 8px 14px; border-radius: 8px;" onclick="ripristinaStockFoto()">
+                            🔄 RESETTA GIACENZE ALLE FOTO INIZIALI
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
         
         prodotti.forEach(p => {
-            vL.innerHTML += `<div class="product-card" data-name="${p.n}">
-                <div class="prod-header">
-                    <span class="prod-name">${p.i} ${p.n}</span> 
-                    <span style="font-size:0.7rem; font-weight:bold; color:var(--text-color); opacity:0.8;">Pas €${p.p.toFixed(2)} / Pen €${p.pen.toFixed(2)}</span>
-                </div>
-                <div class="input-group">
-                    <div class="field"><label>PASSEGGERI</label>
-                        <div class="stepper-container">
-                            <button class="step-btn" onclick="step('vPas-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('vPas-${p.id}', '${p.n} Pass.')"><span id="txt-vPas-${p.id}">${p.vPas}</span></div>
-                            <button class="step-btn" onclick="step('vPas-${p.id}', 1)">+</button>
+            if (vL) {
+                vL.innerHTML += `<div class="product-card" data-name="${p.n}">
+                    <div class="prod-header">
+                        <span class="prod-name">${p.i} ${p.n}</span> 
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size:0.7rem; font-weight:bold; color:var(--text-color); opacity:0.8;" id="label-prezzi-${p.id}">Pas €${p.p.toFixed(2)} / Pen €${p.pen.toFixed(2)}</span>
+                            <button onclick="toggleInlinePriceEdit('${p.id}')" style="background:none; border:none; cursor:pointer; font-size:0.75rem; padding: 2px;" title="Modifica Listino Rapido">✏️</button>
                         </div>
                     </div>
-                    <div class="field"><label>PENDOLARI</label>
-                        <div class="stepper-container" style="background:rgba(41, 128, 185, 0.05); border-color:var(--pend)">
-                            <button class="step-btn" onclick="step('vPen-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('vPen-${p.id}', '${p.n} Pend.')"><span id="txt-vPen-${p.id}" style="color:var(--pend)">${p.vPen}</span></div>
-                            <button class="step-btn" onclick="step('vPen-${p.id}', 1)">+</button>
+
+                    <!-- SEZIONE INLINE EDIT LISTINO PREZZI (Inserita direttamente in Vendite) -->
+                    <div id="inline-price-${p.id}" class="price-edit-row" style="display: ${globalPriceEditVisible ? 'grid' : 'none'}; margin-bottom: 12px; padding: 8px; background: var(--input-bg); border: 1px dashed var(--accent); border-radius: 10px;">
+                        <div class="field"><label style="font-size: 0.55rem; color: var(--accent);">Prezzo Passeggeri (€)</label>
+                            <input type="number" step="0.1" id="inline-input-p-${p.id}" class="price-input" style="padding:6px; font-size:0.8rem;" value="${p.p}" onchange="changePrice('${p.id}', 'p', this.value)">
+                        </div>
+                        <div class="field"><label style="font-size: 0.55rem; color: var(--pend);">Prezzo Pendolari (€)</label>
+                            <input type="number" step="0.1" id="inline-input-pen-${p.id}" class="price-input" style="padding:6px; font-size:0.8rem;" value="${p.pen}" onchange="changePrice('${p.id}', 'pen', this.value)">
                         </div>
                     </div>
-                </div></div>`;
+
+                    <div class="input-group">
+                        <div class="field"><label>PASSEGGERI</label>
+                            <div class="stepper-container">
+                                <button class="step-btn" onclick="step('vPas-${p.id}', -1)">–</button>
+                                <div class="numpad-trigger" onclick="openNumpad('vPas-${p.id}', '${p.n} Pass.')"><span id="txt-vPas-${p.id}">${p.vPas}</span></div>
+                                <button class="step-btn" onclick="step('vPas-${p.id}', 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="field"><label>PENDOLARI</label>
+                            <div class="stepper-container" style="background:rgba(41, 128, 185, 0.05); border-color:var(--pend)">
+                                <button class="step-btn" onclick="step('vPen-${p.id}', -1)">–</button>
+                                <div class="numpad-trigger" onclick="openNumpad('vPen-${p.id}', '${p.n} Pend.')"><span id="txt-vPen-${p.id}" style="color:var(--pend)">${p.vPen}</span></div>
+                                <button class="step-btn" onclick="step('vPen-${p.id}', 1)">+</button>
+                            </div>
+                        </div>
+                    </div></div>`;
+            }
 
             let ddtListHtml = '';
             if (p.ddts && p.ddts.length > 0) {
@@ -1672,48 +1763,38 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
                 ddtListHtml = `<div style="margin-top: 10px; font-size: 0.7rem; color: #7f8c8d; font-style: italic; text-align: center;">Nessun DDT caricato per questo ciclo.</div>`;
             }
             
-            mL.innerHTML += `<div class="product-card" style="border-left-color:var(--pend)" data-name="${p.n}">
-                <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span> <span style="font-size:0.7rem; color:#888">Inizio Periodo: <b>${p.inizio}</b></span></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                    <div class="field"><label>DISPONIBILE BAR</label>
-                        <div class="stepper-container" style="border-color: var(--accent); background: rgba(230, 126, 34, 0.03);">
-                            <button class="step-btn" onclick="step('q-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('q-${p.id}', 'Bar ${p.n}')"><span id="txt-q-${p.id}" style="color:var(--accent);">${p.q}</span></div>
-                            <button class="step-btn" onclick="step('q-${p.id}', 1)">+</button>
-                        </div>
-                    </div>
-                    <div class="field"><label>STOCK DEPOSITO</label>
-                        <div class="stepper-container" style="background:var(--primary-light); border-color:var(--primary)">
-                            <button class="step-btn" style="background:rgba(255,255,255,0.1); color:white" onclick="step('fis-${p.id}', -1)">–</button>
-                            <div class="numpad-trigger" onclick="openNumpad('fis-${p.id}', 'Deposito ${p.n}')"><span id="txt-fis-${p.id}" style="color:#f1c40f">${p.fis}</span></div>
-                            <button class="step-btn" style="background:rgba(255,255,255,0.1); color:white" onclick="step('fis-${p.id}', 1)">+</button>
-                        </div>
-                    </div>
-                    <div class="field" style="grid-column: span 2;"><label style="color:var(--warning); font-weight: bold;">FATTURE / ACQUISTI DDT (SMISTA AL CARICO)</label>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <div style="flex: 1; background: rgba(243, 156, 18, 0.05); border: 1px solid var(--warning); height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.15rem; color: var(--warning);">
-                                Totale DDT: <span id="txt-c-${p.id}" style="margin-left: 6px;">${p.c}</span> pz
+            if (mL) {
+                mL.innerHTML += `<div class="product-card" style="border-left-color:var(--pend)" data-name="${p.n}">
+                    <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span> <span style="font-size:0.7rem; color:#888">Inizio Periodo: <b>${p.inizio}</b></span></div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                        <div class="field"><label>DISPONIBILE BAR</label>
+                            <div class="stepper-container" style="border-color: var(--accent); background: rgba(230, 126, 34, 0.03);">
+                                <button class="step-btn" onclick="step('q-${p.id}', -1)">–</button>
+                                <div class="numpad-trigger" onclick="openNumpad('q-${p.id}', 'Bar ${p.n}')"><span id="txt-q-${p.id}" style="color:var(--accent);">${p.q}</span></div>
+                                <button class="step-btn" onclick="step('q-${p.id}', 1)">+</button>
                             </div>
-                            <button class="btn" style="flex: 1; height: 46px; background: var(--warning); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; padding: 0 10px; border-radius: 10px;" onclick="apriDdtModal('${p.id}')">
-                                ➕ REGISTRA DDT
-                            </button>
                         </div>
-                        ${ddtListHtml}
+                        <div class="field"><label>STOCK DEPOSITO</label>
+                            <div class="stepper-container" style="background:var(--primary-light); border-color:var(--primary)">
+                                <button class="step-btn" style="background:rgba(255,255,255,0.1); color:white" onclick="step('fis-${p.id}', -1)">–</button>
+                                <div class="numpad-trigger" onclick="openNumpad('fis-${p.id}', 'Deposito ${p.n}')"><span id="txt-fis-${p.id}" style="color:#f1c40f">${p.fis}</span></div>
+                                <button class="step-btn" style="background:rgba(255,255,255,0.1); color:white" onclick="step('fis-${p.id}', 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="field" style="grid-column: span 2;"><label style="color:var(--warning); font-weight: bold;">FATTURE / ACQUISTI DDT (SMISTA AL CARICO)</label>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <div style="flex: 1; background: rgba(243, 156, 18, 0.05); border: 1px solid var(--warning); height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.15rem; color: var(--warning);">
+                                    Totale DDT: <span id="txt-c-${p.id}" style="margin-left: 6px;">${p.c}</span> pz
+                                </div>
+                                <button class="btn" style="flex: 1; height: 46px; background: var(--warning); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; padding: 0 10px; border-radius: 10px;" onclick="apriDdtModal('${p.id}')">
+                                    ➕ REGISTRA DDT
+                                </button>
+                            </div>
+                            ${ddtListHtml}
+                        </div>
                     </div>
-                </div>
-                <div class="info-row"><span>Giacenza Totale (Bar + Dep): <b>${p.fis + p.q}</b></span> <span>Inizio Ciclo: ${p.inizio}</span></div></div>`;
-
-            pL.innerHTML += `<div class="product-card" style="border-left-color:var(--warning)" data-name="${p.n}">
-                <div class="prod-header"><span class="prod-name">${p.i} ${p.n}</span></div>
-                <div class="price-edit-row">
-                    <div class="field"><label>PREZZO PASS. (€)</label>
-                        <input type="number" step="0.1" class="price-input" value="${p.p}" onchange="changePrice('${p.id}', 'p', this.value)">
-                    </div>
-                    <div class="field"><label>PREZZO PEND. (€)</label>
-                        <input type="number" step="0.1" class="price-input" value="${p.pen}" onchange="changePrice('${p.id}', 'pen', this.value)">
-                    </div>
-                </div>
-            </div>`;
+                    <div class="info-row"><span>Giacenza Totale (Bar + Dep): <b>${p.fis + p.q}</b></span> <span>Inizio Ciclo: ${p.inizio}</span></div></div>`;
+            }
         });
         
         document.getElementById('search').onkeyup = function() {
@@ -1731,49 +1812,62 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         
         let valoreAttesoTotale = 0;
         let valoreFisicoTotale = 0;
-        let valoreTeoricoInCassaTotale = 0; // Il Teorico REALE in cassa detratto lo sconto dei pendolari
+        let valoreTeoricoInCassaTotale = 0;
         
         prodotti.forEach(p => {
-            // Calcola quanti pezzi mancano in totale (Inizio + DDT - Fisico Corrente)
-            let pezziMancanti = (p.inizio + p.c) - p.fisicoIn;
-            if (pezziMancanti < 0) pezziMancanti = 0;
+            // Sincronizziamo gli accumulatori storici se non definiti
+            if (p.accPas === undefined) p.accPas = 0;
+            if (p.accPen === undefined) p.accPen = 0;
 
-            // Riduce automaticamente i pendolari se superano il consumo totale
-            if (p.vPen > pezziMancanti) {
-                p.vPen = pezziMancanti;
+            // 1. Calcoliamo la giacenza attesa all'inizio di questo turno
+            let inizioTurno = p.inizio + p.c - (p.accPas + p.accPen);
+            if (inizioTurno < 0) inizioTurno = 0;
+
+            // 2. Calcoliamo i pezzi mancanti (consumati) nel turno corrente
+            let pezziMancantiTurno = inizioTurno - p.fisicoIn;
+            if (pezziMancantiTurno < 0) pezziMancantiTurno = 0;
+
+            // 3. I pendolari inseriti non possono superare il consumo del turno corrente
+            if (p.vPen > pezziMancantiTurno) {
+                p.vPen = pezziMancantiTurno;
             }
-            // I restanti mancanti sono passeggeri standard a prezzo pieno
-            p.vPas = Math.max(0, pezziMancanti - p.vPen);
+            // 4. I passeggeri sono la differenza rimanente del turno corrente
+            p.vPas = Math.max(0, pezziMancantiTurno - p.vPen);
 
-            // Popola i contatori visivi
+            // Popoliamo i contatori live dei campi nel DOM
             ['txt-vPas-', 'txt-vPen-', 'txt-q-', 'txt-fis-', 'txt-c-'].forEach(pref => {
                 const el = document.getElementById(pref + p.id);
                 if(el) el.innerText = p[pref.split('-')[1]];
             });
             
-            // Calcola il valore teorico reale dell'incasso dovuto (suddiviso per fasce prezzo)
+            // Incasso teorico del turno corrente
             let incProdottoTeorico = (p.vPas * p.p) + (p.vPen * p.pen);
             valoreTeoricoInCassaTotale += incProdottoTeorico; 
             
             pT += p.vPas; 
             fT += p.vPen;
             
-            // Calcolo valori base di inventario economico
-            let valoreInizialeECarichi = (p.inizio + p.c) * p.p;
-            let valoreVendutoStoricoELive = (p.vPas * p.p) + (p.vPen * p.pen);
+            // Calcolo valori per l'intero ciclo di inventario (Storico + Turno Corrente)
+            let venditeTotaliCicloPas = p.accPas + p.vPas;
+            let venditeTotaliCicloPen = p.accPen + p.vPen;
             
-            let valoreMerceAttesaEconomico = valoreInizialeECarichi - valoreVendutoStoricoELive;
+            let valoreInizialeECarichi = (p.inizio + p.c) * p.p;
+            let valoreVendutoTotaleCiclo = (venditeTotaliCicloPas * p.p) + (venditeTotaliCicloPen * p.pen);
+            
+            let valoreMerceAttesaEconomico = valoreInizialeECarichi - valoreVendutoTotaleCiclo;
             if(valoreMerceAttesaEconomico < 0) valoreMerceAttesaEconomico = 0;
             
             let valoreMerceFisicaRealeEconomico = p.fisicoIn * p.p;
-            let impattoEconomicoDiscrepanza = valoreMerceFisicaRealeEconomico - valoreMerceAttesaEconomico;
             
             valoreAttesoTotale += valoreMerceAttesaEconomico;
             valoreFisicoTotale += valoreMerceFisicaRealeEconomico;
             
+            let pezziMancantiCiclo = (p.inizio + p.c) - p.fisicoIn;
+            if (pezziMancantiCiclo < 0) pezziMancantiCiclo = 0;
+
             let badgeDiff = '';
-            if(pezziMancanti > 0) {
-                badgeDiff = `<span class="badge badge-danger" style="background:#fff5f5; color:var(--danger)">CONSUMATI: ${pezziMancanti} pz</span>`;
+            if(pezziMancantiCiclo > 0) {
+                badgeDiff = `<span class="badge badge-danger" style="background:#fff5f5; color:var(--danger)">CONSUMATI CICLO: ${pezziMancantiCiclo} pz</span>`;
             } else {
                 badgeDiff = `<span class="badge badge-neutral">INTATTO</span>`;
             }
@@ -1783,7 +1877,7 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
                 reportDdtsLabel = `<div style="font-size: 0.65rem; color: var(--warning); margin-top: 4px;">DDT registrati: ${p.ddts.map(d => `#${d.numero} (+${d.qta})`).join(', ')}</div>`;
             }
 
-            // CREAZIONE CARD INVENTARIO FISICO CON SEZIONE "PENDOLARI" SE CI SONO MANCANTI
+            // CREAZIONE CARD INVENTARIO FISICO CON RIPARTO ATTIVO E STORICO CHIARO
             invHTML += `<div style="background:var(--card-bg); padding:14px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:10px; box-shadow:var(--shadow);">
                 <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; margin-bottom:8px;">
                     <div style="font-size: 0.95rem;">${p.i} ${p.n}</div>
@@ -1803,18 +1897,26 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
                 </div>
 
                 <!-- STEP 2: RIPARTO MERCE CONSUMATA (PASSEGGERI / PENDOLARI) -->
-                ${pezziMancanti > 0 ? `
+                ${pezziMancantiCiclo > 0 ? `
                 <div style="margin-top: 8px; padding: 10px; background: var(--input-bg); border-radius: 8px; border: 1px solid var(--border-color);">
                     <div style="display:flex; justify-content:space-between; font-size: 0.72rem; color:#7f8c8d; margin-bottom: 6px;">
-                        <span>Pezzi Mancanti / Consumati:</span>
-                        <b style="color:var(--danger)">${pezziMancanti} pz</b>
+                        <span>Pezzi Consumati nel Ciclo Totale:</span>
+                        <b style="color:var(--danger)">${pezziMancantiCiclo} pz</b>
                     </div>
+                    
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.78rem; margin-bottom: 6px;">
-                        <span style="color:var(--success); font-weight:600;">2. Venduti a Passeggeri (Prezzo pieno):</span>
-                        <b style="font-size: 0.85rem;">${p.vPas} pz</b>
+                        <span style="color:var(--success); font-weight:600;">2. Passeggeri Periodo (Storico: ${p.accPas} + Turno: ${p.vPas}):</span>
+                        <b style="font-size: 0.85rem;">${venditeTotaliCicloPas} pz</b>
                     </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.78rem;">
-                        <span style="color:var(--pend); font-weight:600;">3. Di cui a Pendolari (Prezzo scontato):</span>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.78rem; margin-bottom: 6px;">
+                        <span style="color:var(--pend); font-weight:600;">3. Di cui a Pendolari Periodo (Storico: ${p.accPen} + Turno: ${p.vPen}):</span>
+                        <b style="font-size: 0.85rem; color:var(--pend);">${venditeTotaliCicloPen} pz</b>
+                    </div>
+
+                    <!-- STEP 3: REGOLAZIONE PENDOLARI DEL TURNO CORRENTE -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.78rem; border-top: 1px dotted var(--border-color); padding-top: 6px; margin-top: 4px;">
+                        <span style="font-weight:bold; color:var(--accent);">✏️ Regola Pendolari (Turno Attivo):</span>
                         <div class="stepper-container" style="width:110px; height:30px; background:var(--card-bg); border-color:var(--pend)">
                             <button class="step-btn" style="width:24px; font-size: 1rem;" onclick="stepInventarioPendolari('${p.id}', -1)">-</button>
                             <div class="numpad-trigger" style="font-size:0.85rem;" onclick="openNumpad('invPend-${p.id}', 'Pendolari ${p.n}')">
@@ -1841,18 +1943,23 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         document.getElementById('m-netto').innerText = `€ ${valoreTeoricoInCassaTotale.toFixed(2)}`;
         document.getElementById('count-pas').innerText = pT; 
         document.getElementById('count-pen').innerText = fT;
+
+        // CALCOLO PAGA LIVE: FISSO 26€ + 5% INCASSO REALE
+        let provvigioneLive = cassaRealeGlobal * 0.05;
+        let pagaLiveTotale = 26.00 + provvigioneLive;
+        document.getElementById('paga-live').innerText = `€ ${pagaLiveTotale.toFixed(2)}`;
+        document.getElementById('paga-live-dettaglio').innerText = `(Fisso €26.00 + 5% su €${cassaRealeGlobal.toFixed(2)})`;
+        document.getElementById('paga-calcolata-chiusura').innerText = `€ ${pagaLiveTotale.toFixed(2)}`;
         
-        // Assegniamo il "Teorico da Incassare" basandoci sulla reale suddivisione passeggeri/pendolari
         document.getElementById('cassa-teorica').innerText = `€ ${valoreTeoricoInCassaTotale.toFixed(2)}`;
         document.getElementById('txt-cassa-reale').innerText = cassaRealeGlobal.toFixed(2);
         
-        // GESTIONE QUADRATURA CASSA RISPETTO AI SOLDI INCASSATI VS MERCE CONSUMATA SUDDIVISA
         let diffCassa = cassaRealeGlobal - valoreTeoricoInCassaTotale;
         const diffCassaEl = document.getElementById('val-discrepanza-cassa');
         const boxCassa = document.getElementById('box-discrepanza-cassa');
         const labelCassaEl = document.getElementById('label-discrepanza-cassa');
         
-        if (diffCassa < -0.01) { // Tolleranza centesimi
+        if (diffCassa < -0.01) {
             boxCassa.style.background = 'rgba(231, 76, 60, 0.15)'; 
             diffCassaEl.style.color = 'var(--danger)';
             labelCassaEl.innerHTML = `⚠️ <span class="badge badge-danger" style="font-size:0.8rem; padding: 4px 10px;">PERDITA CASSA</span>`;
@@ -1877,43 +1984,50 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
 
     function renderRegistro() {
         const container = document.getElementById('registro-rows');
+        if (!container) return;
         
         let sumTeoricoStorico = 0;
         let sumRealeStorico = 0;
         let sumDifferenzaStorico = 0;
+        let sumPagheStoriche = 0;
         
-        // Il teorico è la merce consumata suddivisa passeggeri/pendolari
         let valoreTeoricoInCassaTotale = 0;
         prodotti.forEach(p => {
-            let pezziMancanti = (p.inizio + p.c) - p.fisicoIn;
-            if (pezziMancanti < 0) pezziMancanti = 0;
-            let tempPen = Math.min(pezziMancanti, p.vPen);
-            let tempPas = Math.max(0, pezziMancanti - tempPen);
+            let pezziMancantiTurno = (p.inizio + p.c - (p.accPas + p.accPen)) - p.fisicoIn;
+            if (pezziMancantiTurno < 0) pezziMancantiTurno = 0;
+            let tempPen = Math.min(pezziMancantiTurno, p.vPen);
+            let tempPas = Math.max(0, pezziMancantiTurno - tempPen);
             valoreTeoricoInCassaTotale += (tempPas * p.p) + (tempPen * p.pen);
         });
         
         let diffCassaOggi = cassaRealeGlobal - valoreTeoricoInCassaTotale;
+        let pagaOggiLive = 26.00 + (cassaRealeGlobal * 0.05);
 
         let html = '';
 
+        // Riga Live
         html += `<tr style="background: rgba(230, 126, 34, 0.08); font-style: italic;">
             <td><b>🔴 Turno in Corso</b><br><small style="color:#7f8c8d;">Live (Non archiviato)</small></td>
             <td>€ ${valoreTeoricoInCassaTotale.toFixed(2)}</td>
             <td style="font-weight:bold;">€ ${cassaRealeGlobal.toFixed(2)}</td>
+            <td style="color:var(--success); font-weight:bold;">€ ${pagaOggiLive.toFixed(2)}</td>
             <td style="${diffCassaOggi < -0.01 ? 'color: var(--danger);' : (diffCassaOggi > 0.01 ? 'color: var(--success);' : 'color:#7f8c8d;')} font-weight: bold;">
                 € ${diffCassaOggi >= 0 ? '+' : ''}${diffCassaOggi.toFixed(2)}
             </td>
         </tr>`;
 
+        // Righe Storiche
         if(storicoChiusure && storicoChiusure.length) {
             storicoChiusure.slice().reverse().forEach((log) => {
                 let t = safeFloat(log.teorico);
                 let r = safeFloat(log.reale);
-                let d = safeFloat(log.diffCassa);
+                let d = safeFloat(log.diffCassa || log.diff);
+                let p = safeFloat(log.paga !== undefined ? log.paga : (26.00 + (r * 0.05)));
                 
                 sumTeoricoStorico += t;
                 sumRealeStorico += r;
                 sumDifferenzaStorico += d;
+                sumPagheStoriche += p;
                 
                 let classDiff = d < -0.01 ? 'color: var(--danger); font-weight: bold;' : (d > 0.01 ? 'color: var(--success); font-weight: bold;' : 'color:#7f8c8d;');
                 
@@ -1938,6 +2052,7 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
                     <td><b>${dataGiorno}</b><br><small style="color:#888;">${dataOra}</small></td>
                     <td>€ ${t.toFixed(2)}</td>
                     <td style="font-weight:bold;">€ ${r.toFixed(2)}</td>
+                    <td style="color:#27ae60; font-weight:bold;">€ ${p.toFixed(2)}</td>
                     <td style="${classDiff}">€ ${d >= 0 ? '+' : ''}${d.toFixed(2)}</td>
                 </tr>`;
             });
@@ -1948,9 +2063,11 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         let granTeorico = sumTeoricoStorico + valoreTeoricoInCassaTotale;
         let granReale = sumRealeStorico + cassaRealeGlobal;
         let granDifferenza = sumDifferenzaStorico + diffCassaOggi;
+        let granPaghe = sumPagheStoriche + pagaOggiLive;
 
         document.getElementById('tot-teorico-accumulato').innerText = `€ ${granTeorico.toFixed(2)}`;
         document.getElementById('tot-reale-accumulato').innerText = `€ ${granReale.toFixed(2)}`;
+        document.getElementById('tot-paghe-accumulate').innerText = `€ ${granPaghe.toFixed(2)}`;
         
         const diffEl = document.getElementById('tot-differenza-accumulata');
         const cardDiff = document.getElementById('card-diff-accumulata');
@@ -1971,32 +2088,81 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         document.getElementById('tot-teorico-dettagli').innerText = `(Storico: €${sumTeoricoStorico.toFixed(2)} + Oggi: €${valoreTeoricoInCassaTotale.toFixed(2)})`;
         document.getElementById('tot-reale-dettagli').innerText = `(Storico: €${sumRealeStorico.toFixed(2)} + Oggi: €${cassaRealeGlobal.toFixed(2)})`;
         document.getElementById('tot-diff-dettagli').innerText = `(Storico: ${sumDifferenzaStorico >= 0 ? '+' : ''}€${sumDifferenzaStorico.toFixed(2)} + Oggi: ${diffCassaOggi >= 0 ? '+' : ''}€${diffCassaOggi.toFixed(2)})`;
+        document.getElementById('tot-paghe-dettagli').innerText = `(Storico: €${sumPagheStoriche.toFixed(2)} + Oggi: €${pagaOggiLive.toFixed(2)})`;
+    }
+
+    // AZZERA TURNO DI SICUREZZA CON REIMPOSTAZIONE FISICO ALLINEATO AL TURNO ATTIVO
+    function richiediAzzeraVenditeTurno() {
+        let valoreTeoricoInCassaTotale = 0;
+        prodotti.forEach(p => {
+            let pezziMancantiTurno = (p.inizio + p.c - (p.accPas + p.accPen)) - p.fisicoIn;
+            if (pezziMancantiTurno < 0) pezziMancantiTurno = 0;
+            let tempPen = Math.min(pezziMancantiTurno, p.vPen);
+            let tempPas = Math.max(0, pezziMancantiTurno - tempPen);
+            valoreTeoricoInCassaTotale += (tempPas * p.p) + (tempPen * p.pen);
+        });
+
+        const pagaOggi = 26.00 + (cassaRealeGlobal * 0.05);
+
+        showModalConfirm(
+            "🔄 Salva e Azzera Turno Corrente",
+            `Per sicurezza, prima di azzerare le vendite, il sistema ARCHIVIERÀ l'incasso e la paga nel registro.\n\nDati da archiviare:\n- Incasso Teorico: €${valoreTeoricoInCassaTotale.toFixed(2)}\n- Incasso Reale: €${cassaRealeGlobal.toFixed(2)}\n- La tua Paga (26€ + 5%): €${pagaOggi.toFixed(2)}\n\nProcedere con il salvataggio e il successivo azzeramento delle vendite?`,
+            function() {
+                // 1. Archiviazione preventiva obbligatoria
+                const nuovoLog = {
+                    data: new Date().toLocaleString('it-IT'),
+                    teorico: valoreTeoricoInCassaTotale.toFixed(2),
+                    reale: cassaRealeGlobal.toFixed(2),
+                    diffCassa: (cassaRealeGlobal - valoreTeoricoInCassaTotale).toFixed(2),
+                    paga: pagaOggi,
+                    noteMerce: "Salvataggio di sicurezza automatico prima del reset turno."
+                };
+                storicoChiusure.push(nuovoLog);
+                localStorage.setItem(HIST_KEY, JSON.stringify(storicoChiusure));
+
+                // 2. Azzeramento delle vendite e riallineamento del magazzino all'inizio del turno
+                prodotti.forEach(p => {
+                    p.fisicoIn = p.inizio + p.c - (p.accPas + p.accPen); // Allinea il magazzino alla situazione di inizio turno
+                    p.vPas = 0;
+                    p.vPen = 0;
+                });
+                cassaRealeGlobal = 0.00;
+                localStorage.setItem('cassa_reale_global', '0.00');
+                localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
+                
+                showToast("Vendite salvate nel registro e turno resettato con successo!", "🔄");
+                init();
+            }
+        );
     }
 
     function richiediChiusuraCassaGiornaliera() {
         let valoreTeoricoInCassaTotale = 0;
         prodotti.forEach(p => {
-            let pezziMancanti = (p.inizio + p.c) - p.fisicoIn;
-            if (pezziMancanti < 0) pezziMancanti = 0;
-            let tempPen = Math.min(pezziMancanti, p.vPen);
-            let tempPas = Math.max(0, pezziMancanti - tempPen);
+            let pezziMancantiTurno = (p.inizio + p.c - (p.accPas + p.accPen)) - p.fisicoIn;
+            if (pezziMancantiTurno < 0) pezziMancantiTurno = 0;
+            let tempPen = Math.min(pezziMancantiTurno, p.vPen);
+            let tempPas = Math.max(0, pezziMancantiTurno - tempPen);
             valoreTeoricoInCassaTotale += (tempPas * p.p) + (tempPen * p.pen);
         });
 
-        const msg = `Vuoi salvare la cassa del periodo corrente nel registro storico?\n\nValore Merce Venduta da Inventario: €${valoreTeoricoInCassaTotale.toFixed(2)}\nSoldi Contati in Cassa: €${cassaRealeGlobal.toFixed(2)}\n\nDiscrepanza: €${(cassaRealeGlobal - valoreTeoricoInCassaTotale).toFixed(2)}`;
+        const pagaOggi = 26.00 + (cassaRealeGlobal * 0.05);
+
+        const msg = `Vuoi archiviare la cassa e calcolare la tua paga?\n\n- Consumato Teorico: €${valoreTeoricoInCassaTotale.toFixed(2)}\n- Cassa Reale Contata: €${cassaRealeGlobal.toFixed(2)}\n- Discrepanza: €${(cassaRealeGlobal - valoreTeoricoInCassaTotale).toFixed(2)}\n\n💶 LA TUA PAGA DI OGGI: €${pagaOggi.toFixed(2)}`;
         
-        showModalConfirm("Archiviazione Quadratura Cassa", msg, function() {
-            completaChiusuraCassa(valoreTeoricoInCassaTotale);
+        showModalConfirm("Archiviazione Quadratura Cassa & Paga", msg, function() {
+            completaChiusuraCassa(valoreTeoricoInCassaTotale, pagaOggi);
         });
     }
 
-    function completaChiusuraCassa(incTeorico) {
+    function completaChiusuraCassa(incTeorico, pagaCalcolata) {
         const nuovoLog = {
             data: new Date().toLocaleString('it-IT'),
             teorico: incTeorico.toFixed(2),
             reale: cassaRealeGlobal.toFixed(2),
             diffCassa: (cassaRealeGlobal - incTeorico).toFixed(2),
-            noteMerce: "Archiviazione quadratura cassa da inventario di periodo."
+            paga: pagaCalcolata,
+            noteMerce: "Chiusura manuale programmata."
         };
         storicoChiusure.push(nuovoLog);
         localStorage.setItem(HIST_KEY, JSON.stringify(storicoChiusure));
@@ -2012,7 +2178,7 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         localStorage.setItem('cassa_reale_global', '0.00');
         localStorage.setItem(DB_KEY, JSON.stringify(prodotti));
         
-        showToast("Quadratura cassa salvata e archiviata!", "💰");
+        showToast("Sessione salvata con successo nel registro cassa!", "💰");
         init();
         renderRegistro();
         openTab('tab-registro');
@@ -2034,7 +2200,7 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         });
 
         const resoconto = noteM.length ? `Rilevamento discrepanze:\n${noteM.join('\n')}` : "Nessuna discrepanza riscontrata!";
-        const msg = `Vuoi CONSOLIDARE l'inventario del ciclo attuale?\n\n${resoconto}\n\nQuesta azione applicherà la giacenza fisica corrente como 'Iniziale' per il nuovo periodo e azzererà tutti i carichi e le vendite accumulate finora.`;
+        const msg = `Vuoi CONSOLIDARE l'inventario del ciclo attuale?\n\n${resoconto}\n\nQuesta azione applicherà la giacenza fisica corrente come 'Iniziale' per il nuovo periodo e azzererà tutti i carichi e le vendite accumulate finora.`;
         
         showModalConfirm("Consolida Inventario Generale", msg, function() {
             completaConsolidamento();
@@ -2058,15 +2224,17 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         init();
     }
 
+    functionGrid = function(){} 
+
     function richiediAzzeraRegistro() {
         showModalConfirm(
             "⚠️ Azzeramento Registro", 
-            "Attenzione! Questa azione cancellerà permanentemente tutto lo storico accumulato degli incassi reali e teorici. Continuare?", 
+            "Attenzione! Questa azione cancellerà permanentemente tutto lo storico accumulato degli incassi e delle paghe registrate. Continuare?", 
             function() {
                 storicoChiusure = [];
                 localStorage.setItem(HIST_KEY, JSON.stringify(storicoChiusure));
                 renderRegistro();
-                showToast("Registro cassa azzerato.", "🗑️");
+                showToast("Registro cassa e paghe azzerato.", "🗑️");
             }
         );
     }
@@ -2149,7 +2317,7 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
 
     function scaricaJSONBackup() {
         const backupData = {
-            versione: "v11_vesuvio_jet",
+            versione: "v11_vesuvio_jet_paga",
             dataEsportazione: new Date().toLocaleString('it-IT'),
             prodotti: prodotti,
             cassaRealeGlobal: cassaRealeGlobal,
@@ -2227,10 +2395,11 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
             return;
         }
         let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "Data;Incasso Teorico;Incasso Reale;Differenza Cassa\n";
+        csvContent += "Data;Incasso Teorico;Incasso Reale;Paga Giornaliera;Differenza Cassa\n";
         
         storicoChiusure.forEach(log => {
-            csvContent += `"${log.data}";"${log.teorico}";"${log.reale}";"${log.diffCassa}"\n`;
+            let p = log.paga !== undefined ? log.paga : (26.00 + (safeFloat(log.reale) * 0.05));
+            csvContent += `"${log.data}";"${log.teorico}";"${log.reale}";"${p.toFixed(2)}";"${log.diffCassa}"\n`;
         });
         
         const encodedUri = encodeURI(csvContent);
@@ -2244,7 +2413,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
     }
 
     function condividiWhatsApp() {
-        let incTeoricoOggi = 0;
         let noteM = [];
         
         prodotti.forEach(p => {
@@ -2255,21 +2423,24 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
             if(diff !== 0) noteM.push(`${p.i} ${p.n}: ${diff > 0 ? 'PLUS +' : 'AMMANCO '}${diff}`);
         });
         
-        // Calcolo teorico basato sul consumo
         let valoreTeoricoInCassaTotale = 0;
         prodotti.forEach(p => {
-            let pezziMancanti = (p.inizio + p.c) - p.fisicoIn;
-            if (pezziMancanti < 0) pezziMancanti = 0;
-            let tempPen = Math.min(pezziMancanti, p.vPen);
-            let tempPas = Math.max(0, pezziMancanti - tempPen);
+            let pezziMancantiTurno = (p.inizio + p.c - (p.accPas + p.accPen)) - p.fisicoIn;
+            if (pezziMancantiTurno < 0) pezziMancantiTurno = 0;
+            let tempPen = Math.min(pezziMancantiTurno, p.vPen);
+            let tempPas = Math.max(0, pezziMancantiTurno - tempPen);
             valoreTeoricoInCassaTotale += (tempPas * p.p) + (tempPen * p.pen);
         });
+
+        let pagaOggi = 26.00 + (cassaRealeGlobal * 0.05);
         
         let m = `📊 *REPORT VESUVIO JET BAR MANAGER*\n`;
         m += `📆 *Data Chiusura:* ${new Date().toLocaleDateString('it-IT')}\n\n`;
         m += `💰 *Valore Merce Venduta (Consumata):* €${valoreTeoricoInCassaTotale.toFixed(2)}\n`;
         m += `💵 *Cassa Contata Reale:* €${cassaRealeGlobal.toFixed(2)}\n`;
         m += `⚖️ *Discrepanza Cassa (Incasso vs Merce):* €${(cassaRealeGlobal - valoreTeoricoInCassaTotale).toFixed(2)} (${cassaRealeGlobal >= valoreTeoricoInCassaTotale ? 'PLUS' : 'PERDITA'})\n\n`;
+        m += `💶 *LA TUA PAGA DI OGGI:* €${pagaOggi.toFixed(2)}\n`;
+        m += `   _(Fisso €26.00 + 5% provvigione su €${cassaRealeGlobal.toFixed(2)})_\n\n`;
         m += `🔍 *STATO INVENTARIO DI PERIODO:*\n`;
         m += noteM.length ? noteM.map(n => `• ${n}`).join('\n') : `✓ Nessuna discrepanza di stock riscontrata.\n`;
         m += `\n📌 *NOTE MEZZO:* ${noteMezzo}`;
