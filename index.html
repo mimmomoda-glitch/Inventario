@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -467,6 +468,27 @@
         .ai-item-row:last-child {
             border-bottom: none;
         }
+
+        /* Nuova Sezione Dettaglio Vendite */
+        .sales-breakdown-card {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+        .sales-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+        .sales-list-item:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
@@ -609,6 +631,19 @@
     
     <!-- SCHEDA: REGISTRO GENERALE E STORICO ACCUMULATO -->
     <div id="tab-registro" class="tab-content">
+        <!-- DETTAGLIO MERCE VENDUTA NEL CICLO ATTIVO -->
+        <div class="sales-breakdown-card">
+            <h3 style="margin: 0 0 12px 0; font-size: 1rem; color: var(--accent); border-bottom: 2px solid var(--border-color); padding-bottom: 6px;">
+                📈 DETTAGLIO MERCI VENDUTE (CICLO ATTIVO)
+            </h3>
+            <div id="sales-breakdown-list" style="max-height: 250px; overflow-y: auto;">
+                <!-- Popolato dinamicamente da update() -->
+            </div>
+            <div style="margin-top: 12px; display: flex; gap: 8px;">
+                <button class="btn btn-neutral" style="font-size: 0.75rem; padding: 10px;" onclick="copiaSoloListaSpesa()">📋 COPIA DETTAGLIO VENDUTO</button>
+            </div>
+        </div>
+
         <!-- CRUSCOTTO ACCUMULATORI RIORGANIZZATO CON DETTAGLIO PAGA -->
         <h4 style="margin: 0 0 8px 0; font-size:0.8rem; text-transform:uppercase; color: #7f8c8d;">📈 RIEPILOGO GENERALE CASSA & COMPENSI</h4>
         <div class="registro-dash" style="grid-template-columns: repeat(2, 1fr);">
@@ -662,7 +697,7 @@
             </div>
             <!-- AZZERAMENTO TURNO DI SICUREZZA -->
             <div style="margin-top: 8px;">
-                <button class="btn" style="width:100%; font-size: 0.85rem; background: var(--accent); padding: 12px; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="richiediAzzeraVenditeTurno()">
+                <button class="btn" style="width:100%; font-size: 0.85rem; background: var(--accent); padding: 12px; display: flex; align-items: center; justify-content: center; gap: 6px;" onclick="richiediAzzeraTurno()">
                     🔄 AZZERA VENDITE TURNO (CON SALVATAGGIO DI SICUREZZA)
                 </button>
             </div>
@@ -845,28 +880,21 @@
     let firstVal = null;
     let isResetting = false;
     let decimalMode = false;
-    let activeDdtProductId = null; // ID del prodotto durante l'aggiunta DDT
+    let activeDdtProductId = null; 
     
     let numpadExpression = "";
     let numpadCurrentVal = "0";
     
-    // Stato visibilità listino rapido integrato
     let globalPriceEditVisible = false;
-
-    // Contatori temporanei separati per la gestione DDT splittata
     let tempDdtBar = 0;
     let tempDdtDep = 0;
-
-    // Struttura dati per DDT rilevato da AI
     let ddtRilevatoProdotti = [];
 
-    // Database Keys
     const DB_KEY = 'barData_v11_vesuvio_jet';
-    const HIST_KEY = 'barData_v11_history_logs_paga'; // Chiave nuova per tracciare storico paghe
+    const HIST_KEY = 'barData_v11_history_logs_paga'; 
     const NOTES_KEY = 'barData_v11_notes_mezzo';
     const THEME_KEY = 'barData_v11_theme';
     
-    // I dati reali estratti interamente dalle FOTO REALI caricate
     const defaultData = [
         {id:'acq', n:"Acqua", i:"💧", p:2.0, pen:1.0, inizio:219, q:123, c:120, ddts:[{numero:"294", qta:120, bar:0, dep:120}], vPas:0, vPen:0, accPas:0, accPen:0, fis:120, fisicoIn:243}, 
         {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1.0, inizio:26, q:23, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:23}, 
@@ -902,7 +930,6 @@
         {id:'twi', n:"Twix/KitKat/M&M...", i:"🍫", p:2.5, pen:1.0, inizio:33, q:23, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:23}
     ];
 
-    // Migrazione e caricamento storico
     function migraVecchiDati() {
         const versioniPrecedenti = ['barData_v11_history_logs', 'v10', 'v9'];
         let prodottiMigrati = null;
@@ -1212,7 +1239,7 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
             contents: [{
                 role: "user",
                 parts: [
-                    { text: "Estrai i prodotti da questo DDT e associa gli id come indicato." },
+                    { text: "Estrai i prodotti da questo DDT e associa gli id como indicato." },
                     { inlineData: { mimeType: "image/png", data: base64Image } }
                 ]
             }],
@@ -1382,11 +1409,9 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         const p = prodotti.find(x => x.id === id);
         if(!p) return;
         
-        // 1. Calcoliamo la giacenza attesa all'inizio di questo turno
         let inizioTurno = p.inizio + p.c - (p.accPas + p.accPen);
         if (inizioTurno < 0) inizioTurno = 0;
 
-        // 2. Calcoliamo i pezzi mancanti (consumati) nel turno corrente
         let pezziMancantiTurno = inizioTurno - p.fisicoIn;
         if (pezziMancantiTurno < 0) pezziMancantiTurno = 0;
 
@@ -1617,7 +1642,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         document.getElementById('numpad-overlay').style.display = 'none';
     }
 
-    // Toggle per mostrare o nascondere l'editor prezzi inline nel tab vendite
     function toggleInlinePriceEdit(id) {
         const el = document.getElementById(`inline-price-${id}`);
         if (el) {
@@ -1625,7 +1649,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         }
     }
 
-    // Abilita o disabilita globalmente la modalità modifica prezzi nel tab vendite
     function toggleGlobalPriceEdit() {
         globalPriceEditVisible = !globalPriceEditVisible;
         const btn = document.getElementById('btn-global-price-edit');
@@ -1653,11 +1676,9 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         if(p) { 
             p[type] = parseFloat(val) || 0; 
             
-            // Sincronizza l'input inline nel tab vendite se esistente
             const inlineInput = document.getElementById(`inline-input-${type}-${pId}`);
             if (inlineInput) inlineInput.value = p[type];
 
-            // Sincronizza l'etichetta dei prezzi visibili nell'header della scheda vendite
             const labelEl = document.getElementById(`label-prezzi-${pId}`);
             if (labelEl) {
                 labelEl.innerHTML = `Pas €${p.p.toFixed(2)} / Pen €${p.pen.toFixed(2)}`;
@@ -1677,7 +1698,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         if (vL) vL.innerHTML = ''; 
         if (mL) mL.innerHTML = ''; 
 
-        // Intestazione con pulsante di abilitazione rapida listino nel tab Vendite
         if (vL) {
             vL.innerHTML = `
                 <div style="background: var(--card-bg); padding: 12px; border-radius: 12px; margin-bottom: 12px; border: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow);">
@@ -1718,7 +1738,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
                         </div>
                     </div>
 
-                    <!-- SEZIONE INLINE EDIT LISTINO PREZZI (Inserita direttamente in Vendite) -->
                     <div id="inline-price-${p.id}" class="price-edit-row" style="display: ${globalPriceEditVisible ? 'grid' : 'none'}; margin-bottom: 12px; padding: 8px; background: var(--input-bg); border: 1px dashed var(--accent); border-radius: 10px;">
                         <div class="field"><label style="font-size: 0.55rem; color: var(--accent);">Prezzo Passeggeri (€)</label>
                             <input type="number" step="0.1" id="inline-input-p-${p.id}" class="price-input" style="padding:6px; font-size:0.8rem;" value="${p.p}" onchange="changePrice('${p.id}', 'p', this.value)">
@@ -1814,40 +1833,48 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         let valoreFisicoTotale = 0;
         let valoreTeoricoInCassaTotale = 0;
         
+        let listaVenditeHtml = '';
+        let arrayVenditeTemp = [];
+
         prodotti.forEach(p => {
-            // Sincronizziamo gli accumulatori storici se non definiti
             if (p.accPas === undefined) p.accPas = 0;
             if (p.accPen === undefined) p.accPen = 0;
 
-            // 1. Calcoliamo la giacenza attesa all'inizio di questo turno
             let inizioTurno = p.inizio + p.c - (p.accPas + p.accPen);
             if (inizioTurno < 0) inizioTurno = 0;
 
-            // 2. Calcoliamo i pezzi mancanti (consumati) nel turno corrente
             let pezziMancantiTurno = inizioTurno - p.fisicoIn;
             if (pezziMancantiTurno < 0) pezziMancantiTurno = 0;
 
-            // 3. I pendolari inseriti non possono superare il consumo del turno corrente
             if (p.vPen > pezziMancantiTurno) {
                 p.vPen = pezziMancantiTurno;
             }
-            // 4. I passeggeri sono la differenza rimanente del turno corrente
             p.vPas = Math.max(0, pezziMancantiTurno - p.vPen);
 
-            // Popoliamo i contatori live dei campi nel DOM
             ['txt-vPas-', 'txt-vPen-', 'txt-q-', 'txt-fis-', 'txt-c-'].forEach(pref => {
                 const el = document.getElementById(pref + p.id);
                 if(el) el.innerText = p[pref.split('-')[1]];
             });
             
-            // Incasso teorico del turno corrente
             let incProdottoTeorico = (p.vPas * p.p) + (p.vPen * p.pen);
             valoreTeoricoInCassaTotale += incProdottoTeorico; 
             
             pT += p.vPas; 
             fT += p.vPen;
             
-            // Calcolo valori per l'intero ciclo di inventario (Storico + Turno Corrente)
+            // Per il dettaglio merce venduta
+            let totVendutoPezzi = p.accPas + p.vPas + p.accPen + p.vPen;
+            if(totVendutoPezzi > 0) {
+                arrayVenditeTemp.push({
+                    emoji: p.i,
+                    nome: p.n,
+                    totale: totVendutoPezzi,
+                    valore: (p.accPas + p.vPas) * p.p + (p.accPen + p.vPen) * p.pen,
+                    pas: p.accPas + p.vPas,
+                    pen: p.accPen + p.vPen
+                });
+            }
+
             let venditeTotaliCicloPas = p.accPas + p.vPas;
             let venditeTotaliCicloPen = p.accPen + p.vPen;
             
@@ -1877,7 +1904,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
                 reportDdtsLabel = `<div style="font-size: 0.65rem; color: var(--warning); margin-top: 4px;">DDT registrati: ${p.ddts.map(d => `#${d.numero} (+${d.qta})`).join(', ')}</div>`;
             }
 
-            // CREAZIONE CARD INVENTARIO FISICO CON RIPARTO ATTIVO E STORICO CHIARO
             invHTML += `<div style="background:var(--card-bg); padding:14px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:10px; box-shadow:var(--shadow);">
                 <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; margin-bottom:8px;">
                     <div style="font-size: 0.95rem;">${p.i} ${p.n}</div>
@@ -1886,7 +1912,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
                 <div class="inv-row"><span>Giacenza Iniziale + DDT:</span> <b>${p.inizio + p.c} pz</b> <small style="color:#888">(Inizio: ${p.inizio} | Carico DDT: +${p.c})</small></div>
                 ${reportDdtsLabel}
                 
-                <!-- STEP 1: CONTO FISICO EFFETTIVO RIMASTO -->
                 <div class="inv-row" style="margin-top:6px; padding: 6px 0; border-top: 1px dashed var(--border-color); align-items: center;">
                     <span style="color:var(--text-color); font-weight:bold;">1. CONTO FISICO EFFETTIVO:</span>
                     <div class="stepper-container" style="width:130px; height:34px; background:var(--card-bg); border-color:#95a5a6;">
@@ -1896,7 +1921,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
                     </div>
                 </div>
 
-                <!-- STEP 2: RIPARTO MERCE CONSUMATA (PASSEGGERI / PENDOLARI) -->
                 ${pezziMancantiCiclo > 0 ? `
                 <div style="margin-top: 8px; padding: 10px; background: var(--input-bg); border-radius: 8px; border: 1px solid var(--border-color);">
                     <div style="display:flex; justify-content:space-between; font-size: 0.72rem; color:#7f8c8d; margin-bottom: 6px;">
@@ -1914,7 +1938,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
                         <b style="font-size: 0.85rem; color:var(--pend);">${venditeTotaliCicloPen} pz</b>
                     </div>
 
-                    <!-- STEP 3: REGOLAZIONE PENDOLARI DEL TURNO CORRENTE -->
                     <div style="display:flex; justify-content:space-between; align-items:center; font-size: 0.78rem; border-top: 1px dotted var(--border-color); padding-top: 6px; margin-top: 4px;">
                         <span style="font-weight:bold; color:var(--accent);">✏️ Regola Pendolari (Turno Attivo):</span>
                         <div class="stepper-container" style="width:110px; height:30px; background:var(--card-bg); border-color:var(--pend)">
@@ -1930,6 +1953,32 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
             </div>`;
         });
         
+        // Ordina e visualizza le vendite totali del ciclo
+        arrayVenditeTemp.sort((a,b) => b.totale - a.totale);
+        if(arrayVenditeTemp.length > 0) {
+            arrayVenditeTemp.forEach(item => {
+                listaVenditeHtml += `
+                    <div class="sales-list-item">
+                        <div>
+                            <b>${item.emoji} ${item.nome}</b>
+                            <br>
+                            <span style="font-size: 0.7rem; color: #7f8c8d;">
+                                (Passeggeri: ${item.pas} | Pendolari: ${item.pen})
+                            </span>
+                        </div>
+                        <div style="text-align: right;">
+                            <b style="color: var(--accent); font-size: 0.9rem;">${item.totale} pz</b>
+                            <br>
+                            <small style="color: var(--success); font-weight: bold;">€ ${item.valore.toFixed(2)}</small>
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            listaVenditeHtml = `<p style="text-align:center; color:#7f8c8d; font-style:italic; font-size:0.8rem; margin:10px 0;">Nessun prodotto venduto o rimosso.</p>`;
+        }
+        document.getElementById('sales-breakdown-list').innerHTML = listaVenditeHtml;
+
         document.getElementById('valore-inventario-atteso').innerText = `€ ${valoreAttesoTotale.toFixed(2)}`;
         document.getElementById('valore-inventario-reale').innerText = `€ ${valoreFisicoTotale.toFixed(2)}`;
         
@@ -1944,7 +1993,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         document.getElementById('count-pas').innerText = pT; 
         document.getElementById('count-pen').innerText = fT;
 
-        // CALCOLO PAGA LIVE: FISSO 26€ + 5% INCASSO REALE
         let provvigioneLive = cassaRealeGlobal * 0.05;
         let pagaLiveTotale = 26.00 + provvigioneLive;
         document.getElementById('paga-live').innerText = `€ ${pagaLiveTotale.toFixed(2)}`;
@@ -1982,6 +2030,33 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         renderRegistro();
     }
 
+    function copiaSoloListaSpesa() {
+        let txt = `📋 *DETTAGLIO MERCI VENDUTE - VESUVIO JET*\n`;
+        txt += `==================================\n`;
+        let venditeTrovate = false;
+        
+        prodotti.forEach(p => {
+            let totPezzi = p.accPas + p.vPas + p.accPen + p.vPen;
+            if(totPezzi > 0) {
+                txt += `• ${p.i} *${p.n}*: ${totPezzi} pz (Pas: ${p.accPas + p.vPas} | Pen: ${p.accPen + p.vPen})\n`;
+                venditeTrovate = true;
+            }
+        });
+        
+        if(!venditeTrovate) {
+            showToast("Nessuna vendita registrata in questo ciclo!", "⚠️");
+            return;
+        }
+
+        const el = document.createElement('textarea'); 
+        el.value = txt; 
+        document.body.appendChild(el); 
+        el.select(); 
+        document.execCommand('copy'); 
+        document.body.removeChild(el);
+        showToast("Lista copiata negli appunti!", "📋");
+    }
+
     function renderRegistro() {
         const container = document.getElementById('registro-rows');
         if (!container) return;
@@ -2005,7 +2080,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
 
         let html = '';
 
-        // Riga Live
         html += `<tr style="background: rgba(230, 126, 34, 0.08); font-style: italic;">
             <td><b>🔴 Turno in Corso</b><br><small style="color:#7f8c8d;">Live (Non archiviato)</small></td>
             <td>€ ${valoreTeoricoInCassaTotale.toFixed(2)}</td>
@@ -2016,7 +2090,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
             </td>
         </tr>`;
 
-        // Righe Storiche
         if(storicoChiusure && storicoChiusure.length) {
             storicoChiusure.slice().reverse().forEach((log) => {
                 let t = safeFloat(log.teorico);
@@ -2091,8 +2164,7 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         document.getElementById('tot-paghe-dettagli').innerText = `(Storico: €${sumPagheStoriche.toFixed(2)} + Oggi: €${pagaOggiLive.toFixed(2)})`;
     }
 
-    // AZZERA TURNO DI SICUREZZA CON REIMPOSTAZIONE FISICO ALLINEATO AL TURNO ATTIVO
-    function richiediAzzeraVenditeTurno() {
+    function richiediAzzeraTurno() {
         let valoreTeoricoInCassaTotale = 0;
         prodotti.forEach(p => {
             let pezziMancantiTurno = (p.inizio + p.c - (p.accPas + p.accPen)) - p.fisicoIn;
@@ -2108,7 +2180,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
             "🔄 Salva e Azzera Turno Corrente",
             `Per sicurezza, prima di azzerare le vendite, il sistema ARCHIVIERÀ l'incasso e la paga nel registro.\n\nDati da archiviare:\n- Incasso Teorico: €${valoreTeoricoInCassaTotale.toFixed(2)}\n- Incasso Reale: €${cassaRealeGlobal.toFixed(2)}\n- La tua Paga (26€ + 5%): €${pagaOggi.toFixed(2)}\n\nProcedere con il salvataggio e il successivo azzeramento delle vendite?`,
             function() {
-                // 1. Archiviazione preventiva obbligatoria
                 const nuovoLog = {
                     data: new Date().toLocaleString('it-IT'),
                     teorico: valoreTeoricoInCassaTotale.toFixed(2),
@@ -2120,9 +2191,8 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
                 storicoChiusure.push(nuovoLog);
                 localStorage.setItem(HIST_KEY, JSON.stringify(storicoChiusure));
 
-                // 2. Azzeramento delle vendite e riallineamento del magazzino all'inizio del turno
                 prodotti.forEach(p => {
-                    p.fisicoIn = p.inizio + p.c - (p.accPas + p.accPen); // Allinea il magazzino alla situazione di inizio turno
+                    p.fisicoIn = p.inizio + p.c - (p.accPas + p.accPen); 
                     p.vPas = 0;
                     p.vPen = 0;
                 });
@@ -2184,8 +2254,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         openTab('tab-registro');
     }
 
-    function AIC_Core() {}
-
     function richiediConsolidamentoInventario() {
         let noteM = [];
         
@@ -2223,8 +2291,6 @@ Restituisci solo ed esclusivamente il JSON pulito.`;
         showToast("Inventario consolidato! Nuovo ciclo avviato.", "🔒");
         init();
     }
-
-    functionGrid = function(){} 
 
     function richiediAzzeraRegistro() {
         showModalConfirm(
