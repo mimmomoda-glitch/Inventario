@@ -287,6 +287,7 @@
         "BLIZ", "ISCHIA MAR 3", "URAGANO", "ACQUARIUS", "RAID"
     ];
 
+    // Imposto il VESUVIO JET come predefinito per mostrarti l'importazione
     let currentBoat = localStorage.getItem('NAV_MGR_currentBoat') || "VESUVIO JET";
     let prodotti = [];
     let ordiniPendenti = [];
@@ -334,16 +335,88 @@
         {id:'twi', n:"Twix/KitKat/M&M...", i:"🍫", p:2.5, pen:1.0, inizio:0, q:0, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:0}
     ];
 
-    // DATI JSON DEL 30 MAGGIO 2026 SPECIFICI PER IL VESUVIO JET (Copiano esattamente il JSON fornito)
+    // DATI JSON ESTRATTI DALLA FOTO PER VESUVIO JET (02/06/26)
     const vesuvioBackupData = {
-        "prodotti": [{"id":"acq","n":"Acqua","i":"💧","p":2,"pen":1,"inizio":231,"q":231,"c":240,"ddts":[{"numero":"373","qta":240,"bar":240,"dep":0}],"vPas":92,"vPen":4,"accPas":0,"accPen":0,"fis":87,"fisicoIn":375},{"id":"ara","n":"Arachidi / Frutta S.","i":"🥜","p":2.5,"pen":1,"inizio":18,"q":11,"c":0,"ddts":[],"vPas":1,"vPen":1,"accPas":0,"accPen":0,"fis":0,"fisicoIn":16},{"id":"bp","n":"Borse Piccole","i":"👜","p":6,"pen":6,"inizio":126,"q":10,"c":0,"ddts":[],"vPas":16,"vPen":0,"accPas":0,"accPen":0,"fis":90,"fisicoIn":110},{"id":"bg","n":"Borse Grandi","i":"👜","p":10,"pen":10,"inizio":23,"q":21,"c":0,"ddts":[],"vPas":0,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":23},{"id":"bue","n":"Bueno/B-Ready/Biscuits","i":"🍫","p":3,"pen":1,"inizio":34,"q":81,"c":60,"ddts":[{"numero":"373","qta":60,"bar":60,"dep":0}],"vPas":6,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":88},{"id":"cap","n":"Cappelli","i":"🧢","p":5,"pen":5,"inizio":85,"q":71,"c":0,"ddts":[],"vPas":10,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":75},{"id":"car","n":"Caramelle / Gomme","i":"🍬","p":2.5,"pen":1,"inizio":62,"q":96,"c":40,"ddts":[{"numero":"373","qta":40,"bar":40,"dep":0}],"vPas":5,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":97},{"id":"cia","n":"Cialde","i":"☕","p":2,"pen":1,"inizio":232,"q":38,"c":0,"ddts":[],"vPas":12,"vPen":5,"accPas":0,"accPen":0,"fis":150,"fisicoIn":215},{"id":"die","n":"Dietor","i":"🍬","p":0,"pen":0,"inizio":40,"q":40,"c":0,"ddts":[],"vPas":0,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":40},{"id":"fit","n":"Fitness / Cereal Yo","i":"🌾","p":2.5,"pen":1,"inizio":4,"q":47,"c":48,"ddts":[{"numero":"373","qta":48,"bar":48,"dep":0}],"vPas":3,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":49},{"id":"fon","n":"Fonzies / Patatine","i":"🍟","p":2.5,"pen":1,"inizio":142,"q":97,"c":36,"ddts":[{"numero":"373","qta":36,"bar":36,"dep":0}],"vPas":10,"vPen":2,"accPas":0,"accPen":0,"fis":50,"fisicoIn":166},{"id":"imp","n":"Impermeabili","i":"🧥","p":3.5,"pen":3.25,"inizio":21,"q":0,"c":0,"ddts":[],"vPas":0,"vPen":0,"accPas":0,"accPen":0,"fis":21,"fisicoIn":21},{"id":"kin","n":"Kinder Cards","i":"🃏","p":2.5,"pen":1.5,"inizio":2,"q":2,"c":0,"ddts":[],"vPas":0,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":2},{"id":"lat","n":"Latte","i":"🥛","p":0.5,"pen":0.5,"inizio":3,"q":8,"c":5,"ddts":[{"numero":"373","qta":5,"bar":5,"dep":0}],"vPas":0,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":8},{"id":"ltn","n":"Lattine","i":"🥤","p":3.5,"pen":1.5,"inizio":197,"q":255,"c":240,"ddts":[{"numero":"373","qta":144,"bar":96,"dep":48},{"numero":"373","qta":48,"bar":48,"dep":0},{"numero":"373","qta":48,"bar":48,"dep":0}],"vPas":31,"vPen":4,"accPas":0,"accPen":0,"fis":120,"fisicoIn":402},{"id":"mag","n":"Maglie","i":"👕","p":5,"pen":5,"inizio":39,"q":35,"c":0,"ddts":[],"vPas":3,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":36},{"id":"mik","n":"Mikado","i":"🥖","p":3,"pen":1.5,"inizio":14,"q":13,"c":0,"ddts":[],"vPas":1,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":13},{"id":"muf","n":"Muffin","i":"🧁","p":3,"pen":1,"inizio":13,"q":12,"c":30,"ddts":[{"numero":"373","qta":30,"bar":0,"dep":30}],"vPas":1,"vPen":0,"accPas":0,"accPen":0,"fis":30,"fisicoIn":42},{"id":"nik","n":"Nik Nok","i":"🥜","p":2.5,"pen":1,"inizio":39,"q":38,"c":0,"ddts":[],"vPas":1,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":38},{"id":"pav","n":"Pavesini","i":"🍪","p":2.5,"pen":1,"inizio":19,"q":19,"c":0,"ddts":[],"vPas":0,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":19},{"id":"per","n":"Peroni","i":"🍺","p":4.5,"pen":1.5,"inizio":126,"q":57,"c":120,"ddts":[{"numero":"373","qta":120,"bar":72,"dep":48}],"vPas":42,"vPen":4,"accPas":0,"accPen":0,"fis":96,"fisicoIn":200},{"id":"pec","n":"Peroni Capri","i":"🍋","p":7.5,"pen":7.5,"inizio":30,"q":52,"c":24,"ddts":[{"numero":"373","qta":24,"bar":24,"dep":0}],"vPas":2,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":52},{"id":"pri","n":"Pringles","i":"🥔","p":3.5,"pen":2,"inizio":69,"q":43,"c":0,"ddts":[],"vPas":17,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":52},{"id":"vin","n":"Prosecco / Vino","i":"🍷","p":6,"pen":3,"inizio":47,"q":56,"c":72,"ddts":[{"numero":"373","qta":48,"bar":24,"dep":24},{"numero":"373","qta":24,"bar":0,"dep":24}],"vPas":4,"vPen":0,"accPas":0,"accPen":0,"fis":48,"fisicoIn":115},{"id":"red","n":"Red Bull / Gatorade","i":"⚡","p":4.5,"pen":2.5,"inizio":32,"q":39,"c":24,"ddts":[{"numero":"373","qta":24,"bar":24,"dep":0}],"vPas":3,"vPen":0,"accPas":0,"accPen":0,"fis":12,"fisicoIn":53},{"id":"rin","n":"Ringo / Oreo / Baiocchi","i":"🍪","p":2.5,"pen":1,"inizio":70,"q":81,"c":24,"ddts":[{"numero":"373","qta":24,"bar":24,"dep":0}],"vPas":9,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":85},{"id":"rit","n":"Ritz / Cipster","i":"🍪","p":4.5,"pen":2.5,"inizio":12,"q":29,"c":24,"ddts":[{"numero":"373","qta":24,"bar":24,"dep":0}],"vPas":5,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":31},{"id":"spr","n":"Spritz","i":"🍹","p":8,"pen":8,"inizio":21,"q":31,"c":48,"ddts":[{"numero":"373","qta":48,"bar":24,"dep":24}],"vPas":7,"vPen":0,"accPas":0,"accPen":0,"fis":24,"fisicoIn":62},{"id":"suc","n":"Succo","i":"🧃","p":3.5,"pen":1,"inizio":13,"q":13,"c":0,"ddts":[],"vPas":0,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":13},{"id":"the","n":"The Camomilla","i":"🍵","p":2.5,"pen":1.5,"inizio":41,"q":41,"c":0,"ddts":[],"vPas":0,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":41},{"id":"tuc","n":"Tuc","i":"🍪","p":4,"pen":2,"inizio":8,"q":23,"c":24,"ddts":[{"numero":"373","qta":24,"bar":24,"dep":0}],"vPas":4,"vPen":1,"accPas":0,"accPen":0,"fis":0,"fisicoIn":27},{"id":"twi","n":"Twix/KitKat/M&M...","i":"🍫","p":2.5,"pen":1,"inizio":23,"q":108,"c":96,"ddts":[{"numero":"373","qta":96,"bar":96,"dep":0}],"vPas":4,"vPen":0,"accPas":0,"accPen":0,"fis":0,"fisicoIn":115}],
+        "prodotti": [
+            {id:'acq', n:"Acqua", i:"💧", p:2.0, pen:1.0, inizio:149, q:149, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:149},
+            {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1.0, inizio:4, q:4, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:4},
+            {id:'bp', n:"Borse Piccole", i:"👜", p:6.0, pen:6.0, inizio:142, q:142, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:142},
+            {id:'bg', n:"Borse Grandi", i:"👜", p:10.0, pen:10.0, inizio:5, q:5, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:5},
+            {id:'bue', n:"Bueno/B-Ready/Biscuits", i:"🍫", p:3.0, pen:1.0, inizio:51, q:51, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:51},
+            {id:'cap', n:"Cappelli", i:"🧢", p:5.0, pen:5.0, inizio:63, q:63, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:63},
+            {id:'car', n:"Caramelle / Gomme", i:"🍬", p:2.5, pen:1.0, inizio:75, q:75, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:75},
+            {id:'cia', n:"Cialde", i:"☕", p:2.0, pen:1.0, inizio:126, q:126, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:126},
+            {id:'die', n:"Dietor", i:"🍬", p:0.0, pen:0.0, inizio:40, q:40, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:40},
+            {id:'fit', n:"Fitness / Cereal Yo", i:"🌾", p:2.5, pen:1.0, inizio:45, q:45, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:45},
+            {id:'fon', n:"Fonzies / Patatine", i:"🍟", p:2.5, pen:1.0, inizio:106, q:106, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:106},
+            {id:'imp', n:"Impermeabili", i:"🧥", p:3.5, pen:3.25, inizio:21, q:21, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:21},
+            {id:'kin', n:"Kinder Cards", i:"🃏", p:2.5, pen:1.5, inizio:0, q:0, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:0},
+            {id:'lat', n:"Latte", i:"🥛", p:0.5, pen:0.5, inizio:0, q:0, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:0},
+            {id:'ltn', n:"Lattine", i:"🥤", p:3.5, pen:1.5, inizio:291, q:291, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:291},
+            {id:'mag', n:"Maglie", i:"👕", p:5.0, pen:5.0, inizio:31, q:31, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:31},
+            {id:'mik', n:"Mikado", i:"🥖", p:3.0, pen:1.5, inizio:12, q:12, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:12},
+            {id:'muf', n:"Muffin", i:"🧁", p:3.0, pen:1.0, inizio:39, q:39, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:39},
+            {id:'nik', n:"Nik Nok", i:"🥜", p:2.5, pen:1.0, inizio:34, q:34, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:34},
+            {id:'pav', n:"Pavesini", i:"🍪", p:2.5, pen:1.0, inizio:19, q:19, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:19},
+            {id:'per', n:"Peroni", i:"🍺", p:4.5, pen:1.5, inizio:64, q:64, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:64},
+            {id:'pec', n:"Peroni Capri", i:"🍋", p:7.5, pen:7.5, inizio:49, q:49, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:49},
+            {id:'pri', n:"Pringles", i:"🥔", p:3.5, pen:2.0, inizio:42, q:42, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:42},
+            {id:'vin', n:"Prosecco / Vino", i:"🍷", p:6.0, pen:3.0, inizio:48, q:48, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:48},
+            {id:'red', n:"Red Bull / Gatorade", i:"⚡", p:4.5, pen:2.5, inizio:43, q:43, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:43},
+            {id:'rin', n:"Ringo / Oreo / Baiocchi", i:"🍪", p:2.5, pen:1.0, inizio:48, q:48, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:48},
+            {id:'rit', n:"Ritz / Cipster", i:"🍪", p:4.5, pen:2.5, inizio:22, q:22, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:22},
+            {id:'spr', n:"Spritz", i:"🍹", p:8.0, pen:8.0, inizio:39, q:39, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:39},
+            {id:'suc', n:"Succo", i:"🧃", p:3.5, pen:1.0, inizio:7, q:7, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:7},
+            {id:'the', n:"The Camomilla", i:"🍵", p:2.5, pen:1.5, inizio:0, q:0, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:0},
+            {id:'tuc', n:"Tuc", i:"🍪", p:4.0, pen:2.0, inizio:15, q:15, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:15},
+            {id:'twi', n:"Twix/KitKat/M&M...", i:"🍫", p:2.5, pen:1.0, inizio:95, q:95, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:95}
+        ],
         "ordiniPendenti": [],
         "ordiniCompletati": [],
-        "cassaRealeGlobal": 1041,
-        "storicoChiusure": [
-            {"data":"20/05/2026, 18:45:12","teorico":"365.50","reale":"367.00","diffCassa":"1.50","paga":44.35,"noteMerce":"Esempio Chiusura 20 Maggio. Cassa quadrata positivamente, rimanenze aggiornate.","dettaglioVendite":[{"id":"acq","n":"Acqua","i":"💧","pas":30,"pen":10,"tot":40,"valore":70},{"id":"per","n":"Peroni","i":"🍺","pas":15,"pen":5,"tot":20,"valore":75},{"id":"pec","n":"Peroni Capri","i":"🍋","pas":10,"pen":0,"tot":10,"valore":75},{"id":"cia","n":"Cialde","i":"☕","pas":20,"pen":5,"tot":25,"valore":45},{"id":"ltn","n":"Lattine","i":"🥤","pas":10,"pen":5,"tot":15,"valore":42.5},{"id":"fon","n":"Fonzies / Patatine","i":"🍟","pas":15,"pen":3,"tot":18,"valore":40.5},{"id":"pri","n":"Pringles","i":"🥔","pas":5,"pen":0,"tot":5,"valore":17.5}]},
-            {"data":"30/05/2026, 09:24:23","teorico":"829.50","reale":"926.00","diffCassa":"96.50","paga":72.30000000000001,"noteMerce":"Salvataggio di sicurezza automatico prima del reset turno.","dettaglioVendite":[{"id":"acq","n":"Acqua","i":"💧","pas":54,"pen":3,"tot":57,"valore":111},{"id":"ara","n":"Arachidi / Frutta S.","i":"🥜","pas":5,"pen":0,"tot":5,"valore":12.5},{"id":"bp","n":"Borse Piccole","i":"👜","pas":10,"pen":0,"tot":10,"valore":60},{"id":"bg","n":"Borse Grandi","i":"👜","pas":2,"pen":0,"tot":2,"valore":20},{"id":"bue","n":"Bueno/B-Ready/Biscuits","i":"🍫","pas":6,"pen":1,"tot":7,"valore":19},{"id":"cap","n":"Cappelli","i":"🧢","pas":4,"pen":0,"tot":4,"valore":20},{"id":"car","n":"Caramelle / Gomme","i":"🍬","pas":1,"pen":0,"tot":1,"valore":2.5},{"id":"cia","n":"Cialde","i":"☕","pas":23,"pen":4,"tot":27,"valore":50},{"id":"fit","n":"Fitness / Cereal Yo","i":"🌾","pas":2,"pen":0,"tot":2,"valore":5},{"id":"fon","n":"Fonzies / Patatine","i":"🍟","pas":17,"pen":2,"tot":19,"valore":44.5},{"id":"ltn","n":"Lattine","i":"🥤","pas":26,"pen":0,"tot":26,"valore":91},{"id":"mag","n":"Maglie","i":"👕","pas":1,"pen":0,"tot":1,"valore":5},{"id":"per","n":"Peroni","i":"🍺","pas":38,"pen":5,"tot":43,"valore":178.5},{"id":"pri","n":"Pringles","i":"🥔","pas":9,"pen":0,"tot":9,"valore":31.5},{"id":"vin","n":"Prosecco / Vino","i":"🍷","pas":11,"pen":0,"tot":11,"valore":66},{"id":"red","n":"Red Bull / Gatorade","i":"⚡","pas":2,"pen":0,"tot":2,"valore":9},{"id":"rin","n":"Ringo / Oreo / Baiocchi","i":"🍪","pas":3,"pen":1,"tot":4,"valore":8.5},{"id":"rit","n":"Ritz / Cipster","i":"🍪","pas":2,"pen":0,"tot":2,"valore":9},{"id":"spr","n":"Spritz","i":"🍹","pas":7,"pen":0,"tot":7,"valore":56},{"id":"tuc","n":"Tuc","i":"🍪","pas":4,"pen":0,"tot":4,"valore":16},{"id":"twi","n":"Twix/KitKat/M&M...","i":"🍫","pas":5,"pen":2,"tot":7,"valore":14.5}]}
-        ]
+        "cassaRealeGlobal": 0,
+        "storicoChiusure": []
+    };
+
+    // DATI JSON ESTRATTI DALLA FOTO PER NAPOLI JET (01/06/26)
+    const napoliBackupData = {
+        "prodotti": [
+            {id:'acq', n:"Acqua", i:"💧", p:2.0, pen:1.0, inizio:180, q:180, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:180},
+            {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1.0, inizio:85, q:85, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:85},
+            {id:'bp', n:"Borse Piccole", i:"👜", p:6.0, pen:6.0, inizio:71, q:71, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:71},
+            {id:'bg', n:"Borse Grandi", i:"👜", p:10.0, pen:10.0, inizio:20, q:20, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:20},
+            {id:'bue', n:"Bueno/B-Ready/Biscuits", i:"🍫", p:3.0, pen:1.0, inizio:123, q:123, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:123},
+            {id:'cap', n:"Cappelli", i:"🧢", p:5.0, pen:5.0, inizio:183, q:183, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:183},
+            {id:'car', n:"Caramelle / Gomme", i:"🍬", p:2.5, pen:1.0, inizio:103, q:103, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:103},
+            {id:'cia', n:"Cialde", i:"☕", p:2.0, pen:1.0, inizio:107, q:107, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:107},
+            {id:'die', n:"Dietor", i:"🍬", p:0.0, pen:0.0, inizio:4, q:4, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:4},
+            {id:'fit', n:"Fitness / Cereal Yo", i:"🌾", p:2.5, pen:1.0, inizio:38, q:38, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:38},
+            {id:'fon', n:"Fonzies / Patatine", i:"🍟", p:2.5, pen:1.0, inizio:34, q:34, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:34},
+            {id:'imp', n:"Impermeabili", i:"🧥", p:3.5, pen:3.25, inizio:54, q:54, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:54},
+            {id:'kin', n:"Kinder Cards", i:"🃏", p:2.5, pen:1.5, inizio:0, q:0, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:0},
+            {id:'lat', n:"Latte", i:"🥛", p:0.5, pen:0.5, inizio:0, q:0, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:0},
+            {id:'ltn', n:"Lattine", i:"🥤", p:3.5, pen:1.5, inizio:330, q:330, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:330},
+            {id:'mag', n:"Maglie", i:"👕", p:5.0, pen:5.0, inizio:28, q:28, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:28},
+            {id:'mik', n:"Mikado", i:"🥖", p:3.0, pen:1.5, inizio:48, q:48, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:48},
+            {id:'muf', n:"Muffin", i:"🧁", p:3.0, pen:1.0, inizio:33, q:33, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:33},
+            {id:'nik', n:"Nik Nok", i:"🥜", p:2.5, pen:1.0, inizio:6, q:6, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:6},
+            {id:'pav', n:"Pavesini", i:"🍪", p:2.5, pen:1.0, inizio:21, q:21, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:21},
+            {id:'per', n:"Peroni", i:"🍺", p:4.5, pen:1.5, inizio:202, q:202, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:202},
+            {id:'pec', n:"Peroni Capri", i:"🍋", p:7.5, pen:7.5, inizio:54, q:54, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:54},
+            {id:'pri', n:"Pringles", i:"🥔", p:3.5, pen:2.0, inizio:86, q:86, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:86},
+            {id:'vin', n:"Prosecco / Vino", i:"🍷", p:6.0, pen:3.0, inizio:111, q:111, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:111},
+            {id:'red', n:"Red Bull / Gatorade", i:"⚡", p:4.5, pen:2.5, inizio:55, q:55, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:55},
+            {id:'rin', n:"Ringo / Oreo / Baiocchi", i:"🍪", p:2.5, pen:1.0, inizio:62, q:62, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:62},
+            {id:'rit', n:"Ritz / Cipster", i:"🍪", p:4.5, pen:2.5, inizio:28, q:28, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:28},
+            {id:'spr', n:"Spritz", i:"🍹", p:8.0, pen:8.0, inizio:45, q:45, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:45},
+            {id:'suc', n:"Succo", i:"🧃", p:3.5, pen:1.0, inizio:34, q:34, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:34},
+            {id:'the', n:"The Camomilla", i:"🍵", p:2.5, pen:1.5, inizio:41, q:41, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:41},
+            {id:'tuc', n:"Tuc", i:"🍪", p:4.0, pen:2.0, inizio:16, q:16, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:16},
+            {id:'twi', n:"Twix/KitKat/M&M...", i:"🍫", p:2.5, pen:1.0, inizio:124, q:124, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:124}
+        ],
+        "ordiniPendenti": [],
+        "ordiniCompletati": [],
+        "cassaRealeGlobal": 0,
+        "storicoChiusure": []
     };
 
     // Crea una chiave di salvataggio UNICA e ISOLATA per la barca corrente
@@ -397,28 +470,34 @@
         localStorage.setItem(getStorageKey('history'), JSON.stringify(storicoChiusure));
     }
 
-    // Carica dati per la barca (Se non esistono crea quelli base da 0, o inietta il JSON di default per Vesuvio)
+    // Carica dati per la barca
     function loadData() {
         let savedProdotti = JSON.parse(localStorage.getItem(getStorageKey('prodotti')));
+        let isNapoliImported = localStorage.getItem('NAV_MGR_NAPOLI_JET_imported_foto');
+        let isVesuvioImported = localStorage.getItem('NAV_MGR_VESUVIO_JET_imported_foto_0206');
         
-        if (!savedProdotti) { 
-            // Inizializzazione della prima volta che si visita una barca
-            if (currentBoat === "VESUVIO JET") {
-                // Se è la primissima volta sul Vesuvio, usa i dati completi richiesti da JSON
-                prodotti = JSON.parse(JSON.stringify(vesuvioBackupData.prodotti));
-                ordiniPendenti = JSON.parse(JSON.stringify(vesuvioBackupData.ordiniPendenti));
-                ordiniCompletati = JSON.parse(JSON.stringify(vesuvioBackupData.ordiniCompletati));
-                cassaRealeGlobal = parseFloat(vesuvioBackupData.cassaRealeGlobal) || 0;
-                storicoChiusure = JSON.parse(JSON.stringify(vesuvioBackupData.storicoChiusure));
-            } else {
-                // Per le altre barche, tutto a 0
-                prodotti = JSON.parse(JSON.stringify(defaultZeroData));
-                ordiniPendenti = [];
-                ordiniCompletati = [];
-                cassaRealeGlobal = 0.00;
-                storicoChiusure = [];
-            }
-            saveCurrentBoatData(); // Salva immediatamente così la prossima volta esisteranno
+        // Se navighiamo su Napoli Jet e non abbiamo ancora importato i dati
+        if (currentBoat === "NAPOLI JET" && !isNapoliImported) {
+            prodotti = JSON.parse(JSON.stringify(napoliBackupData.prodotti));
+            ordiniPendenti = []; ordiniCompletati = []; cassaRealeGlobal = 0.00; storicoChiusure = [];
+            localStorage.setItem('NAV_MGR_NAPOLI_JET_imported_foto', 'true');
+            saveCurrentBoatData();
+        } 
+        // Se navighiamo su Vesuvio Jet e non abbiamo ancora importato i dati
+        else if (currentBoat === "VESUVIO JET" && !isVesuvioImported) {
+            prodotti = JSON.parse(JSON.stringify(vesuvioBackupData.prodotti));
+            ordiniPendenti = []; ordiniCompletati = []; cassaRealeGlobal = 0.00; storicoChiusure = [];
+            localStorage.setItem('NAV_MGR_VESUVIO_JET_imported_foto_0206', 'true');
+            saveCurrentBoatData();
+        }
+        else if (!savedProdotti) { 
+            // Inizializzazione per le altre barche
+            prodotti = JSON.parse(JSON.stringify(defaultZeroData));
+            ordiniPendenti = [];
+            ordiniCompletati = [];
+            cassaRealeGlobal = 0.00;
+            storicoChiusure = [];
+            saveCurrentBoatData(); 
         } 
         else { 
             prodotti = savedProdotti;
