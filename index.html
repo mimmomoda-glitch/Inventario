@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -153,15 +154,15 @@
         .inv-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 0.78rem; border-bottom: 1px dashed var(--border-color); }
         
         /* Register & Inventory Dashboards */
-        .registro-table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 10px; overflow: hidden; font-size: 0.78rem; margin-top: 10px; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
-        .registro-table th, .registro-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        .registro-table th { background: var(--primary-light); color: white; font-weight: bold; font-size: 0.7rem; text-transform: uppercase; }
+        .registro-table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 10px; overflow: hidden; font-size: 0.75rem; margin-top: 10px; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
+        .registro-table th, .registro-table td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .registro-table th { background: var(--primary-light); color: white; font-weight: bold; font-size: 0.65rem; text-transform: uppercase; }
         .registro-table tr.clickable-row { cursor: pointer; transition: background 0.15s; }
         .registro-table tr.clickable-row:hover { background: rgba(0,0,0,0.02); }
         body[data-theme="dark"] .registro-table tr.clickable-row:hover { background: rgba(255,255,255,0.02); }
         .registro-table tr:last-child td { border-bottom: none; }
         
-        .registro-dash { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        .registro-dash { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 15px; }
         .reg-card { background: var(--card-bg); padding: 12px 6px; border-radius: 12px; text-align: center; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
         .reg-card span { font-size: 0.58rem; color: #7f8c8d; display: block; text-transform: uppercase; margin-bottom: 4px; font-weight: bold; }
         .reg-card b { font-size: 0.9rem; }
@@ -171,7 +172,7 @@
         .modal-card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid var(--border-color); text-align: center; animation: modalScale 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes modalScale { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .modal-title { font-size: 1.1rem; font-weight: bold; color: var(--text-color); margin-bottom: 12px; }
-        .modal-body { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 20px; line-height: 1.4; }
+        .modal-body { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 20px; line-height: 1.4; white-space: pre-line; }
         .modal-buttons { display: flex; gap: 10px; justify-content: center; }
         .modal-btn { flex: 1; padding: 12px; border-radius: 10px; font-weight: bold; border: none; cursor: pointer; font-size: 0.85rem; transition: var(--transition); }
         .modal-btn-ok { background: var(--accent); color: white; }
@@ -208,8 +209,7 @@
     <button class="tab-btn active" id="btn-vendite" onclick="openTab('tab-vendite')">💰 VENDITE</button>
     <button class="tab-btn" id="btn-magazzino" onclick="openTab('tab-magazzino')">📦 STOCK</button>
     <button class="tab-btn" id="btn-ordini" onclick="openTab('tab-ordini')">🛒 ORDINI</button>
-    <button class="tab-btn" id="btn-report" onclick="openTab('tab-report')">📊 INV.</button>
-    <button class="tab-btn" id="btn-registro" onclick="openTab('tab-registro')">📁 REGISTRO</button>
+    <button class="tab-btn" id="btn-riepilogo" onclick="openTab('tab-riepilogo')">📊 INV & REG</button>
 </div>
 
 <div class="content">
@@ -231,11 +231,10 @@
     <div id="tab-vendite" class="tab-content active"></div>
     <div id="tab-magazzino" class="tab-content"></div>
     <div id="tab-ordini" class="tab-content"></div>
-    <div id="tab-report" class="tab-content">
-        <div id="report-container-interno"></div>
-    </div>
-    <div id="tab-registro" class="tab-content">
-        <div id="registro-container-interno"></div>
+    
+    <!-- L'UNICA SCHEDA CHE CONTIENE TUTTO (INV + REGISTRO) -->
+    <div id="tab-riepilogo" class="tab-content">
+        <div id="riepilogo-container-interno"></div>
     </div>
 </div>
 
@@ -270,7 +269,7 @@
 
 <div class="bottom-actions">
     <button class="btn btn-wa" onclick="condividiWhatsApp()"><span>📲</span> COPIA & INVIA REPORT WHATSAPP</button>
-    <div style="display:flex; gap:8px;"><button class="btn btn-neutral" onclick="openTab('tab-vendite')">TORNA VENDITE</button><button class="btn btn-success" onclick="openTab('tab-report')">INVENTARIO & CASSA</button></div>
+    <div style="display:flex; gap:8px;"><button class="btn btn-neutral" onclick="openTab('tab-vendite')">TORNA VENDITE</button><button class="btn btn-success" onclick="openTab('tab-riepilogo')">VAI AL RIEPILOGO GENERALE</button></div>
 </div>
 
 <div class="modal-overlay" id="customModal">
@@ -287,7 +286,6 @@
         "BLIZ", "ISCHIA MAR 3", "URAGANO", "ACQUARIUS", "RAID"
     ];
 
-    // Imposto il VESUVIO JET come predefinito per mostrarti l'importazione
     let currentBoat = localStorage.getItem('NAV_MGR_currentBoat') || "VESUVIO JET";
     let prodotti = [];
     let ordiniPendenti = [];
@@ -299,7 +297,6 @@
 
     const THEME_KEY = 'barData_v13_theme';
     
-    // TUTTI I DATI DI BASE A ZERO PER LE BARCHE GENERICHE (Solo prezzi conservati)
     const defaultZeroData = [
         {id:'acq', n:"Acqua", i:"💧", p:2.0, pen:1.0, inizio:0, q:0, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:0}, 
         {id:'ara', n:"Arachidi / Frutta S.", i:"🥜", p:2.5, pen:1.0, inizio:0, q:0, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:0}, 
@@ -335,7 +332,6 @@
         {id:'twi', n:"Twix/KitKat/M&M...", i:"🍫", p:2.5, pen:1.0, inizio:0, q:0, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:0}
     ];
 
-    // DATI JSON ESTRATTI DALLA FOTO PER VESUVIO JET (02/06/26)
     const vesuvioBackupData = {
         "prodotti": [
             {id:'acq', n:"Acqua", i:"💧", p:2.0, pen:1.0, inizio:149, q:149, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:149},
@@ -377,7 +373,6 @@
         "storicoChiusure": []
     };
 
-    // DATI JSON ESTRATTI DALLA FOTO PER NAPOLI JET (01/06/26)
     const napoliBackupData = {
         "prodotti": [
             {id:'acq', n:"Acqua", i:"💧", p:2.0, pen:1.0, inizio:180, q:180, c:0, ddts:[], vPas:0, vPen:0, accPas:0, accPen:0, fis:0, fisicoIn:180},
@@ -419,10 +414,7 @@
         "storicoChiusure": []
     };
 
-    // Crea una chiave di salvataggio UNICA e ISOLATA per la barca corrente
-    function getStorageKey(type) {
-        return `NAV_MGR_${currentBoat.replace(/ /g, '_')}_${type}`;
-    }
+    function getStorageKey(type) { return `NAV_MGR_${currentBoat.replace(/ /g, '_')}_${type}`; }
 
     function safeFloat(val) {
         if (val === undefined || val === null) return 0;
@@ -436,9 +428,7 @@
         document.body.setAttribute('data-theme', nt); localStorage.setItem(THEME_KEY, nt);
     }
     
-    function initTheme() { 
-        document.body.setAttribute('data-theme', localStorage.getItem(THEME_KEY) || 'light'); 
-    }
+    function initTheme() { document.body.setAttribute('data-theme', localStorage.getItem(THEME_KEY) || 'light'); }
 
     function showModalConfirm(title, message, onConfirm) {
         document.getElementById('customModalTitle').innerText = title;
@@ -456,12 +446,11 @@
     function openTab(id) {
         document.querySelectorAll('.tab-content, .tab-btn').forEach(e => e.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        const map = { 'tab-vendite':'btn-vendite', 'tab-magazzino':'btn-magazzino', 'tab-ordini':'btn-ordini', 'tab-report':'btn-report', 'tab-registro':'btn-registro' };
+        const map = { 'tab-vendite':'btn-vendite', 'tab-magazzino':'btn-magazzino', 'tab-ordini':'btn-ordini', 'tab-riepilogo':'btn-riepilogo' };
         if(map[id]) document.getElementById(map[id]).classList.add('active');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Funzione che salva tutti i dati della barca corrente in modo persistente
     function saveCurrentBoatData() {
         localStorage.setItem(getStorageKey('prodotti'), JSON.stringify(prodotti));
         localStorage.setItem(getStorageKey('ordini_pend'), JSON.stringify(ordiniPendenti));
@@ -470,34 +459,21 @@
         localStorage.setItem(getStorageKey('history'), JSON.stringify(storicoChiusure));
     }
 
-    // Carica dati per la barca
     function loadData() {
         let savedProdotti = JSON.parse(localStorage.getItem(getStorageKey('prodotti')));
         let isNapoliImported = localStorage.getItem('NAV_MGR_NAPOLI_JET_imported_foto');
         let isVesuvioImported = localStorage.getItem('NAV_MGR_VESUVIO_JET_imported_foto_0206');
         
-        // Se navighiamo su Napoli Jet e non abbiamo ancora importato i dati
         if (currentBoat === "NAPOLI JET" && !isNapoliImported) {
-            prodotti = JSON.parse(JSON.stringify(napoliBackupData.prodotti));
-            ordiniPendenti = []; ordiniCompletati = []; cassaRealeGlobal = 0.00; storicoChiusure = [];
-            localStorage.setItem('NAV_MGR_NAPOLI_JET_imported_foto', 'true');
-            saveCurrentBoatData();
+            prodotti = JSON.parse(JSON.stringify(napoliBackupData.prodotti)); ordiniPendenti = []; ordiniCompletati = []; cassaRealeGlobal = 0.00; storicoChiusure = [];
+            localStorage.setItem('NAV_MGR_NAPOLI_JET_imported_foto', 'true'); saveCurrentBoatData();
         } 
-        // Se navighiamo su Vesuvio Jet e non abbiamo ancora importato i dati
         else if (currentBoat === "VESUVIO JET" && !isVesuvioImported) {
-            prodotti = JSON.parse(JSON.stringify(vesuvioBackupData.prodotti));
-            ordiniPendenti = []; ordiniCompletati = []; cassaRealeGlobal = 0.00; storicoChiusure = [];
-            localStorage.setItem('NAV_MGR_VESUVIO_JET_imported_foto_0206', 'true');
-            saveCurrentBoatData();
+            prodotti = JSON.parse(JSON.stringify(vesuvioBackupData.prodotti)); ordiniPendenti = []; ordiniCompletati = []; cassaRealeGlobal = 0.00; storicoChiusure = [];
+            localStorage.setItem('NAV_MGR_VESUVIO_JET_imported_foto_0206', 'true'); saveCurrentBoatData();
         }
         else if (!savedProdotti) { 
-            // Inizializzazione per le altre barche
-            prodotti = JSON.parse(JSON.stringify(defaultZeroData));
-            ordiniPendenti = [];
-            ordiniCompletati = [];
-            cassaRealeGlobal = 0.00;
-            storicoChiusure = [];
-            saveCurrentBoatData(); 
+            prodotti = JSON.parse(JSON.stringify(defaultZeroData)); ordiniPendenti = []; ordiniCompletati = []; cassaRealeGlobal = 0.00; storicoChiusure = []; saveCurrentBoatData(); 
         } 
         else { 
             prodotti = savedProdotti;
@@ -505,24 +481,13 @@
             ordiniCompletati = JSON.parse(localStorage.getItem(getStorageKey('ordini_comp'))) || [];
             cassaRealeGlobal = parseFloat(localStorage.getItem(getStorageKey('cassa'))) || 0.00;
             storicoChiusure = JSON.parse(localStorage.getItem(getStorageKey('history'))) || [];
-            
-            // Garantisce l'esistenza di nuovi prodotti nell'array se rilasciati con futuri aggiornamenti
-            defaultZeroData.forEach(d => { 
-                if (!prodotti.find(x => x.id === d.id)) {
-                    prodotti.push(JSON.parse(JSON.stringify(d)));
-                } 
-            }); 
+            defaultZeroData.forEach(d => { if (!prodotti.find(x => x.id === d.id)) prodotti.push(JSON.parse(JSON.stringify(d))); }); 
         }
-        
         document.title = `NAV Bar - ${currentBoat}`;
     }
 
     function changeBoat(newBoat) {
-        currentBoat = newBoat;
-        localStorage.setItem('NAV_MGR_currentBoat', currentBoat);
-        loadData();
-        init(); // Ricarica tutto con la nuova barca
-        showToast(`Passato a ${currentBoat}`, "🚢");
+        currentBoat = newBoat; localStorage.setItem('NAV_MGR_currentBoat', currentBoat); loadData(); init(); showToast(`Passato a ${currentBoat}`, "🚢");
     }
 
     function initBoatSelector() {
@@ -534,32 +499,28 @@
     function renderOrdiniTab() {
         const t = document.getElementById('tab-ordini');
         if(!t) return;
-        
         let html = `
         <div id="ordini-dashboard">
             <button class="btn" style="width: 100%; font-size: 1rem; background: var(--warning); color: white; padding: 14px; border-radius: 12px; font-weight: bold; margin-bottom: 15px; box-shadow: var(--shadow);" onclick="apriNuovoOrdine()">
                 ➕ COMPILA SCHEDA ORDINE
             </button>
-            
             <h3 style="font-size: 1rem; color: var(--accent); margin-bottom: 10px; padding-bottom: 5px; border-bottom: 2px solid var(--border-color);">⏳ Ordini In Attesa</h3>
             <div id="lista-pendenti">`;
             
         if(ordiniPendenti.length === 0) {
-            html += `<p style="font-size:0.8rem; color:#888; text-align:center; font-style:italic; margin-bottom:20px;">Nessun ordine in attesa per questa nave.</p>`;
+            html += `<p style="font-size:0.8rem; color:#888; text-align:center; font-style:italic; margin-bottom:20px;">Nessun ordine in attesa.</p>`;
         } else {
             ordiniPendenti.forEach(o => {
                 html += `
                 <div class="ordine-card" style="border-left-color: var(--warning);">
                     <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                        <b style="font-size:0.95rem;">📄 ${o.numero}</b>
-                        <span class="badge" style="background:#fff3cd; color:#856404;">IN ATTESA</span>
+                        <b style="font-size:0.95rem;">📄 ${o.numero}</b><span class="badge" style="background:#fff3cd; color:#856404;">IN ATTESA</span>
                     </div>
                     <div style="font-size:0.75rem; color:#666; margin-bottom:10px;">
-                        Data compilazione: <b>${o.data}</b><br>
-                        Articoli richiesti: <b>${o.voci.length}</b> (Tot: ${o.voci.reduce((s,v)=>s+v.qtaRichiesta,0)} pz)
+                        Data compilazione: <b>${o.data}</b><br>Articoli richiesti: <b>${o.voci.length}</b> (Tot: ${o.voci.reduce((s,v)=>s+v.qtaRichiesta,0)} pz)
                     </div>
                     <div style="display:flex; gap:8px;">
-                        <button class="btn btn-success" style="flex:2; padding:10px; font-size:0.8rem;" onclick="apriValidaOrdine('${o.id}')">📥 VALIDA ARRIVO / SMISTA</button>
+                        <button class="btn btn-success" style="flex:2; padding:10px; font-size:0.8rem;" onclick="apriValidaOrdine('${o.id}')">📥 VALIDA ARRIVO</button>
                         <button class="btn btn-neutral" style="flex:1; padding:10px; background:#25D366; font-size:0.8rem;" onclick="condividiOrdineWhatsApp('${o.id}')">📲</button>
                         <button class="btn btn-danger" style="flex:1; padding:10px; font-size:0.8rem;" onclick="eliminaOrdinePendente('${o.id}')">🗑️</button>
                     </div>
@@ -572,268 +533,108 @@
             <div id="lista-completati">`;
             
         if(ordiniCompletati.length === 0) {
-            html += `<p style="font-size:0.8rem; color:#888; text-align:center; font-style:italic;">Nessuno storico presente per questa nave.</p>`;
+            html += `<p style="font-size:0.8rem; color:#888; text-align:center; font-style:italic;">Nessuno storico presente.</p>`;
         } else {
             ordiniCompletati.slice().reverse().forEach(o => {
                 html += `
                 <div class="ordine-card" style="border-left-color: var(--success); opacity:0.8; padding: 10px;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                        <b style="font-size:0.85rem;">📄 ${o.numero}</b>
-                        <span class="badge badge-success" style="font-size:0.6rem;">RICEVUTO</span>
+                        <b style="font-size:0.85rem;">📄 ${o.numero}</b><span class="badge badge-success" style="font-size:0.6rem;">RICEVUTO</span>
                     </div>
                     <div style="font-size:0.7rem; color:#666;">
-                        Compilato: ${o.data}<br>
-                        Arrivato il: <b>${o.dataArrivo}</b><br>
-                        Totale caricato: <b>${o.totalePezzi} pz</b> (di cui Bar: ${o.caricatoBar||0} | Dep: ${o.caricatoDep||0})
+                        Compilato: ${o.data}<br>Arrivato il: <b>${o.dataArrivo}</b><br>Totale caricato: <b>${o.totalePezzi} pz</b> (Bar: ${o.caricatoBar||0} | Dep: ${o.caricatoDep||0})
                     </div>
                 </div>`;
             });
         }
-        
         html += `</div></div>
         
         <div id="ordini-crea-view" style="display:none; background:var(--card-bg); padding:15px; border-radius:16px; border:1px solid var(--border-color);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="margin:0; color:var(--warning);">📝 Nuova Scheda Ordine</h3>
-                <button class="btn btn-danger" style="padding:6px 12px; border-radius:8px;" onclick="chiudiVisteOrdini()">✕</button>
-            </div>
-            <div class="field" style="margin-bottom:15px;">
-                <label>Nome / Riferimento Ordine</label>
-                <input type="text" id="nuovo-ordine-nome" class="price-input" style="text-align:left;">
-            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><h3 style="margin:0; color:var(--warning);">📝 Nuova Scheda</h3><button class="btn btn-danger" style="padding:6px 12px; border-radius:8px;" onclick="chiudiVisteOrdini()">✕</button></div>
+            <div class="field" style="margin-bottom:15px;"><label>Nome / Riferimento</label><input type="text" id="nuovo-ordine-nome" class="price-input" style="text-align:left;"></div>
             <div style="margin-bottom:15px; border-top:1px solid var(--border-color); padding-top:10px;" id="nuovo-ordine-lista"></div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-neutral" style="flex:1; padding:14px; font-size:0.95rem; border-radius:10px; background:var(--primary-light);" onclick="salvaNuovoOrdine(false)">💾 SALVA SCHEDA</button>
-                <button class="btn btn-wa" style="flex:1; padding:14px; font-size:0.95rem; border-radius:10px; background:#25D366;" onclick="salvaNuovoOrdine(true)">📲 SALVA E INVIA</button>
-            </div>
+            <div style="display:flex; gap:10px;"><button class="btn btn-neutral" style="flex:1; padding:14px; font-size:0.95rem; border-radius:10px; background:var(--primary-light);" onclick="salvaNuovoOrdine(false)">💾 SALVA</button><button class="btn btn-wa" style="flex:1; padding:14px; font-size:0.95rem; border-radius:10px; background:#25D366;" onclick="salvaNuovoOrdine(true)">📲 INVIA</button></div>
         </div>
         
         <div id="ordini-valida-view" style="display:none; background:var(--card-bg); padding:15px; border-radius:16px; border:1px solid var(--border-color);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="margin:0; color:var(--success);">📥 Importa Arrivo Merce</h3>
-                <button class="btn btn-danger" style="padding:6px 12px; border-radius:8px;" onclick="chiudiVisteOrdini()">✕</button>
-            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><h3 style="margin:0; color:var(--success);">📥 Importa Arrivo</h3><button class="btn btn-danger" style="padding:6px 12px; border-radius:8px;" onclick="chiudiVisteOrdini()">✕</button></div>
             <input type="hidden" id="valida-ordine-id">
-            <div style="background: var(--input-bg); padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color); font-size: 0.8rem;">
-                📅 Ordine del: <b id="valida-ordine-data-creazione">--/--/----</b><br>
-                Riferimento: <b id="valida-ordine-nome-info">--</b>
-            </div>
-            <div class="field" style="margin-bottom:15px;">
-                <label>Num. Documento / DDT (Opzionale)</label>
-                <input type="text" id="valida-ordine-ddt" class="price-input" style="text-align:left;">
-            </div>
-            <p style="font-size:0.75rem; color:#666; margin-bottom:10px;">Clicca sui riquadri numerati per smistare i carichi in tempo reale tra <b>Bar</b> e <b>Deposito</b>.</p>
+            <div style="background: var(--input-bg); padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color); font-size: 0.8rem;">📅 Ordine del: <b id="valida-ordine-data-creazione">--/--/----</b><br>Riferimento: <b id="valida-ordine-nome-info">--</b></div>
+            <div class="field" style="margin-bottom:15px;"><label>Num. Documento / DDT</label><input type="text" id="valida-ordine-ddt" class="price-input" style="text-align:left;"></div>
             <div style="margin-bottom:15px; border-top:1px solid var(--border-color); padding-top:10px;" id="valida-ordine-lista"></div>
-            <button class="btn btn-success" style="width:100%; padding:14px; font-size:1rem; border-radius:10px;" onclick="confermaArrivo()">✅ CARICA NEL MAGAZZINO</button>
-        </div>
-        `;
+            <button class="btn btn-success" style="width:100%; padding:14px; font-size:1rem; border-radius:10px;" onclick="confermaArrivo()">✅ CARICA IN MAGAZZINO</button>
+        </div>`;
         t.innerHTML = html;
     }
 
     function apriNuovoOrdine() {
-        document.getElementById('ordini-dashboard').style.display = 'none';
-        document.getElementById('ordini-crea-view').style.display = 'block';
-        document.getElementById('ordini-valida-view').style.display = 'none';
+        document.getElementById('ordini-dashboard').style.display = 'none'; document.getElementById('ordini-crea-view').style.display = 'block'; document.getElementById('ordini-valida-view').style.display = 'none';
         document.getElementById('nuovo-ordine-nome').value = 'ORD-' + new Date().toISOString().slice(2,10).replace(/-/g, '') + '-' + Math.floor(100 + Math.random() * 900);
-        
         let html = '';
-        prodotti.forEach(p => {
-            html += `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color);">
-                <div style="flex: 1; font-weight: bold; font-size: 0.9rem;">${p.i} ${p.n}</div>
-                <div style="width: 120px;">
-                    <div class="stepper-container" style="height: 38px;">
-                        <div class="numpad-trigger" onclick="openNumpad('req-new-${p.id}', 'Ordina ${p.n}')">
-                            <span id="txt-req-new-${p.id}" style="font-size: 1.1rem; font-weight: bold;">0</span>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-        });
-        document.getElementById('nuovo-ordine-lista').innerHTML = html;
-        window.scrollTo({ top: 0 });
+        prodotti.forEach(p => { html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border-color);"><div style="flex:1; font-weight:bold; font-size:0.9rem;">${p.i} ${p.n}</div><div style="width:120px;"><div class="stepper-container" style="height:38px;"><div class="numpad-trigger" onclick="openNumpad('req-new-${p.id}', 'Ordina ${p.n}')"><span id="txt-req-new-${p.id}" style="font-size:1.1rem; font-weight:bold;">0</span></div></div></div></div>`; });
+        document.getElementById('nuovo-ordine-lista').innerHTML = html; window.scrollTo({ top: 0 });
     }
 
     function salvaNuovoOrdine(inviaSubito = false) {
-        const nome = document.getElementById('nuovo-ordine-nome').value.trim() || 'ORD-GENERICO';
-        let voci = [];
-        prodotti.forEach(p => {
-            const el = document.getElementById(`txt-req-new-${p.id}`);
-            const val = el ? parseInt(el.innerText) || 0 : 0;
-            if (val > 0) voci.push({ idProdotto: p.id, n: p.n, i: p.i, qtaRichiesta: val });
-        });
-        
-        if (voci.length === 0) {
-            showToast("Non hai inserito nessuna quantità!", "⚠️");
-            return;
-        }
-        
-        const nuovoId = 'ORD-' + Date.now();
-        ordiniPendenti.push({
-            id: nuovoId,
-            numero: nome,
-            data: new Date().toLocaleString('it-IT'),
-            voci: voci
-        });
-        
-        localStorage.setItem(getStorageKey('ordini_pend'), JSON.stringify(ordiniPendenti));
-        showToast("Ordine salvato!", "📝");
-        
-        if (inviaSubito) {
-            condividiOrdineWhatsApp(nuovoId);
-        } else {
-            chiudiVisteOrdini();
-            init(); 
-        }
+        const nome = document.getElementById('nuovo-ordine-nome').value.trim() || 'ORD-GENERICO'; let voci = [];
+        prodotti.forEach(p => { const el = document.getElementById(`txt-req-new-${p.id}`); const val = el ? parseInt(el.innerText) || 0 : 0; if (val > 0) voci.push({ idProdotto: p.id, n: p.n, i: p.i, qtaRichiesta: val }); });
+        if (voci.length === 0) return showToast("Non hai inserito nessuna quantità!", "⚠️");
+        const nuovoId = 'ORD-' + Date.now(); ordiniPendenti.push({ id: nuovoId, numero: nome, data: new Date().toLocaleString('it-IT'), voci: voci });
+        localStorage.setItem(getStorageKey('ordini_pend'), JSON.stringify(ordiniPendenti)); showToast("Ordine salvato!", "📝");
+        if (inviaSubito) condividiOrdineWhatsApp(nuovoId); else { chiudiVisteOrdini(); init(); }
     }
 
     function apriValidaOrdine(id) {
-        const o = ordiniPendenti.find(x => x.id === id);
-        if (!o) return;
-        
-        document.getElementById('ordini-dashboard').style.display = 'none';
-        document.getElementById('ordini-crea-view').style.display = 'none';
-        document.getElementById('ordini-valida-view').style.display = 'block';
-        document.getElementById('valida-ordine-id').value = id;
-        document.getElementById('valida-ordine-ddt').value = o.numero;
-        document.getElementById('valida-ordine-data-creazione').innerText = o.data;
-        document.getElementById('valida-ordine-nome-info').innerText = o.numero;
-        
+        const o = ordiniPendenti.find(x => x.id === id); if (!o) return;
+        document.getElementById('ordini-dashboard').style.display = 'none'; document.getElementById('ordini-crea-view').style.display = 'none'; document.getElementById('ordini-valida-view').style.display = 'block';
+        document.getElementById('valida-ordine-id').value = id; document.getElementById('valida-ordine-ddt').value = o.numero; document.getElementById('valida-ordine-data-creazione').innerText = o.data; document.getElementById('valida-ordine-nome-info').innerText = o.numero;
         let html = '';
-        o.voci.forEach(v => {
-            html += `
-            <div style="padding: 12px 0; border-bottom: 1px dashed var(--border-color);">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <b style="font-size: 0.95rem;">${v.i} ${v.n}</b>
-                    <span class="badge" style="background:#fff3cd; color:#856404;">Richiesti: ${v.qtaRichiesta} pz</span>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <div class="field" style="flex:1;">
-                        <label style="color:var(--accent); text-align:center; font-weight:800; font-size:0.55rem;">🚚 SMISTA AL BAR</label>
-                        <div class="stepper-container" style="border-color:var(--accent); background:rgba(230,126,34,0.03); height:38px;">
-                            <div class="numpad-trigger" onclick="openNumpad('arr-bar-${v.idProdotto}', 'Bar ${v.n}')">
-                                <span id="txt-arr-bar-${v.idProdotto}" style="color:var(--accent); font-weight:bold;">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field" style="flex:1;">
-                        <label style="color:var(--primary-light); text-align:center; font-weight:800; font-size:0.55rem;">🏢 SMISTA IN DEPOSITO</label>
-                        <div class="stepper-container" style="border-color:var(--primary-light); background:var(--input-bg); height:38px;">
-                            <div class="numpad-trigger" onclick="openNumpad('arr-dep-${v.idProdotto}', 'Dep. ${v.n}')">
-                                <span id="txt-arr-dep-${v.idProdotto}" style="color:var(--primary-light); font-weight:bold;">${v.qtaRichiesta}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-        });
-        document.getElementById('valida-ordine-lista').innerHTML = html;
-        window.scrollTo({ top: 0 });
+        o.voci.forEach(v => { html += `<div style="padding:12px 0; border-bottom:1px dashed var(--border-color);"><div style="display:flex; justify-content:space-between; margin-bottom:8px;"><b style="font-size:0.95rem;">${v.i} ${v.n}</b><span class="badge" style="background:#fff3cd; color:#856404;">Richiesti: ${v.qtaRichiesta} pz</span></div><div style="display:flex; gap:10px;"><div class="field" style="flex:1;"><label style="color:var(--accent); text-align:center; font-weight:800; font-size:0.55rem;">🚚 SMISTA BAR</label><div class="stepper-container" style="border-color:var(--accent); background:rgba(230,126,34,0.03); height:38px;"><div class="numpad-trigger" onclick="openNumpad('arr-bar-${v.idProdotto}', 'Bar ${v.n}')"><span id="txt-arr-bar-${v.idProdotto}" style="color:var(--accent); font-weight:bold;">0</span></div></div></div><div class="field" style="flex:1;"><label style="color:var(--primary-light); text-align:center; font-weight:800; font-size:0.55rem;">🏢 SMISTA DEP</label><div class="stepper-container" style="border-color:var(--primary-light); background:var(--input-bg); height:38px;"><div class="numpad-trigger" onclick="openNumpad('arr-dep-${v.idProdotto}', 'Dep. ${v.n}')"><span id="txt-arr-dep-${v.idProdotto}" style="color:var(--primary-light); font-weight:bold;">${v.qtaRichiesta}</span></div></div></div></div></div>`; });
+        document.getElementById('valida-ordine-lista').innerHTML = html; window.scrollTo({ top: 0 });
     }
 
     function confermaArrivo() {
-        const id = document.getElementById('valida-ordine-id').value;
-        const idx = ordiniPendenti.findIndex(x => x.id === id);
-        if (idx === -1) return;
-        const o = ordiniPendenti[idx];
-        const ddt = document.getElementById('valida-ordine-ddt').value.trim() || o.numero;
-        
-        let totPezzi = 0;
-        let totBar = 0;
-        let totDep = 0;
-
+        const id = document.getElementById('valida-ordine-id').value; const idx = ordiniPendenti.findIndex(x => x.id === id); if (idx === -1) return;
+        const o = ordiniPendenti[idx]; const ddt = document.getElementById('valida-ordine-ddt').value.trim() || o.numero;
+        let totPezzi = 0, totBar = 0, totDep = 0;
         o.voci.forEach(v => {
             const p = prodotti.find(x => x.id === v.idProdotto);
             if (p) {
-                const elB = document.getElementById(`txt-arr-bar-${v.idProdotto}`);
-                const elD = document.getElementById(`txt-arr-dep-${v.idProdotto}`);
-                const b = elB ? parseInt(elB.innerText) || 0 : 0;
-                const d = elD ? parseInt(elD.innerText) || 0 : 0;
+                const b = parseInt(document.getElementById(`txt-arr-bar-${v.idProdotto}`)?.innerText) || 0;
+                const d = parseInt(document.getElementById(`txt-arr-dep-${v.idProdotto}`)?.innerText) || 0;
                 const tot = b + d;
-                
                 if (tot > 0) {
-                    if (!p.ddts) p.ddts = [];
-                    p.ddts.push({ numero: ddt, qta: tot, bar: b, dep: d });
-                    p.c += tot;
-                    p.q += b;
-                    p.fis += d;
-                    p.fisicoIn += tot;
-                    totPezzi += tot;
-                    totBar += b;
-                    totDep += d;
+                    if (!p.ddts) p.ddts = []; p.ddts.push({ numero: ddt, qta: tot, bar: b, dep: d });
+                    p.c += tot; p.q += b; p.fis += d; p.fisicoIn += tot; totPezzi += tot; totBar += b; totDep += d;
                 }
             }
         });
-        
-        o.totalePezzi = totPezzi;
-        o.caricatoBar = totBar;
-        o.caricatoDep = totDep;
-        o.dataArrivo = new Date().toLocaleString('it-IT');
-        
-        ordiniCompletati.push(o);
-        ordiniPendenti.splice(idx, 1);
-        
-        localStorage.setItem(getStorageKey('ordini_pend'), JSON.stringify(ordiniPendenti));
-        localStorage.setItem(getStorageKey('ordini_comp'), JSON.stringify(ordiniCompletati));
-        localStorage.setItem(getStorageKey('prodotti'), JSON.stringify(prodotti));
-        
-        showToast(`Carico completato! Bar: +${totBar} pz, Deposito: +${totDep} pz`, "✅");
-        chiudiVisteOrdini();
-        init();
+        o.totalePezzi = totPezzi; o.caricatoBar = totBar; o.caricatoDep = totDep; o.dataArrivo = new Date().toLocaleString('it-IT');
+        ordiniCompletati.push(o); ordiniPendenti.splice(idx, 1);
+        localStorage.setItem(getStorageKey('ordini_pend'), JSON.stringify(ordiniPendenti)); localStorage.setItem(getStorageKey('ordini_comp'), JSON.stringify(ordiniCompletati)); localStorage.setItem(getStorageKey('prodotti'), JSON.stringify(prodotti));
+        showToast(`Carico completato!`, "✅"); chiudiVisteOrdini(); init();
     }
 
-    function chiudiVisteOrdini() {
-        document.getElementById('ordini-dashboard').style.display = 'block';
-        document.getElementById('ordini-crea-view').style.display = 'none';
-        document.getElementById('ordini-valida-view').style.display = 'none';
+    function chiudiVisteOrdini() { document.getElementById('ordini-dashboard').style.display = 'block'; document.getElementById('ordini-crea-view').style.display = 'none'; document.getElementById('ordini-valida-view').style.display = 'none'; }
+    function eliminaOrdinePendente(id) { showModalConfirm("Elimina Ordine", "Cancellare questo ordine in attesa?", function() { ordiniPendenti = ordiniPendenti.filter(o => o.id !== id); localStorage.setItem(getStorageKey('ordini_pend'), JSON.stringify(ordiniPendenti)); showToast("Ordine eliminato", "🗑️"); init(); }); }
+    function condividiOrdineWhatsApp(id) {
+        const o = ordiniPendenti.find(x => x.id === id); if(!o) return;
+        let m = `🛒 *SCHEDA ORDINE*\nNave: *${currentBoat}*\nRif: *${o.numero}*\nData: ${o.data}\n\n*DA RICEVERE:*\n`; o.voci.forEach(v => { m += `• ${v.i} ${v.n}: *${v.qtaRichiesta} pz*\n`; });
+        const el = document.createElement('textarea'); el.value = m; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); showToast("Copiato!", "📲"); setTimeout(() => { window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(m)}`, '_blank'); chiudiVisteOrdini(); init(); }, 600);
     }
 
-    function eliminaOrdinePendente(idOrdine) {
-        showModalConfirm("Elimina Ordine", "Vuoi cancellare questo ordine in attesa? L'operazione non può essere annullata.", function() {
-            ordiniPendenti = ordiniPendenti.filter(o => o.id !== idOrdine);
-            localStorage.setItem(getStorageKey('ordini_pend'), JSON.stringify(ordiniPendenti));
-            showToast("Ordine eliminato", "🗑️");
-            init(); 
-        });
-    }
-
-    function condividiOrdineWhatsApp(idOrdine) {
-        const ordine = ordiniPendenti.find(o => o.id === idOrdine);
-        if(!ordine) return;
-        
-        let m = `🛒 *SCHEDA ORDINE CARICO*\n`;
-        m += `Nave: *${currentBoat}*\n`;
-        m += `Rif: *${ordine.numero}*\n`;
-        m += `Data ordine: ${ordine.data}\n\n`;
-        m += `*DA RICEVERE:*\n`;
-        ordine.voci.forEach(v => { m += `• ${v.i} ${v.n}: *${v.qtaRichiesta} pz*\n`; });
-        
-        const el = document.createElement('textarea'); el.value = m; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); 
-        showToast("Ordine copiato! Reindirizzamento WhatsApp...", "📲");
-        
-        setTimeout(() => {
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(m)}`, '_blank');
-            chiudiVisteOrdini();
-            init();
-        }, 600);
-    }
-
-    // --- FUNZIONI DDT SINGOLO E UI STANDARD ---
-    function apriDdtModal(productId) {
-        activeDdtProductId = productId; const p = prodotti.find(x => x.id === productId); if(!p) return;
-        document.getElementById('ddtModalProdName').innerText = `${p.i} ${p.n}`; document.getElementById('ddtModalNum').value = '';
-        tempDdtBar = 0; tempDdtDep = 0; aggiornaDdtTotale(); document.getElementById('ddtModal').style.display = 'flex';
-    }
+    // --- FUNZIONI DDT SINGOLO ---
+    function apriDdtModal(id) { activeDdtProductId = id; const p = prodotti.find(x => x.id === id); if(!p) return; document.getElementById('ddtModalProdName').innerText = `${p.i} ${p.n}`; document.getElementById('ddtModalNum').value = ''; tempDdtBar = 0; tempDdtDep = 0; aggiornaDdtTotale(); document.getElementById('ddtModal').style.display = 'flex'; }
     function aggiornaDdtTotale() { document.getElementById('txt-ddt-qta-bar-display').innerText = tempDdtBar; document.getElementById('txt-ddt-qta-dep-display').innerText = tempDdtDep; document.getElementById('txt-ddt-tot-display').innerText = tempDdtBar + tempDdtDep; }
     function closeDdtModal() { document.getElementById('ddtModal').style.display = 'none'; activeDdtProductId = null; }
     function salvaNuovoDdt() {
         const num = document.getElementById('ddtModalNum').value.trim(), tot = tempDdtBar + tempDdtDep;
-        if(!num || tot <= 0) { showToast("Dati non validi!", "⚠️"); return; }
+        if(!num || tot <= 0) return showToast("Dati non validi!", "⚠️");
         const p = prodotti.find(x => x.id === activeDdtProductId);
         if(p) {
             if(!p.ddts) p.ddts = []; p.ddts.push({ numero: num, qta: tot, bar: tempDdtBar, dep: tempDdtDep });
             p.c += tot; p.q += tempDdtBar; p.fis += tempDdtDep; p.fisicoIn += tot;
-            localStorage.setItem(getStorageKey('prodotti'), JSON.stringify(prodotti)); showToast(`Carico +${tot} registrato`, "📦"); closeDdtModal(); init(); 
+            localStorage.setItem(getStorageKey('prodotti'), JSON.stringify(prodotti)); showToast(`Carico registrato`, "📦"); closeDdtModal(); init(); 
         }
     }
     function ddtIndex(pId, idx) {
@@ -852,50 +653,23 @@
 
     function stepInventarioPendolari(id, delta) { 
         const p = prodotti.find(x => x.id === id); if(!p) return; 
-        let t = Math.max(0, p.inizio + p.c - (p.accPas + p.accPen)); 
-        let m = Math.max(0, t - p.fisicoIn); 
-        p.vPen = Math.max(0, Math.min(m, p.vPen + delta)); 
-        update(); 
+        let t = Math.max(0, p.inizio + p.c - (p.accPas + p.accPen)); let m = Math.max(0, t - p.fisicoIn); p.vPen = Math.max(0, Math.min(m, p.vPen + delta)); update(); 
     }
     
     function step(fId, d) {
         const [f, id] = fId.split('-'); const p = prodotti.find(x => x.id === id); if(!p) return;
-        
         if(f === 'vPas' || f === 'vPen') {
-            if(d > 0) { 
-                if(p.q > 0) p.q--;
-                else if(p.fis > 0) p.fis--;
-                else p.q--; 
-
-                p[f]++;
-                p.fisicoIn--;
-            } else { 
-                if(p[f] > 0) {
-                    p[f]--;
-                    p.q++;
-                    p.fisicoIn++;
-                }
-            }
+            if(d > 0) { if(p.q > 0) p.q--; else if(p.fis > 0) p.fis--; else p.q--; p[f]++; p.fisicoIn--; } 
+            else { if(p[f] > 0) { p[f]--; p.q++; p.fisicoIn++; } }
         }
         else if(f === 'q') {
-            if (d > 0) {
-                if (p.fis > 0) { p.q++; p.fis--; } 
-                else { p.q++; p.fisicoIn++; } 
-            } else {
-                p.q--; p.fisicoIn--;
-            }
+            if (d > 0) { if (p.fis > 0) { p.q++; p.fis--; } else { p.q++; p.fisicoIn++; } } 
+            else { p.q--; p.fisicoIn--; }
         }
-        else if(f === 'fis') {
-            p.fis += d;
-            p.fisicoIn += d;
-        }
+        else if(f === 'fis') { p.fis += d; p.fisicoIn += d; }
         else if(f === 'fisicoIn') {
-            if (d > 0) {
-                p.q++; p.fisicoIn++;
-            } else {
-                if(p.q > 0) p.q--; else if(p.fis > 0) p.fis--; else p.q--;
-                p.fisicoIn--;
-            }
+            if (d > 0) { p.q++; p.fisicoIn++; } 
+            else { if(p.q > 0) p.q--; else if(p.fis > 0) p.fis--; else p.q--; p.fisicoIn--; }
         }
         update();
     }
@@ -905,9 +679,9 @@
         if (id === 'cassa-reale-global') v = cassaRealeGlobal.toFixed(2); 
         else if (id === 'ddt-qta-bar') v = String(tempDdtBar); 
         else if (id === 'ddt-qta-dep') v = String(tempDdtDep);
-        else if (id.startsWith('req-new-')) { const pid = id.split('-')[2]; const tel = document.getElementById(`txt-req-new-${pid}`); v = tel ? tel.innerText : "0"; }
-        else if (id.startsWith('arr-bar-')) { const pid = id.split('-')[2]; const tel = document.getElementById(`txt-arr-bar-${pid}`); v = tel ? tel.innerText : "0"; }
-        else if (id.startsWith('arr-dep-')) { const pid = id.split('-')[2]; const tel = document.getElementById(`txt-arr-dep-${pid}`); v = tel ? tel.innerText : "0"; }
+        else if (id.startsWith('req-new-')) { const el = document.getElementById(`txt-req-new-${id.split('-')[2]}`); v = el ? el.innerText : "0"; }
+        else if (id.startsWith('arr-bar-')) { const el = document.getElementById(`txt-arr-bar-${id.split('-')[2]}`); v = el ? el.innerText : "0"; }
+        else if (id.startsWith('arr-dep-')) { const el = document.getElementById(`txt-arr-dep-${id.split('-')[2]}`); v = el ? el.innerText : "0"; }
         else if (id.startsWith('invPend-')) v = String(prodotti.find(x => x.id === id.split('-')[1]).vPen || 0); 
         else v = String(prodotti.find(x => x.id === id.split('-')[1])[id.split('-')[0]] || 0);
         
@@ -929,52 +703,29 @@
             else if (currentInputId === 'ddt-qta-dep') { tempDdtDep = Math.round(val); aggiornaDdtTotale(); } 
             else if (currentInputId.startsWith('invPend-')) { 
                 const p = prodotti.find(x => x.id === currentInputId.split('-')[1]); 
-                let m = Math.max(0, p.inizio + p.c - (p.accPas + p.accPen) - p.fisicoIn); 
-                p.vPen = Math.max(0, Math.min(m, Math.round(val))); 
+                let m = Math.max(0, p.inizio + p.c - (p.accPas + p.accPen) - p.fisicoIn); p.vPen = Math.max(0, Math.min(m, Math.round(val))); 
             } 
-            else if (currentInputId.startsWith('req-new-')) { const pid = currentInputId.split('-')[2]; const el = document.getElementById(`txt-req-new-${pid}`); if(el) el.innerText = Math.round(val); }
-            else if (currentInputId.startsWith('arr-bar-')) { const pid = currentInputId.split('-')[2]; const el = document.getElementById(`txt-arr-bar-${pid}`); if(el) el.innerText = Math.round(val); }
-            else if (currentInputId.startsWith('arr-dep-')) { const pid = currentInputId.split('-')[2]; const el = document.getElementById(`txt-arr-dep-${pid}`); if(el) el.innerText = Math.round(val); }
+            else if (currentInputId.startsWith('req-new-')) { const el = document.getElementById(`txt-req-new-${currentInputId.split('-')[2]}`); if(el) el.innerText = Math.round(val); }
+            else if (currentInputId.startsWith('arr-bar-')) { const el = document.getElementById(`txt-arr-bar-${currentInputId.split('-')[2]}`); if(el) el.innerText = Math.round(val); }
+            else if (currentInputId.startsWith('arr-dep-')) { const el = document.getElementById(`txt-arr-dep-${currentInputId.split('-')[2]}`); if(el) el.innerText = Math.round(val); }
             else {
                 const [f, id] = currentInputId.split('-'); const p = prodotti.find(x => x.id === id); let v = decimalMode ? val : Math.round(val);
-                
                 if(f === 'vPas' || f === 'vPen') {
                     let diff = v - p[f];
-                    if(diff > 0) {
-                        for(let i=0; i<diff; i++) {
-                            if(p.q > 0) p.q--; else if(p.fis > 0) p.fis--; else p.q--;
-                        }
-                        p.fisicoIn -= diff;
-                    } else if(diff < 0) {
-                        p.q += Math.abs(diff);
-                        p.fisicoIn += Math.abs(diff);
-                    }
+                    if(diff > 0) { for(let i=0; i<diff; i++) { if(p.q > 0) p.q--; else if(p.fis > 0) p.fis--; else p.q--; } p.fisicoIn -= diff; } 
+                    else if(diff < 0) { p.q += Math.abs(diff); p.fisicoIn += Math.abs(diff); }
                     p[f] = v;
                 } 
                 else if(f === 'q') {
                     let diff = v - p.q;
-                    if(diff > 0) {
-                        let fromFis = Math.min(p.fis, diff);
-                        p.q = v; p.fis -= fromFis; p.fisicoIn += (diff - fromFis);
-                    } else {
-                        p.q = v; p.fisicoIn += diff;
-                    }
+                    if(diff > 0) { let fromFis = Math.min(p.fis, diff); p.q = v; p.fis -= fromFis; p.fisicoIn += (diff - fromFis); } 
+                    else { p.q = v; p.fisicoIn += diff; }
                 } 
-                else if(f === 'fis') {
-                    let diff = v - p.fis;
-                    p.fis = v;
-                    p.fisicoIn += diff;
-                }
+                else if(f === 'fis') { let diff = v - p.fis; p.fis = v; p.fisicoIn += diff; }
                 else if(f === 'fisicoIn') {
                     let diff = v - p.fisicoIn;
-                    if(diff > 0) {
-                        p.q += diff;
-                    } else if(diff < 0) {
-                        let toRemove = Math.abs(diff);
-                        for(let i=0; i<toRemove; i++) {
-                            if(p.q > 0) p.q--; else if(p.fis > 0) p.fis--; else p.q--;
-                        }
-                    }
+                    if(diff > 0) { p.q += diff; } 
+                    else if(diff < 0) { let toRemove = Math.abs(diff); for(let i=0; i<toRemove; i++) { if(p.q > 0) p.q--; else if(p.fis > 0) p.fis--; else p.q--; } }
                     p.fisicoIn = v;
                 }
                 else p[f] = v;
@@ -994,10 +745,8 @@
         
         const vL = document.getElementById('tab-vendite'), mL = document.getElementById('tab-magazzino');
         
-        // Setup Vendite
         if(vL) vL.innerHTML = `<div style="background:var(--card-bg); padding:12px; border-radius:12px; margin-bottom:12px; border:1px dashed var(--border-color); display:flex; justify-content:space-between; align-items:center;"><span style="font-size:0.75rem; font-weight:bold; color:var(--accent);">Gestisci listino prezzi:</span><button class="btn" id="btn-global-price-edit" style="padding:8px 12px; font-size:0.72rem; border-radius:8px; font-weight:bold; background:var(--input-bg); border:1px solid var(--border-color); color:var(--text-color);" onclick="toggleGlobalPriceEdit()">🏷️ MODIFICA PREZZI</button></div>`;
         
-        // Setup Magazzino
         if(mL) mL.innerHTML = `
             <div style="background: var(--card-bg); padding: 14px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
                 <button class="btn" style="width: 100%; font-size: 0.85rem; background: var(--primary-light); padding: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="openAiDdtModal()">
@@ -1026,51 +775,136 @@
         update();
     }
 
+    // --- FUNZIONE CENTRALE UNIFICATA: RIEPILOGO, INVENTARIO E REGISTRO ---
     function renderHtmlReportERegistro() {
-        const rc = document.getElementById('report-container-interno');
-        if (rc) rc.innerHTML = `
+        const rc = document.getElementById('riepilogo-container-interno');
+        if (!rc) return;
+        
+        rc.innerHTML = `
+        <!-- 1. SEZIONE CASSA E CHIUSURA -->
         <div style="background:var(--card-bg); padding:16px; border-radius:16px; margin-bottom:16px; box-shadow:var(--shadow); border:1px solid var(--border-color);">
-            <h3 style="margin:0 0 12px 0; font-size:1.1rem; border-bottom:2px solid var(--border-color); padding-bottom:6px; color:var(--accent);">💰 QUADRATURA CASSA - ${currentBoat}</h3>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;"><div class="field"><label>Teorico</label><div style="background:var(--input-bg); height:46px; display:flex; align-items:center; justify-content:center; font-weight:bold; border-radius:10px; border:1px solid var(--border-color); color:var(--primary);" id="cassa-teorica">€ 0.00</div></div><div class="field"><label style="color:var(--accent)">Reale</label><div class="stepper-container" style="border-color:var(--accent); background:rgba(230,126,34,0.05)"><div class="numpad-trigger" onclick="openNumpad('cassa-reale-global', 'Incasso Reale', true)"><span id="txt-cassa-reale" style="color:var(--accent); font-size:1.25rem;">0.00</span></div></div></div></div>
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:14px; border-radius:12px; margin-bottom:12px;" id="box-discrepanza-cassa"><span id="label-discrepanza-cassa" style="font-weight:bold; font-size:0.9rem;">Cassa:</span><b id="val-discrepanza-cassa" style="font-size:1.25rem;">€ 0.00</b></div>
-            <button class="btn btn-success" style="width:100%; font-size:1rem; padding:14px;" onclick="richiediChiusuraCassaGiornaliera()">💾 CHIUDI CASSA E SALVA</button>
+            <h3 style="margin:0 0 12px 0; font-size:1.1rem; border-bottom:2px solid var(--border-color); padding-bottom:6px; color:var(--accent);">💰 1. LA TUA CASSA OGGI (${currentBoat})</h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+                <div class="field"><label>Teorico (Dal PC)</label><div style="background:var(--input-bg); height:46px; display:flex; align-items:center; justify-content:center; font-weight:bold; border-radius:10px; border:1px solid var(--border-color); color:var(--primary);" id="cassa-teorica">€ 0.00</div></div>
+                <div class="field"><label style="color:var(--accent)">Reale (Contanti)</label><div class="stepper-container" style="border-color:var(--accent); background:rgba(230,126,34,0.05)"><div class="numpad-trigger" onclick="openNumpad('cassa-reale-global', 'Incasso Reale', true)"><span id="txt-cassa-reale" style="color:var(--accent); font-size:1.25rem;">0.00</span></div></div></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:14px; border-radius:12px; margin-bottom:12px;" id="box-discrepanza-cassa">
+                <span id="label-discrepanza-cassa" style="font-weight:bold; font-size:0.9rem;">Cassa:</span><b id="val-discrepanza-cassa" style="font-size:1.25rem;">€ 0.00</b>
+            </div>
+            <button class="btn btn-success" style="width:100%; font-size:1rem; padding:14px; text-transform:uppercase; font-weight:bold; background:linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); margin-bottom:8px;" onclick="eseguiChiusuraEConsolidamentoTurno()">🔒 CHIUDI TURNO E SALVA LOG</button>
+            <button class="btn btn-neutral" style="width:100%; font-size:0.85rem; padding:10px; color:#7f8c8d; background:transparent; border:1px solid var(--border-color);" onclick="richiediConsolidamentoInventario()">SOLO AZZERA ACCUMULI (NO LOG)</button>
         </div>
-        <div style="background:var(--card-bg); padding:16px; border-radius:16px; box-shadow:var(--shadow); border:1px solid var(--border-color);">
-            <h3 style="margin:0 0 12px 0; font-size:1.1rem; color:var(--accent);">📋 INVENTARIO FISICO</h3>
-            <div style="background:var(--input-bg); border:1px solid var(--border-color); border-radius:12px; padding:12px; margin-bottom:15px; display:grid; grid-template-columns:1fr 1fr; gap:8px;"><div class="stat" style="border-right:1px solid var(--border-color);"><span>Atteso</span><b id="valore-inventario-atteso">€ 0.00</b></div><div class="stat"><span>Reale</span><b id="valore-inventario-reale">€ 0.00</b></div><div class="stat highlight" style="grid-column:span 2; padding-top:8px; border-top:1px dashed var(--border-color);"><span id="label-diff-economica">Teorico</span><b id="valore-differenza-economica">€ 0.00</b></div></div>
-            <div id="report-items"></div>
-            <button class="btn btn-neutral" style="width:100%; margin-top:20px; font-size:0.85rem; padding:12px; background:var(--pend);" onclick="scaricaReportInventarioText()">📥 SCARICA FOGLIO INVENTARIO</button>
-            <button class="btn btn-danger" style="width:100%; margin-top:10px; font-size:1rem; padding:14px;" onclick="richiediConsolidamentoInventario()">🔒 CONSOLIDA INVENTARIO</button>
-        </div>`;
 
-        const regc = document.getElementById('registro-container-interno');
-        if (regc) regc.innerHTML = `
-        <div class="sales-breakdown-card"><h3 style="margin:0 0 12px 0; font-size:1rem; color:var(--accent);">📈 MERCI VENDUTE (CICLO)</h3><div id="sales-breakdown-list" style="max-height:250px; overflow-y:auto;"></div><button class="btn btn-neutral" style="font-size:0.75rem; padding:10px; margin-top:12px;" onclick="copiaSoloListaSpesa()">📋 COPIA DETTAGLIO</button></div>
-        <div class="registro-dash" style="grid-template-columns:repeat(2,1fr);"><div class="reg-card" style="border-bottom:4px solid var(--primary-light);"><span>Teorico Tot</span><b id="tot-teorico-accumulato">€ 0.00</b></div><div class="reg-card" style="border-bottom:4px solid var(--success);"><span>Reale Tot</span><b id="tot-reale-accumulato" style="color:var(--success);">€ 0.00</b></div><div class="reg-card" id="card-diff-accumulata"><span>Diff Tot</span><b id="tot-differenza-accumulata">€ 0.00</b></div><div class="reg-card" style="border-bottom:4px solid #25D366; background:rgba(37,211,102,0.04);"><span>PAGHE TOT</span><b id="tot-paghe-accumulate" style="color:var(--success);">€ 26.00</b></div></div>
+        <!-- 2. SEZIONE INVENTARIO FISICO (CONTEGGIO) -->
+        <div style="background:var(--card-bg); padding:16px; border-radius:16px; margin-bottom:16px; box-shadow:var(--shadow); border:1px solid var(--border-color);">
+            <h3 style="margin:0 0 12px 0; font-size:1.1rem; color:var(--accent);">📋 2. INVENTARIO FISICO (MERCE)</h3>
+            <p style="font-size:0.75rem; color:#7f8c8d; margin-bottom:12px;">Se modifichi il FISICO, il valore Teorico in cassa si adatterà automaticamente.</p>
+            <div style="background:var(--input-bg); border:1px solid var(--border-color); border-radius:12px; padding:12px; margin-bottom:15px; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div class="stat" style="border-right:1px solid var(--border-color);"><span>Valore Atteso</span><b id="valore-inventario-atteso">€ 0.00</b></div>
+                <div class="stat"><span>Valore Reale</span><b id="valore-inventario-reale">€ 0.00</b></div>
+                <div class="stat highlight" style="grid-column:span 2; padding-top:8px; border-top:1px dashed var(--border-color);"><span id="label-diff-economica">Diff. Merce</span><b id="valore-differenza-economica">€ 0.00</b></div>
+            </div>
+            <div id="report-items"></div>
+            <button class="btn btn-neutral" style="width:100%; margin-top:15px; font-size:0.85rem; padding:12px; background:var(--pend);" onclick="scaricaReportInventarioText()">📥 SCARICA FOGLIO TXT INVENTARIO</button>
+        </div>
+
+        <!-- 3. DASHBOARD TOTALI E ANDAMENTO -->
+        <div style="margin-bottom:16px;">
+            <h3 style="margin:0 0 10px 0; font-size:1.1rem; color:var(--accent); padding-left:4px;">📈 3. ANDAMENTO GLOBALE</h3>
+            <div class="registro-dash" style="grid-template-columns:repeat(2,1fr);">
+                <div class="reg-card" style="border-bottom:4px solid var(--primary-light);"><span>Teorico Tot</span><b id="tot-teorico-accumulato">€ 0.00</b></div>
+                <div class="reg-card" style="border-bottom:4px solid var(--success);"><span>Reale Tot</span><b id="tot-reale-accumulato" style="color:var(--success);">€ 0.00</b></div>
+                <div class="reg-card" id="card-diff-accumulata"><span>Diff Tot Cassa</span><b id="tot-differenza-accumulata">€ 0.00</b></div>
+                <div class="reg-card" style="border-bottom:4px solid #25D366; background:rgba(37,211,102,0.04);"><span>PAGHE TOT</span><b id="tot-paghe-accumulate" style="color:var(--success);">€ 26.00</b></div>
+            </div>
+        </div>
+
+        <!-- 4. STORICO CHIUSURE E VENDUTO -->
         <div style="background:var(--card-bg); padding:14px; border-radius:16px; margin-bottom:16px; border:1px solid var(--border-color);">
-            <h3 style="margin:0 0 10px 0; font-size:1rem;">📋 STORICO CHIUSURE</h3>
+            <h3 style="margin:0 0 10px 0; font-size:1.1rem; color:var(--accent);">📁 4. STORICO TURNI</h3>
             <div style="overflow-x:auto;">
                 <table class="registro-table">
                     <thead>
                         <tr>
-                            <th>Data</th>
-                            <th>Barca</th>
-                            <th>Teorico</th>
-                            <th>Reale</th>
-                            <th>Paga</th>
-                            <th>Diff</th>
+                            <th style="width: 30%;">Sessione</th>
+                            <th style="width: 70%;">Resoconto Cassa, Paga & Bilancio</th>
                         </tr>
                     </thead>
                     <tbody id="registro-rows"></tbody>
                 </table>
             </div>
-            <div style="display:flex; gap:8px; margin-top:15px;"><button class="btn btn-neutral" style="font-size:0.8rem;" onclick="esportaCSV()">📥 CSV</button><button class="btn btn-danger" style="font-size:0.8rem; background:#c0392b;" onclick="richiediAzzeraRegistro()">🗑️ AZZERA</button></div><button class="btn" style="width:100%; font-size:0.85rem; background:var(--accent); padding:12px; margin-top:8px;" onclick="richiediAzzeraTurno()">🔄 AZZERA TURNO (SALVA)</button>
+            <div style="display:flex; gap:8px; margin-top:15px;"><button class="btn btn-neutral" style="font-size:0.8rem;" onclick="esportaCSV()">📥 ESPORTA CSV</button><button class="btn btn-danger" style="font-size:0.8rem; background:#c0392b;" onclick="richiediAzzeraRegistro()">🗑️ AZZERA STORICO</button></div>
         </div>
-        <div style="background:var(--card-bg); padding:16px; border-radius:16px; border:1px solid var(--border-color);"><h3 style="margin:0 0 10px 0; font-size:1rem; color:var(--accent);">💾 BACKUP (JSON)</h3><div style="display:flex; gap:8px;"><button class="btn btn-neutral" style="font-size:0.8rem; background:#8e44ad;" onclick="scaricaJSONBackup()">📤 SCARICA</button><button class="btn btn-neutral" style="font-size:0.8rem; background:#2980b9;" onclick="triggerCaricaJSON()">📥 CARICA</button></div><input type="file" id="importJsonInput" style="display:none" accept=".json" onchange="completaCaricaJSON(event)"></div>`;
+
+        <!-- 5. ALTRE INFO E BACKUP -->
+        <div class="sales-breakdown-card">
+            <h3 style="margin:0 0 12px 0; font-size:1rem; color:var(--accent);">🛒 MERCI VENDUTE (QUESTO TURNO)</h3>
+            <div id="sales-breakdown-list" style="max-height:200px; overflow-y:auto;"></div>
+            <button class="btn btn-neutral" style="width:100%; font-size:0.75rem; padding:10px; margin-top:12px;" onclick="copiaSoloListaSpesa()">📋 COPIA DETTAGLIO VENDUTO</button>
+        </div>
+
+        <div style="background:var(--card-bg); padding:16px; border-radius:16px; border:1px solid var(--border-color);">
+            <h3 style="margin:0 0 10px 0; font-size:1rem; color:var(--accent);">💾 GESTIONE BACKUP (JSON)</h3>
+            <div style="display:flex; gap:8px;"><button class="btn btn-neutral" style="font-size:0.8rem; background:#8e44ad;" onclick="scaricaJSONBackup()">📤 SCARICA</button><button class="btn btn-neutral" style="font-size:0.8rem; background:#2980b9;" onclick="triggerCaricaJSON()">📥 CARICA</button></div><input type="file" id="importJsonInput" style="display:none" accept=".json" onchange="completaCaricaJSON(event)">
+        </div>`;
+    }
+
+    function eseguiChiusuraEConsolidamentoTurno() {
+        let vT=0; 
+        prodotti.forEach(p => { 
+            let m = Math.max(0, (p.inizio + p.c - (p.accPas + p.accPen)) - p.fisicoIn); 
+            vT += (Math.max(0, m - Math.min(m, p.vPen)) * p.p) + (Math.min(m, p.vPen) * p.pen); 
+        });
+
+        let diffCassa = cassaRealeGlobal - vT;
+        let pagaCalcolata = 26.00 + (cassaRealeGlobal * 0.05);
+
+        let msg = `Confermi la chiusura e archiviazione del turno per la nave ${currentBoat}?\n\n` +
+                  `💰 DETTAGLI ECONOMICI:\n` +
+                  `• Cassa Teorica: € ${vT.toFixed(2)}\n` +
+                  `• Cassa Reale Inserita: € ${cassaRealeGlobal.toFixed(2)}\n` +
+                  `• Discrepanza: € ${diffCassa.toFixed(2)} (${diffCassa >= 0 ? 'PLUS' : 'PERDITA'})\n` +
+                  `• Paga Spettante: € ${pagaCalcolata.toFixed(2)}\n\n` +
+                  `🔒 CONSOLIDAMENTO INVENTARIO:\n` +
+                  `• Il "Fisico Effettivo" diventerà la base di partenza per il prossimo turno.\n` +
+                  `• Gli accumuli temporanei del turno verranno azzerati.\n` +
+                  `• La cassa corrente verrà riportata a € 0.00.`;
+
+        showModalConfirm("Salva, Consolida e Archivia", msg, function() {
+            storicoChiusure.push({
+                data: new Date().toLocaleString('it-IT'),
+                teorico: vT.toFixed(2),
+                reale: cassaRealeGlobal.toFixed(2),
+                diffCassa: diffCassa.toFixed(2),
+                paga: pagaCalcolata.toFixed(2),
+                dettaglioVendite: ottieniVenditeSessioneCorrente()
+            });
+            localStorage.setItem(getStorageKey('history'), JSON.stringify(storicoChiusure));
+
+            prodotti.forEach(p => {
+                p.inizio = p.fisicoIn; 
+                p.c = 0; 
+                p.ddts = []; 
+                p.accPas = 0; 
+                p.accPen = 0; 
+                p.vPas = 0; 
+                p.vPen = 0; 
+                p.q = p.fisicoIn > p.fis ? p.fisicoIn - p.fis : 0; 
+            });
+
+            cassaRealeGlobal = 0.00;
+            localStorage.setItem(getStorageKey('cassa'), '0.00');
+            localStorage.setItem(getStorageKey('prodotti'), JSON.stringify(prodotti));
+
+            showToast("Turno consolidato e registrato con successo!", "🔒");
+            init(); 
+            openTab('tab-riepilogo'); // Riapre la tab unificata e scrolla in cima
+        });
     }
 
     function ottieniVenditeSessioneCorrente() { return prodotti.filter(p => (p.vPas + p.vPen) > 0).map(p => ({ id: p.id, n: p.n, i: p.i, pas: p.vPas, pen: p.vPen, tot: p.vPas + p.vPen, valore: (p.vPas * p.p) + (p.vPen * p.pen) })); }
 
+    // Update unificato per alimentare tutti gli elementi HTML del Riepilogo
     function update() {
         let pT=0, fT=0, invHTML='', vAtteso=0, vFisico=0, vTeorico=0, lHtml='', vArr=[];
         
@@ -1100,18 +934,17 @@
         const elS=document.getElementById('sales-breakdown-list'); if(elS) elS.innerHTML=lHtml;
         const elA=document.getElementById('valore-inventario-atteso'); if(elA) elA.innerText=`€ ${vAtteso.toFixed(2)}`;
         const elR=document.getElementById('valore-inventario-reale'); if(elR) elR.innerText=`€ ${vFisico.toFixed(2)}`;
-        const elD=document.getElementById('valore-differenza-economica'); if(elD) { elD.innerText=`€ ${vTeorico.toFixed(2)}`; elD.style.color='var(--accent)'; }
+        const elD=document.getElementById('valore-differenza-economica'); if(elD) { elD.innerText=`€ ${(vFisico-vAtteso).toFixed(2)}`; elD.style.color=(vFisico-vAtteso)<0?'var(--danger)':'var(--success)'; }
         
         document.getElementById('m-netto').innerText=`€ ${vTeorico.toFixed(2)}`; document.getElementById('count-pas').innerText=pT; document.getElementById('count-pen').innerText=fT;
         let pagaL=26+(cassaRealeGlobal*0.05); document.getElementById('paga-live').innerText=`€ ${pagaL.toFixed(2)}`; document.getElementById('paga-live-dettaglio').innerText=`(Fisso €26 + 5% su €${cassaRealeGlobal.toFixed(2)})`;
-        const elPC=document.getElementById('paga-calcolata-chiusura'); if(elPC) elPC.innerText=`€ ${pagaL.toFixed(2)}`;
         const elCT=document.getElementById('cassa-teorica'); if(elCT) elCT.innerText=`€ ${vTeorico.toFixed(2)}`;
         const elCR=document.getElementById('txt-cassa-reale'); if(elCR) elCR.innerText=cassaRealeGlobal.toFixed(2);
         
         let dC=cassaRealeGlobal-vTeorico; const dCEl=document.getElementById('val-discrepanza-cassa'), bC=document.getElementById('box-discrepanza-cassa'), lCEl=document.getElementById('label-discrepanza-cassa');
         if(bC){
-            if(dC<-0.01){ bC.style.background='rgba(231,76,60,0.15)'; dCEl.style.color='var(--danger)'; lCEl.innerHTML=`⚠️ <span class="badge badge-danger">PERDITA</span>`; dCEl.innerText=`- € ${Math.abs(dC).toFixed(2)}`; }
-            else if(dC>0.01){ bC.style.background='rgba(39,174,96,0.15)'; dCEl.style.color='var(--success)'; lCEl.innerHTML=`🎉 <span class="badge badge-success">PLUS</span>`; dCEl.innerText=`+ € ${Math.abs(dC).toFixed(2)}`; }
+            if(dC<-0.01){ bC.style.background='rgba(231,76,60,0.15)'; dCEl.style.color='var(--danger)'; lCEl.innerHTML=`⚠️ <span class="badge badge-danger">PERDITA CASSA</span>`; dCEl.innerText=`- € ${Math.abs(dC).toFixed(2)}`; }
+            else if(dC>0.01){ bC.style.background='rgba(39,174,96,0.15)'; dCEl.style.color='var(--success)'; lCEl.innerHTML=`🎉 <span class="badge badge-success">PLUS CASSA</span>`; dCEl.innerText=`+ € ${Math.abs(dC).toFixed(2)}`; }
             else { bC.style.background='var(--input-bg)'; dCEl.style.color='#7f8c8d'; lCEl.innerHTML=`⚖️ Bilancio:`; dCEl.innerText=`€ 0.00`; }
         }
         const elRI=document.getElementById('report-items'); if(elRI) elRI.innerHTML=invHTML||'<p>Nessun prodotto</p>';
@@ -1121,7 +954,7 @@
 
     function toggleDettaglioSessione(idx) { const el = document.getElementById(`dettaglio-log-${idx}`); if(el) el.style.display = el.style.display === 'none' ? 'table-row' : 'none'; }
     
-    // TABELLA STORICO CON COLONNA "BARCA"
+    // TABELLA STORICO NELLA TAB RIEPILOGO UNIFICATA
     function renderRegistroHtml() {
         const c=document.getElementById('registro-rows'); if(!c) return;
         let sT=0, sR=0, sD=0, sP=0, vT=0;
@@ -1132,41 +965,65 @@
         if(vL.length>0) vL.forEach(i=>{ lB+=`<div class="history-detail-item"><span>${i.i} <b>${i.n}</b></span><span><b>${i.tot} pz</b> <span style="color:var(--success)">€ ${i.valore.toFixed(2)}</span></span></div>`; });
         else lB=`<div style="text-align:center; color:#888; font-style:italic;">Nessun prodotto venduto.</div>`;
         
-        // RIGA LIVE CON NOME BARCA
-        h+=`<tr class="clickable-row" style="background:rgba(230,126,34,0.08);" onclick="toggleDettaglioSessione('live')">
-                <td><b>🔴 Live</b></td>
-                <td style="color:var(--primary); font-weight:800; font-size:0.65rem;">${currentBoat}</td>
-                <td>€ ${vT.toFixed(2)}</td>
-                <td style="font-weight:bold;">€ ${cassaRealeGlobal.toFixed(2)}</td>
-                <td style="color:var(--success); font-weight:bold;">€ ${pO.toFixed(2)}</td>
-                <td style="${dO<-0.01?'color:var(--danger)':(dO>0.01?'color:var(--success)':'color:#888')} font-weight:bold;">€ ${dO>=0?'+':''}${dO.toFixed(2)} ▾</td>
-            </tr>
-            <tr id="dettaglio-log-live" class="history-expanded-row" style="display:none;"><td colspan="6"><div class="history-expanded-content">${lB}</div></td></tr>`;
+        let diffColorLive = dO < -0.01 ? 'var(--danger)' : (dO > 0.01 ? 'var(--success)' : '#7f8c8d');
+        let diffTextLive = dO === 0 ? 'In Pari' : (dO > 0 ? `+€ ${dO.toFixed(2)}` : `-€ ${Math.abs(dO).toFixed(2)}`);
+        let badgeClassLive = dO < -0.01 ? 'badge-danger' : (dO > 0.01 ? 'badge-success' : 'badge-neutral');
 
-        // RIGHE STORICO CON NOME BARCA
+        h+=`<tr class="clickable-row" style="background:rgba(230,126,34,0.08);" onclick="toggleDettaglioSessione('live')">
+                <td>
+                    <div style="font-weight:bold; color:var(--accent);">🔴 Live</div>
+                    <div style="font-size:0.65rem; color:#7f8c8d; font-weight:bold;">${currentBoat}</div>
+                </td>
+                <td>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span style="font-size:0.75rem;">Cassa: <b>Reale € ${cassaRealeGlobal.toFixed(2)}</b> <small style="color:#7f8c8d;">/ Teor. € ${vT.toFixed(2)}</small></span>
+                        <span class="badge ${badgeClassLive}" style="font-size:0.62rem; padding:2px 6px;">${diffTextLive}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border-color); padding-top:4px; margin-top:4px;">
+                        <span style="color:var(--success); font-weight:bold; font-size:0.75rem;">💰 Paga: € ${pO.toFixed(2)}</span>
+                        <span style="font-size:0.65rem; color:#7f8c8d; font-weight:bold; text-decoration:underline;">Dettagli ▾</span>
+                    </div>
+                </td>
+            </tr>
+            <tr id="dettaglio-log-live" class="history-expanded-row" style="display:none;"><td colspan="2"><div class="history-expanded-content">${lB}</div></td></tr>`;
+
         if(storicoChiusure&&storicoChiusure.length) {
             storicoChiusure.slice().reverse().forEach((l, rI) => {
                 let i=storicoChiusure.length-1-rI, t=safeFloat(l.teorico), r=safeFloat(l.reale), d=safeFloat(l.diffCassa), p=safeFloat(l.paga!==undefined?l.paga:(26+r*0.05)); sT+=t; sR+=r; sD+=d; sP+=p;
                 let sB=''; if(l.dettaglioVendite&&l.dettaglioVendite.length>0) l.dettaglioVendite.forEach(it=>{ sB+=`<div class="history-detail-item"><span>${it.i||'📦'} <b>${it.n}</b></span><span><b>${it.tot} pz</b> <span style="color:var(--success)">€ ${safeFloat(it.valore).toFixed(2)}</span></span></div>`; }); else sB=`<div style="text-align:center; color:#888;">Dati non disponibili.</div>`;
+                
+                let diffText = d === 0 ? 'In Pari' : (d > 0 ? `+€ ${d.toFixed(2)}` : `-€ ${Math.abs(d).toFixed(2)}`);
+                let badgeClass = d < -0.01 ? 'badge-danger' : (d > 0.01 ? 'badge-success' : 'badge-neutral');
+
                 h+=`<tr class="clickable-row" onclick="toggleDettaglioSessione(${i})">
-                        <td><b>${(l.data||'N/D').split(',')[0]}</b></td>
-                        <td style="color:var(--primary); font-weight:800; font-size:0.65rem;">${currentBoat}</td>
-                        <td>€ ${t.toFixed(2)}</td>
-                        <td style="font-weight:bold;">€ ${r.toFixed(2)}</td>
-                        <td style="color:#27ae60; font-weight:bold;">€ ${p.toFixed(2)}</td>
-                        <td style="${d<-0.01?'color:var(--danger)':(d>0.01?'color:var(--success)':'color:#888')} font-weight:bold;">€ ${d>=0?'+':''}${d.toFixed(2)} ▾</td>
+                        <td>
+                            <div style="font-weight:bold;">${(l.data||'N/D').split(',')[0]}</div>
+                            <div style="font-size:0.65rem; color:var(--primary); font-weight:bold;">${currentBoat}</div>
+                        </td>
+                        <td>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                <span style="font-size:0.75rem;">Cassa: <b>Reale € ${r.toFixed(2)}</b> <small style="color:#7f8c8d;">/ Teor. € ${t.toFixed(2)}</small></span>
+                                <span class="badge ${badgeClass}" style="font-size:0.62rem; padding:2px 6px;">${diffText}</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border-color); padding-top:4px; margin-top:4px;">
+                                <span style="color:var(--success); font-weight:bold; font-size:0.75rem;">💰 Paga: € ${p.toFixed(2)}</span>
+                                <span style="font-size:0.65rem; color:#7f8c8d; font-weight:bold; text-decoration:underline;">Dettagli ▾</span>
+                            </div>
+                        </td>
                     </tr>
-                    <tr id="dettaglio-log-${i}" class="history-expanded-row" style="display:none;"><td colspan="6"><div class="history-expanded-content">${sB}</div></td></tr>`;
+                    <tr id="dettaglio-log-${i}" class="history-expanded-row" style="display:none;"><td colspan="2"><div class="history-expanded-content">${sB}</div></td></tr>`;
             });
         }
         c.innerHTML=h;
-        document.getElementById('tot-teorico-accumulato').innerText=`€ ${(sT+vT).toFixed(2)}`; document.getElementById('tot-reale-accumulato').innerText=`€ ${(sR+cassaRealeGlobal).toFixed(2)}`; document.getElementById('tot-paghe-accumulate').innerText=`€ ${(sP+pO).toFixed(2)}`;
-        const td=document.getElementById('tot-differenza-accumulata'); td.innerText=`${(sD+dO)>=0?'+':''}€ ${(sD+dO).toFixed(2)}`; td.style.color=(sD+dO)<-0.01?'var(--danger)':((sD+dO)>0.01?'var(--success)':'#7f8c8d');
+        document.getElementById('tot-teorico-accumulato').innerText=`€ ${(sT+vT).toFixed(2)}`; 
+        document.getElementById('tot-reale-accumulato').innerText=`€ ${(sR+cassaRealeGlobal).toFixed(2)}`; 
+        document.getElementById('tot-paghe-accumulate').innerText=`€ ${(sP+pO).toFixed(2)}`;
+        const td=document.getElementById('tot-differenza-accumulata'); 
+        td.innerText=`${(sD+dO)>=0?'+':''}€ ${(sD+dO).toFixed(2)}`; 
+        td.style.color=(sD+dO)<-0.01?'var(--danger)':((sD+dO)>0.01?'var(--success)':'#7f8c8d');
     }
 
-    function richiediAzzeraTurno() { showModalConfirm("🔄 Salva e Azzera Turno", "Archiviare e azzerare?", function() { let vT=0; prodotti.forEach(p=>{ let m=Math.max(0,(p.inizio+p.c-(p.accPas+p.accPen))-p.fisicoIn); vT+=(Math.max(0,m-Math.min(m,p.vPen))*p.p)+(Math.min(m,p.vPen)*p.pen); }); storicoChiusure.push({ data:new Date().toLocaleString('it-IT'), teorico:vT.toFixed(2), reale:cassaRealeGlobal.toFixed(2), diffCassa:(cassaRealeGlobal-vT).toFixed(2), paga:26+(cassaRealeGlobal*0.05), dettaglioVendite:ottieniVenditeSessioneCorrente() }); localStorage.setItem(getStorageKey('history'), JSON.stringify(storicoChiusure)); prodotti.forEach(p=>{ p.fisicoIn=Math.max(0,p.inizio+p.c-(p.accPas+p.accPen)); p.vPas=0; p.vPen=0; }); cassaRealeGlobal=0.00; localStorage.setItem(getStorageKey('cassa'), '0.00'); localStorage.setItem(getStorageKey('prodotti'), JSON.stringify(prodotti)); showToast("Turno resettato!", "🔄"); init(); }); }
-    function richiediChiusuraCassaGiornaliera() { let vT=0; prodotti.forEach(p=>{ let m=Math.max(0,(p.inizio+p.c-(p.accPas+p.accPen))-p.fisicoIn); vT+=(Math.max(0,m-Math.min(m,p.vPen))*p.p)+(Math.min(m,p.vPen)*p.pen); }); showModalConfirm("Archiviazione", `Vuoi archiviare la cassa per ${currentBoat}?\nPaga calcolata: €${(26+(cassaRealeGlobal*0.05)).toFixed(2)}`, function() { storicoChiusure.push({ data:new Date().toLocaleString('it-IT'), teorico:vT.toFixed(2), reale:cassaRealeGlobal.toFixed(2), diffCassa:(cassaRealeGlobal-vT).toFixed(2), paga:26+(cassaRealeGlobal*0.05), dettaglioVendite:ottieniVenditeSessioneCorrente() }); localStorage.setItem(getStorageKey('history'), JSON.stringify(storicoChiusure)); prodotti.forEach(p=>{ p.accPas+=p.vPas; p.accPen+=p.vPen; p.vPas=0; p.vPen=0; }); cassaRealeGlobal=0; localStorage.setItem(getStorageKey('cassa'), '0.00'); localStorage.setItem(getStorageKey('prodotti'), JSON.stringify(prodotti)); showToast("Sessione archiviata!", "💰"); init(); openTab('tab-registro'); }); }
-    function richiediConsolidamentoInventario() { showModalConfirm("Consolida Inventario", "Azzerare accumuli e usare il fisico come nuovo Inizio per questa barca?", function() { prodotti.forEach(p=>{ p.inizio=p.fisicoIn; p.c=0; p.ddts=[]; p.accPas=0; p.accPen=0; p.vPas=0; p.vPen=0; p.q=p.fisicoIn>p.fis?p.fisicoIn-p.fis:0; }); localStorage.setItem(getStorageKey('prodotti'), JSON.stringify(prodotti)); showToast("Inventario consolidato!", "🔒"); init(); }); }
+    function richiediConsolidamentoInventario() { showModalConfirm("Azzera Accumuli", "Vuoi azzerare la merce consumata finora e impostare i valori fisici come nuovo Inizio? (NON salva la chiusura nel registro storico)", function() { prodotti.forEach(p=>{ p.inizio=p.fisicoIn; p.c=0; p.ddts=[]; p.accPas=0; p.accPen=0; p.vPas=0; p.vPen=0; p.q=p.fisicoIn>p.fis?p.fisicoIn-p.fis:0; }); cassaRealeGlobal = 0.00; localStorage.setItem(getStorageKey('cassa'), '0.00'); localStorage.setItem(getStorageKey('prodotti'), JSON.stringify(prodotti)); showToast("Inventario consolidato e azzerato!", "🔒"); init(); }); }
     function richiediAzzeraRegistro() { showModalConfirm("⚠️ Azzeramento", `Cancellare tutto lo storico di questa nave (${currentBoat})?`, function() { storicoChiusure=[]; localStorage.setItem(getStorageKey('history'), JSON.stringify(storicoChiusure)); renderRegistroHtml(); showToast("Registro azzerato.", "🗑️"); }); }
     function scaricaReportInventarioText() { let r=`=== INVENTARIO ${currentBoat} ===\nData: ${new Date().toLocaleString()}\n\n`; prodotti.forEach(p=>{ r+=`${p.n}: Inizio ${p.inizio} | Carico ${p.c} | Fisico ${p.fisicoIn}\n`; }); const l=document.createElement("a"); l.href=URL.createObjectURL(new Blob([r], {type:'text/plain'})); l.download=`inv_${currentBoat.replace(/ /g, '_')}_${new Date().toISOString().slice(0,10)}.txt`; document.body.appendChild(l); l.click(); document.body.removeChild(l); }
     
@@ -1179,32 +1036,19 @@
             try { 
                 const i=JSON.parse(ev.target.result); 
                 if(!i.prodotti) { showToast("Errore: File non valido.", "❌"); return; }
-                
                 let msg = `Vuoi sovrascrivere i dati SOLO per la barca attuale: ${currentBoat}?`;
-                if(i.barca && i.barca !== currentBoat) {
-                    msg = `ATTENZIONE: Questo backup era stato creato per la barca "${i.barca}".\n\nSei sicuro di volerlo caricare nella barca ATTUALE "${currentBoat}"?`;
-                }
-
-                showModalConfirm("Ripristino Dati", msg, function(){ 
-                    prodotti=i.prodotti; ordiniPendenti=i.ordiniPendenti||[]; ordiniCompletati=i.ordiniCompletati||[]; storicoChiusure=i.storicoChiusure||[]; cassaRealeGlobal=parseFloat(i.cassaRealeGlobal)||0; 
-                    saveCurrentBoatData();
-                    showToast(`Backup caricato su ${currentBoat}!`, "📥"); 
-                    init(); 
-                }); 
+                if(i.barca && i.barca !== currentBoat) { msg = `ATTENZIONE: Questo backup era stato creato per la barca "${i.barca}".\n\nSei sicuro di volerlo caricare nella barca ATTUALE "${currentBoat}"?`; }
+                showModalConfirm("Ripristino Dati", msg, function(){ prodotti=i.prodotti; ordiniPendenti=i.ordiniPendenti||[]; ordiniCompletati=i.ordiniCompletati||[]; storicoChiusure=i.storicoChiusure||[]; cassaRealeGlobal=parseFloat(i.cassaRealeGlobal)||0; saveCurrentBoatData(); showToast(`Backup caricato su ${currentBoat}!`, "📥"); init(); }); 
             } catch(err){ showToast("Errore: Impossibile leggere il file.", "❌"); } 
         }; 
-        r.readAsText(e.target.files[0]); 
-        e.target.value=''; 
+        r.readAsText(e.target.files[0]); e.target.value=''; 
     }
     
     function copiaSoloListaSpesa() { let txt=`📋 *DETTAGLIO MERCI VENDUTE - ${currentBoat}*\n`; let tr=false; prodotti.forEach(p=>{ let t=p.accPas+p.vPas+p.accPen+p.vPen; if(t>0){ txt+=`• ${p.i} *${p.n}*: ${t} pz (Pas:${p.accPas+p.vPas}|Pen:${p.accPen+p.vPen})\n`; tr=true; } }); if(!tr) return showToast("Nessuna vendita!", "⚠️"); const el=document.createElement('textarea'); el.value=txt; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); showToast("Copiata!", "📋"); }
     
-    // ESPORTAZIONE CSV CON COLONNA "BARCA" AGGIUNTA
     function esportaCSV() { 
         let c="Data;Barca;Teorico;Reale;Paga;Diff\n"; 
-        storicoChiusure.forEach(l=>{ 
-            c+=`"${l.data}";"${currentBoat}";"${l.teorico}";"${l.reale}";"${(l.paga||(26+safeFloat(l.reale)*0.05)).toFixed(2)}";"${l.diffCassa}"\n`; 
-        }); 
+        storicoChiusure.forEach(l=>{ c+=`"${l.data}";"${currentBoat}";"${l.teorico}";"${l.reale}";"${(l.paga||(26+safeFloat(l.reale)*0.05)).toFixed(2)}";"${l.diffCassa}"\n`; }); 
         const l=document.createElement("a"); l.href=encodeURI("data:text/csv;charset=utf-8,"+c); l.download=`registro_${currentBoat.replace(/ /g, '_')}.csv`; document.body.appendChild(l); l.click(); document.body.removeChild(l); 
     }
     
@@ -1216,10 +1060,7 @@
         setTimeout(() => { window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(m)}`, '_blank'); }, 600);
     }
     
-    window.onload = function() { 
-        loadData();
-        init(); 
-    };
+    window.onload = function() { loadData(); init(); };
 </script>
 </body>
 </html>
